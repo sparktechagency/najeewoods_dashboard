@@ -79,11 +79,11 @@ export default function RootHome() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div>
           <h1 className="text-2xl font-semibold mb-10">Posting preference</h1>
-          <PostingCart />
+          {/* <PostingCart /> */}
         </div>
         <div>
           <h1 className="text-2xl font-semibold mb-10">Posting preference</h1>
-          <AnalyticsCharts />
+          {/* <AnalyticsCharts /> */}
         </div>
       </div>
     </div>
