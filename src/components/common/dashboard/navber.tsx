@@ -29,7 +29,7 @@ export default function Navber() {
   }, [dropdownOpen]);
 
   return (
-    <div className="h-30 relative w-full px-5 pt-5">
+    <div className="h-42 relative w-full px-5 pt-5">
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
       <div className="relative pl-[80px] z-10">
         <div className="flex justify-between items-center">

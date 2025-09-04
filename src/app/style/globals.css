@@ -51,6 +51,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-green-figma:#00AE26;
+  --color-reds-figma:#FB5E5E;
 }
 
 :root {
@@ -68,7 +70,7 @@
   --accent: oklch(0.967 0.003 264.542);
   --accent-foreground: oklch(0.21 0.034 264.665);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.928 0.006 264.531);
+  --border: rgba(255, 255, 255, 0.10);
   --input: oklch(0.928 0.006 264.531);
   --ring: oklch(0.707 0.022 261.325);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -130,9 +132,13 @@
     @apply bg-background text-foreground;
   }
 }
- 
+
 .blur-bg {
-  @apply bg-[#1D1D1D]/20 backdrop-blur-xl
+  @apply bg-[#1D1D1D]/20 backdrop-blur-xl;
+}
+
+.bgOne {
+  background: linear-gradient(180deg, #ff8787 0%, #8578b4 100%);
 }
 
 .ql-toolbar {
