@@ -6,7 +6,7 @@ import React from "react";
 
 export default function CommonLayout({ children }: childrenProps) {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex overflow-hidden">
       {/* <!-- ===== Sidebar Start ===== --> */}
       <Sideber />
       {/* <!-- ===== Content Area Start ===== --> */}

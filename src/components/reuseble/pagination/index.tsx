@@ -1,6 +1,6 @@
 "use client"
 import ResponsivePagination from 'react-responsive-pagination'
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import {ChevronsLeft, ChevronsRight } from "lucide-react"
 import { cn } from '@/lib/utils'
 import React from 'react'
 
@@ -20,12 +20,12 @@ export function Pagination({
   return (
     <div className={cn("lg:w-[320px] flex justify-end", className)}>
       <ResponsivePagination
-        previousLabel={<ChevronLeft className="h-4 w-4" />}
-        nextLabel={<ChevronRight className="h-4 w-4" />}
+        previousLabel={<ChevronsLeft className="size-5" />}
+        nextLabel={<ChevronsRight className="size-5" />}
         className="flex flex-row gap-1 w-fit"
-        pageItemClassName={cn("h-10 border rounded-md w-10 flex items-center justify-center whitespace-nowrap text-sm font-medium hover:bg-accent hover:text-accent-foreground",itemStyle)}
+        pageItemClassName={cn("h-10 border rounded-full w-10 flex items-center justify-center whitespace-nowrap text-sm font-medium hover:bg-transparent hover:text-white",itemStyle)}
         pageLinkClassName="h-10 w-10 flex items-center justify-center rounded-full"
-        activeItemClassName={cn(`bg-transparent border border-[#1890FF] text-[#1890FF] hover:bg-transparent hover:!text-[#1890FF] rounded-md`,activeStyle)}
+        activeItemClassName={cn(`bg-transparent border-none text-white bgOne hover:!text-white  hover:bg-transparent rounded-full`,activeStyle)}
         disabledItemClassName="hover:!bg-transparent"
         current={current_page}
         total={totalCount}

@@ -4,13 +4,17 @@ import navbg from "@/assets/navber-bg.png";
 import Image from "next/image";
 import FavIcon from "@/icon/favIcon";
 import { formatDate } from "@/lib";
-import { Button } from "@/components/ui";
+import { Button, Input } from "@/components/ui";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
 import Link from "next/link";
+import { useSearch } from "../search-box";
+
+
 
 export default function Navber() {
+  const { searchText, setSearchText } = useSearch();
   const contentRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -29,7 +33,7 @@ export default function Navber() {
   }, [dropdownOpen]);
 
   return (
-    <div className="h-42 relative w-full px-5 pt-5">
+    <div className="!h-42  relative w-full px-5 pt-5">
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
       <div className="relative pl-[80px] z-10">
         <div className="flex justify-between items-center">
@@ -38,6 +42,17 @@ export default function Navber() {
               <FavIcon name="calender" />
               {formatDate(new Date())}
             </div>
+          </div>
+          {/* seach box */}
+          <div className="relative w-full md:max-w-xs  xl:max-w-xl 2xl:max-w-2xl blur-bg rounded-full py-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-grays" />
+            <Input
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search"
+              className="pl-10 pr-4 py-2 rounded-full border-none w-full placeholder:text-grays"
+            />
           </div>
           <div>
             <div className="flex gap-2 items-center">
