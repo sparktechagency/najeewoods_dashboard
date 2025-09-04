@@ -117,6 +117,7 @@ export default function Users() {
   const handleDelete = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this user",
+      subTitle:"Delete User",
       description: "After deleting, this user wont be able to use your app ",
     });
     if (con) {

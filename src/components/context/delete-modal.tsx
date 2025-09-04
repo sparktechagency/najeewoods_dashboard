@@ -15,9 +15,10 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 // ✅ Default State
 const initialDialogState: ConfirmDialogState = {
   open: false,
-  title: "Are you sure to delete this video ?",
+  title: "Are you sure to delete this video?",
+  subTitle: "Delete Provider",
   description: "Users can't find your video anymore.",
-  confirmText: "Yes, Delete",
+  confirmText: "Delete",
   cancelText: "Cancel",
   className: "",
   titleStyle: "",
@@ -35,6 +36,7 @@ type ConfirmDialogOptions = Partial<
 interface ConfirmDialogState {
   open: boolean;
   title: string;
+  subTitle?: string;
   description: string;
   confirmText: string;
   cancelText: string;
@@ -66,12 +68,17 @@ export const ConfirmDialogProvider = ({
 
   // ✅ Main confirm function
   const confirm = (options: ConfirmDialogOptions = {}): Promise<boolean> => {
+    // Use provided options, falling back to defaults for missing properties
+    const finalState = {
+      ...initialDialogState,   // Default values
+      ...options,              // Custom options override defaults
+      open: true,              // Ensure dialog is open
+    };
+
     return new Promise((resolve) => {
       setDialogState({
-        ...initialDialogState, // Reset first
-        ...options, // Apply custom options
-        open: true,
-        resolve,
+        ...finalState,  // Apply final state combining default and custom options
+        resolve,        // Resolve the promise when the dialog is closed
       });
     });
   };
@@ -100,15 +107,18 @@ export const ConfirmDialogProvider = ({
       <AlertDialog open={dialogState.open} onOpenChange={closeDialog}>
         <AlertDialogContent
           className={cn(
-            "rounded-md w-[420px] px-6 py-6",
+            "rounded-xl w-[420px] px-10 py-6",
             dialogState?.className
           )}
         >
           <AlertDialogHeader>
             <AlertDialogTitle>
+              <div className="h-12 grid place-items-center justify-center absolute top-0 left-0 w-full rounded-t-xl bg-reds-figma text-white">
+                {dialogState.subTitle}
+              </div>
               <ul>
                 {/* Icon */}
-                <li className="flex justify-center mb-2">
+                <li className="flex justify-center mb-2 mt-10">
                   <svg
                     width="48"
                     height="60"
@@ -146,7 +156,7 @@ export const ConfirmDialogProvider = ({
             <AlertDialogCancel
               onClick={handleCancel}
               className={cn(
-                "cursor-pointer bg-[#2D2D2D] rounded-full py-6 px-8",
+                "cursor-pointer bg-[#2D2D2D] hover:bg-[#2D2D2D] border-none hover:text-white  rounded-xl py-5  px-8",
                 dialogState?.btnStyle
               )}
             >
@@ -155,7 +165,7 @@ export const ConfirmDialogProvider = ({
             <AlertDialogAction
               onClick={handleConfirm}
               className={cn(
-                "bg-reds hover:bg-reds cursor-pointer rounded-full py-6 px-5",
+                "cursor-pointer bg-reds-figma hover:bg-reds-figma border-none hover:text-white  rounded-xl py-5  px-8",
                 dialogState?.btnStyle
               )}
             >
@@ -178,3 +188,4 @@ export default function useConfirmation(): ConfirmDialogContextType {
   }
   return context;
 }
+
