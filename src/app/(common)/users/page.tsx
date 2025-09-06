@@ -5,13 +5,16 @@ import useConfirmation from "@/components/context/delete-modal";
 import { dummyJson } from "@/components/dummy-json";
 import Avatars from "@/components/reuseble/avater";
 import { Deletebtn, Previewbtn } from "@/components/reuseble/icon-list";
+import Modal from "@/components/reuseble/modal";
 import { Pagination } from "@/components/reuseble/pagination";
 import { CustomTable } from "@/components/reuseble/table";
 import { TableNoItem } from "@/components/reuseble/table-no-item";
 import { TableSkeleton } from "@/components/reuseble/table-skeleton";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { TableCell, TableRow } from "@/components/ui";
-import { ArrowUp } from "lucide-react";
+import FavIcon from "@/icon/favIcon";
+import { ArrowUp, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import React, { useState } from "react";
 import { useDebounce } from "use-debounce";
 
@@ -99,6 +102,7 @@ const data = [
 ];
 
 export default function Users() {
+  const [isPreview, setIsPreview] = useState(false);
   const { confirm } = useConfirmation();
   const { searchText, setSearchText } = useSearch();
   const [isPage, setIsPage] = useState(1);
@@ -117,7 +121,7 @@ export default function Users() {
   const handleDelete = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this user",
-      subTitle:"Delete User",
+      subTitle: "Delete User",
       description: "After deleting, this user wont be able to use your app ",
     });
     if (con) {
@@ -169,7 +173,7 @@ export default function Users() {
                 <TableCell>
                   <ul className="flex gap-2">
                     <li>
-                      <Previewbtn />
+                      <Previewbtn onClick={() => setIsPreview(!isPreview)} />
                     </li>
                     <li>
                       <Deletebtn onClick={() => handleDelete(item.name)} />
@@ -195,6 +199,89 @@ export default function Users() {
           ></Pagination>
         </li>
       </ul>
+      {/* preview */}
+      <Modal
+        open={isPreview}
+        setIsOpen={setIsPreview}
+        title="User Details"
+        titleStyle="text-center"
+        className="sm:max-w-2xl"
+      >
+        <div className="p-1 space-y-3">
+          <div className="border flex justify-between rounded-lg p-2">
+            <div className="flex items-center space-x-2">
+              <Avatars
+                src={""}
+                fallback={"T"}
+                alt="profile"
+                fallbackStyle="bg-[#cb4ec9]/70 text-white"
+              />
+              <div className="leading-5">
+                <h1>Elizabeth Olson</h1>
+                <h1 className="text-secondery-figma">example@gmail.com</h1>
+              </div>
+            </div>
+            <div className="border cursor-pointer size-10  grid place-items-center rounded-md">
+              <FavIcon name="delete" className="size-5" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-medium">Bio</h1>
+          <div className="border p-3 rounded-md text-[#FFF]">
+            Lorem ipsum dolor sit amet consectetur. Nulla erat nisl cursus
+            morbi. Vitae eu non et urna hendrerit nullam mattis. Facilisis
+            consectetur bibendum mattis sed scelerisque. Quam lectus velit magna
+            lacus volutpat at lacus lacus phasellus. Eu nibh aliquet lacus
+            bibendum fusce massa purus luctus. Augue tortor pretium molestie
+            faucibus diam habitant neque lacus. Lectus et habitant velit semper
+            sed egestas suspendisse condimentum. Viverra adipiscing risus vel
+            turpis turpis egestas feugiat eget non. Faucibus adipiscing enim nec
+            leo morbi.
+          </div>
+          <div className="space-y-3 pt-2">
+            <DetailsNav
+              href="/users/vibe-posted"
+              icon={<FavIcon name="vibePost" className="size-5" />}
+              text="Vibe posted"
+              value={50}
+            />
+            <DetailsNav
+              href="/users/music-posted"
+              icon={<FavIcon name="music" className="size-5" />}
+              text="Music posted"
+              value={36}
+            />
+            <DetailsNav
+              href="/users/podcast-posted"
+              icon={<FavIcon name="padcostDetails" className="size-5" />}
+              text="Podcast posted"
+              value={10}
+            />
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+}
+
+// DetailsNav
+function DetailsNav({ href, icon, text, value }: any) {
+  return (
+    <div className="flex justify-between space-x-3 h-11">
+      <Link
+        href={href}
+        className="w-full flex justify-between items-center border rounded-xl px-3"
+      >
+        <span className="flex gap-x-2 items-center">
+          {icon} {text}:
+        </span>
+        <span>{value}</span>
+      </Link>
+      <Link
+        href={href}
+        className="h-11 w-12 bgOne rounded-xl grid place-items-center cursor-pointer"
+      >
+        <ArrowUpRight />
+      </Link>
     </div>
   );
 }

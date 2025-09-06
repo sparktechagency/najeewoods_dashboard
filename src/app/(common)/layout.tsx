@@ -12,7 +12,7 @@ export default function CommonLayout({ children }: childrenProps) {
       {/* <!-- ===== Content Area Start ===== --> */}
       <div className="relative flex  flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Navber />
-        <div className="p-5 ml-[80px]">{children}</div>
+        <div className="p-6 ml-[80px]">{children}</div>
       </div>
     </div>
   );
