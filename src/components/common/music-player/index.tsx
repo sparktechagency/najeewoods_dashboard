@@ -31,6 +31,7 @@ export default function MusicPlayer() {
           onClick={togglePlay}
           variant="ghost"
           size="sm"
+          type="button"
           className="h-8 w-8 p-0 cursor-pointer text-white hover:bg-white/20 rounded-full mr-4"
         >
           {isPlaying ? <FavIcon name="pluse" className="size-9" /> : <FavIcon className="size-9" name="play" />}
@@ -56,6 +57,7 @@ export default function MusicPlayer() {
           onClick={toggleMute}
           variant="ghost"
           size="sm"
+          type="button"
           className="h-8 w-8 p-0 text-white hover:bg-white/20 rounded-full ml-4"
         >
           {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}

@@ -1,13 +1,12 @@
 "use client";
 import ShadowBox from "@/components/common/shadow-box";
-import { BackBtn } from "@/components/reuseble/back-btn";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { CircleAlert, Plus, X } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useEffect, useState } from "react";
 import useConfirmation from "@/components/context/delete-modal";
 import { Button } from "@/components/ui";
-import emoji from "@/assets/unuse/emoji.png";
+import emoji from "@/assets/unuse/angry.png";
 import Image from "next/image";
 import { Deletebtn, Editbtn } from "@/components/reuseble/icon-list";
 import Modal from "@/components/reuseble/modal";
@@ -64,7 +63,7 @@ export default function Moods() {
   // UpdateSubmit
   const updateSubmit = async (values: FieldValues) => {
     console.log(values);
-    from.reset();
+    Updatefrom.reset();
     setIsImg(intImg);
   };
 
@@ -85,13 +84,10 @@ export default function Moods() {
     <div>
       <ShadowBox>
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
-          <div className="flex gap-2">
-            <BackBtn />
             <div>
               <h1 className="text-2xl font-semibold">Moods</h1>
               <h1 className="text-base">Total moods: 05</h1>
             </div>
-          </div>
           <Button
             onClick={() => setIsStore(!isStore)}
             variant="primary"
@@ -113,7 +109,7 @@ export default function Moods() {
                   <Image src={emoji} alt="img" width={60} height={20} />
                 </div>
                 <div className="text-center text-white text-lg  mt-1 mb-2 font-medium">
-                  Party
+                 Angry
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <span>

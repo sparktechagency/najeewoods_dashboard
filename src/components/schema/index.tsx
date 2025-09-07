@@ -6,3 +6,14 @@ export const moodSchema = z.object({
     .any()
     .refine((file) => file instanceof File, { message: "Photo is required" }),
 });
+
+
+export const musicSchema = z.object({
+  vide:z.string().nonempty("Vide is required"),
+  location: z.string().nonempty("Location is required"),
+  caption: z.string().nonempty("Caption is required"),
+  visibility: z.string().nonempty("Visibility is required"),
+  audio: z
+    .any()
+    .refine((file) => file instanceof File, { message: "Audio is required" }),
+});
