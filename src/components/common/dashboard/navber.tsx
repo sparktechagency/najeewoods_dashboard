@@ -11,11 +11,10 @@ import { ArrowUpRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useSearch } from "../search-box";
 
-
-
 export default function Navber() {
   const { searchText, setSearchText } = useSearch();
   const contentRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -32,8 +31,15 @@ export default function Navber() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    const onScroll = () =>
+      navRef.current?.classList.toggle("nav-sticky", window.scrollY > 0);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <div className="!h-42  relative w-full px-5 pt-5">
+    <div ref={navRef} className="h-42 [transition:0.5s]  relative w-full px-5 pt-5">
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
       <div className="relative pl-[80px] z-10">
         <div className="flex justify-between items-center">
@@ -69,7 +75,7 @@ export default function Navber() {
                   <ImgBox
                     alt="profile"
                     className="size-12 cursor-pointer"
-                    src="./profile.svg"
+                    src="/profile.svg"
                   />
                   <div className="text-start leading-5">
                     <h1 className="font-medium">Elizabeth Olson</h1>
@@ -111,6 +117,16 @@ export default function Navber() {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .nav-sticky {
+          position:fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 50;
+          height:80px
+        }
+      `}</style>
     </div>
   );
 }

@@ -9,9 +9,28 @@ import FavIcon from "@/icon/favIcon";
 import { useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
+import { PlaceholderImg } from "@/lib";
+import img1 from "@/assets/unuse/img1.jpg";
+import LikeToggle from "@/components/reuseble/like-toggle";
+import useConfirmation from "@/components/context/delete-modal";
 
 export default function VidePost() {
+    const { confirm } = useConfirmation();
   const [isPreview, setIsPreview] = useState(false);
+
+
+ 
+    const handleDelete = async (id: string) => {
+    const con = await confirm({
+      title: "You are going to delete this vibe",
+      subTitle: "Delete Vibe",
+      description: "After deleting, users wont be able to find this vibe in your app",
+    });
+    if (con) {
+      console.log(id);
+    }
+  };
+
   return (
     <div>
       <ShadowBox>
@@ -22,7 +41,7 @@ export default function VidePost() {
               <h1 className="text-2xl font-semibold">
                 Elizabeth Olson&apos;s vibes
               </h1>
-              <h1 className="text-xl">20 vibes posted</h1>
+              <h1 className="text-base">20 vibes posted</h1>
             </div>
           </div>
           <h1 className="flex gap-2 mt-2 lg:mt-0">
@@ -56,10 +75,12 @@ export default function VidePost() {
       <ModalOne
         open={isPreview}
         setIsOpen={setIsPreview}
+        className="sm:max-w-xs"
+        headerStyle="pt-4 px-4 pb-0"
         profile={
           <>
             <Avatars
-              src={""}
+              src={PlaceholderImg()}
               fallback={"E"}
               alt="profile"
               fallbackStyle="bg-[#cb4ec9]/70 text-white"
@@ -74,25 +95,17 @@ export default function VidePost() {
           </>
         }
       >
-        <h1>fjdlf</h1>
+        <ImgBox src={img1} className="w-full h-[300px]" alt="img"></ImgBox>
+        <div className="mt-4 flex justify-between items-center">
+          <LikeToggle />
+          <div
+            onClick={() => handleDelete("123")}
+            className="border cursor-pointer size-10  grid place-items-center rounded-md"
+          >
+            <FavIcon name="delete" className="size-5" />
+          </div>
+        </div>
       </ModalOne>
-      {/* <Dialog1 open={isPreview} onOpenChange={setIsPreview}>
-        <DialogTrigger1 asChild />
-        <DialogContent1
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onInteractOutside={(e) => e.preventDefault()}
-          className="sm:max-w-md p-0 gap-0 bg-blacks rounded-2xl overflow-hidden border-none"
-        >
-          <DialogHeader1 className=" text-white p-4">
-             <div className="flex items-center space-x-2">
-              
-            </div>
-            <DialogTitle1 className={"text-white hidden font-medium"}>
-            </DialogTitle1>
-          </DialogHeader1>
-          <div className="p-4">main</div>
-        </DialogContent1>
-      </Dialog1> */}
     </div>
   );
 }

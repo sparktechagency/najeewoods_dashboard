@@ -56,6 +56,7 @@
   --color-secondery-figma:#AFAFAF;
   --color-modal-figma:#2D2D2D;
   --color-blacks:#202020;
+  --color-card-figma:#3D3D3D;
 }
 
 :root {
@@ -135,6 +136,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+
 
 .blur-bg {
   @apply bg-[#1D1D1D]/20 backdrop-blur-xl;

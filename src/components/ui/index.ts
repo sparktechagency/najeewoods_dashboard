@@ -6,3 +6,5 @@ export * from "./input"
 export * from "./table"
 export * from "./skeleton"
 export * from "./alert-dialog"
+export * from "./label"
+

@@ -221,7 +221,7 @@ export default function Users() {
                 <h1 className="text-secondery-figma">example@gmail.com</h1>
               </div>
             </div>
-            <div className="border cursor-pointer size-10  grid place-items-center rounded-md">
+            <div onClick={() => handleDelete("55")} className="border cursor-pointer size-10  grid place-items-center rounded-md">
               <FavIcon name="delete" className="size-5" />
             </div>
           </div>
