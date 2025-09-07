@@ -12,7 +12,7 @@ export default function Sideber() {
     <div className="flex fixed left-0 top-0 z-60">
       {/* Sidebar */}
       <aside
-        className={`w-20 h-screen border-r border-white/10  bg-sideber blur-bg backdrop-blur-2xl`}
+        className={`w-20 h-screen overflow-y-scroll scrollbar-hide border-r border-white/10  bg-sideber blur-bg backdrop-blur-2xl`}
       >
         <div className="flex flex-col h-full relative">
           <div className="flex items-center justify-center mt-4 mb-8  rounded-md">

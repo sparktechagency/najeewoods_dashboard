@@ -61,6 +61,7 @@ export default function Music() {
   const [isStore, setIsStore] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isAudio, setIsAudio] = useState<any>({ audioPreview: "" });
+  const [isPlay,setIsPlay]=useState(false)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -210,7 +211,11 @@ export default function Music() {
                   <h1 className="text-start text-secondery-figma text-lg font-medium">
                     0:50
                   </h1>
-                  <h1 className="bg-[#F7F7F7] w-full h-px"></h1>
+                  <h1 className="bg-secondery-figma relative w-full h-px">
+                    <span style={{
+                      width:'20%'
+                    }} className="bg-white h-px absolute inset"></span>
+                  </h1>
                   <div className="flex items-center justify-between">
                     <span className="font-medium flex items-center">
                       {" "}

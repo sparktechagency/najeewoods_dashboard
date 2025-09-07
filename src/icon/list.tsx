@@ -614,6 +614,26 @@ export const favIcon = {
       />
     </svg>
   ),
+  musicBers1: (
+    <svg width="87" height="32" viewBox="0 0 87 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect opacity="0.66" x="0.666626" y="15" width="2" height="2" rx="1" fill="white" />
+      <rect opacity="0.66" x="6.66663" y="12" width="2" height="8" rx="1" fill="white" />
+      <rect opacity="0.66" x="12.6666" y="9" width="2" height="14" rx="1" fill="white" />
+      <rect opacity="0.66" x="18.6666" y="14" width="2" height="4" rx="1" fill="white" />
+      <rect opacity="0.66" x="24.6666" y="8" width="2" height="16" rx="1" fill="white" />
+      <rect opacity="0.66" x="30.6666" y="9" width="2" height="14" rx="1" fill="white" />
+      <rect opacity="0.66" x="36.6666" y="11" width="2" height="10" rx="1" fill="white" />
+      <rect opacity="0.66" x="42.6666" y="11" width="2" height="10" rx="1" fill="white" />
+      <rect opacity="0.66" x="48.6666" y="11" width="2" height="10" rx="1" fill="white" />
+      <rect opacity="0.66" x="54.6666" y="9" width="2" height="14" rx="1" fill="white" />
+      <rect opacity="0.66" x="60.6666" y="11" width="2" height="10" rx="1" fill="white" />
+      <rect opacity="0.66" x="66.6666" y="8" width="2" height="16" rx="1" fill="white" />
+      <rect opacity="0.66" x="72.6666" y="11" width="2" height="10" rx="1" fill="white" />
+      <rect opacity="0.66" x="78.6666" y="14" width="2" height="4" rx="1" fill="white" />
+      <rect opacity="0.66" x="84.6666" y="15" width="2" height="2" rx="1" fill="white" />
+    </svg>
+
+  ),
   play: (
     <svg
       width="32"
@@ -733,4 +753,6 @@ export const favIcon = {
       />
     </svg>
   ),
+
+
 };
