@@ -1,3 +1,4 @@
+"use client"
 import { AnalyticsCharts } from "@/components/common/chart/earning-chart";
 import PostingCart from "@/components/common/chart/posting-chart";
 import ShadowBox from "@/components/common/shadow-box";

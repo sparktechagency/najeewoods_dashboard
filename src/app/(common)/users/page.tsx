@@ -1,5 +1,4 @@
 "use client";
-import { useSearch } from "@/components/common/search-box";
 import ShadowBox from "@/components/common/shadow-box";
 import useConfirmation from "@/components/context/delete-modal";
 import { dummyJson } from "@/components/dummy-json";
@@ -15,7 +14,7 @@ import { TableCell, TableRow } from "@/components/ui";
 import FavIcon from "@/icon/favIcon";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 
 const data = [
@@ -104,9 +103,8 @@ const data = [
 export default function Users() {
   const [isPreview, setIsPreview] = useState(false);
   const { confirm } = useConfirmation();
-  const { searchText, setSearchText } = useSearch();
   const [isPage, setIsPage] = useState(1);
-  const [value] = useDebounce(searchText, 1000);
+  const [value] = useDebounce("", 1000);
   const headers = [
     "Name",
     "Email",
@@ -117,6 +115,8 @@ export default function Users() {
     "Action",
   ];
   const isLoading = false;
+
+
 
   const handleDelete = async (id: string) => {
     const con = await confirm({

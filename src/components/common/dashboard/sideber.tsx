@@ -4,7 +4,6 @@ import logo from "@/assets/logo.svg";
 import Image from "next/image";
 import { navItems } from "./nav-data";
 import FavIcon from "@/icon/favIcon";
-import { usePathname } from "next/navigation";
 import Navitem from "./nav-item";
 
 export default function Sideber() {
@@ -12,15 +11,17 @@ export default function Sideber() {
     <div className="flex fixed left-0 top-0 z-60">
       {/* Sidebar */}
       <aside
-        className={`w-20 h-screen overflow-y-scroll scrollbar-hide border-r border-white/10  bg-sideber blur-bg backdrop-blur-2xl`}
+        className={`w-20 overflow-y-scroll scrollbar-hide border-r border-white/10  bg-sideber blur-bg backdrop-blur-2xl`}
       >
-        <div className="flex flex-col h-full relative">
-          <div className="flex items-center justify-center mt-4 mb-8  rounded-md">
-            <Image src={logo} alt="img" width={40} height={20} />
+        <div className="flex flex-col relative">
+          <div className="flex items-center justify-center h-[120px]  rounded-md">
+            <span className="relative mb-6"> <Image src={logo} alt="img" width={40} height={20} /></span>
           </div>
-          <Navitem items={navItems} />
-          <div className="absolute cursor-pointer bottom-8 left-1/2 -translate-x-1/2 w-max">
-            <FavIcon name="logout" />
+          <div className="flex flex-col pb-10 justify-between overflow-y-scroll scrollbar-hide h-[calc(100vh-120px)]">
+            <Navitem items={navItems} />
+            <div className="w-max mt-8 mx-auto">
+              <FavIcon name="logout" />
+            </div>
           </div>
         </div>
       </aside>

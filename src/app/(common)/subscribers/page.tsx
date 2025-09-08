@@ -1,5 +1,4 @@
 "use client";
-import { useSearch } from "@/components/common/search-box";
 import ShadowBox from "@/components/common/shadow-box";
 import useConfirmation from "@/components/context/delete-modal";
 import { dummyJson } from "@/components/dummy-json";
@@ -98,9 +97,8 @@ export default function Subscribers() {
   const [subscriberToggle, setSubscriberToggle] = useState<any>();
   const [isUser, setIsUser] = useState(false);
   const { confirm } = useConfirmation();
-  const { searchText, setSearchText } = useSearch();
   const [isPage, setIsPage] = useState(1);
-  const [value] = useDebounce(searchText, 1000);
+  const [value] = useDebounce("searchText", 1000);
   const headers = [
     "Name",
     "Subscriber type",

@@ -24,6 +24,7 @@ import { vibeOptions } from "@/dummy-json";
 
 
 
+
 export default function Music() {
   const { confirm } = useConfirmation();
   const [isPreview, setIsPreview] = useState(false);
@@ -33,6 +34,7 @@ export default function Music() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isAudio, setIsAudio] = useState<any>({ audioPreview: "" });
   const [isPlay,setIsPlay]=useState(false)
+   
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -75,7 +75,7 @@ export default function NavItem({ items }: { items: NavItem[] }) {
                 opacity: activeSubmenu === parentIndex ? 1 : 0,
               }}
               transition={{ duration: 0.3 }}
-              className="absolute top-10 mt-3 overflow-hidden space-y-3 shadow-lg rounded-xl"
+             className="overflow-hidden transition-all space-y-1 pt-1 duration-300 ease-out max-h-0"
             >
               {submenu.map(({ href, icon }, subIndex) => (
                 <li key={subIndex}>
