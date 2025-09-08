@@ -39,7 +39,10 @@ export default function Navber() {
   }, []);
 
   return (
-    <div ref={navRef} className="h-42 [transition:0.5s]  relative w-full px-5 pt-5">
+    <div
+      ref={navRef}
+      className="h-42 [transition:0.5s]  relative w-full px-5 pt-5"
+    >
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
       <div className="relative pl-[80px] z-10">
         <div className="flex justify-between items-center">
@@ -94,20 +97,26 @@ export default function Navber() {
                       exit={{ opacity: 0, scaleY: 0, originY: "top" }}
                     >
                       <div className="flex flex-col space-y-3 p-4">
-                        <div className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2">
+                        <Link
+                          href={`/profile?tab=overview`}
+                          className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2"
+                        >
                           <span className="flex gap-x-2 items-center">
                             <FavIcon className="size-5" name="admin" />
                             Admin profile
                           </span>
                           <ArrowUpRight className="size-5" />
-                        </div>
-                        <div className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2">
+                        </Link>
+                        <Link
+                          href={`/profile?tab=password`}
+                          className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2"
+                        >
                           <span className="flex gap-x-2 items-center">
                             <FavIcon className="size-5" name="password" />
                             Change password
                           </span>
                           <ArrowUpRight className="size-5" />
-                        </div>
+                        </Link>
                       </div>
                     </motion.div>
                   )}
@@ -119,12 +128,12 @@ export default function Navber() {
       </div>
       <style jsx>{`
         .nav-sticky {
-          position:fixed;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 50;
-          height:80px
+          height: 80px;
         }
       `}</style>
     </div>
