@@ -17,41 +17,12 @@ import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
 import { FromTextArea } from "@/components/reuseble/from-textarea";
 import { InputSelectField } from "@/components/reuseble/from-select";
-import assets from "@/assets";
-import { ImgBox } from "@/components/reuseble/img-box";
 import AudioUpload from "@/components/reuseble/audio-box";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema } from "@/components/schema";
+import { vibeOptions } from "@/dummy-json";
 
-const videOptions = [
-  {
-    label: "Chill",
-    value: "chill",
-    icon: <ImgBox className="size-8" src={assets.emoji.chill} alt="img" />,
-  },
-  {
-    label: "Party",
-    value: "party",
-    icon: <ImgBox className="size-7" src={assets.emoji.party} alt="img2" />,
-  },
-  {
-    label: "Mental",
-    value: "mental",
-    icon: <ImgBox className="size-7" src={assets.emoji.mental} alt="img3" />,
-  },
-  {
-    label: "Hot",
-    value: "hot",
-    icon: <ImgBox className="size-7" src={assets.emoji.hot} alt="img4" />,
-  },
-  {
-    label: "Angry",
-    value: "angry",
-    icon: (
-      <ImgBox className="size-[23px]" src={assets.emoji.angry} alt="img5" />
-    ),
-  },
-];
+
 
 export default function Music() {
   const { confirm } = useConfirmation();
@@ -83,7 +54,7 @@ export default function Music() {
       audio: null,
       location: "",
       caption: "",
-      vide: "",
+      vibe: "",
       visibility: "",
     },
   });
@@ -105,7 +76,7 @@ export default function Music() {
       audio: null,
       location: "",
       caption: "",
-      vide: "",
+      vibe: "",
       visibility: "",
     },
   });
@@ -173,7 +144,7 @@ export default function Music() {
         </div>
         {isActive == "Owned" ? (
           // ========="Owned=========
-          <div className="pt-4 flex  gap-5 flex-wrap">
+          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
             {Array.from({ length: 10 }).map((item, index) => {
               return (
                 <div
@@ -231,7 +202,7 @@ export default function Music() {
           </div>
         ) : (
           // ==========Users ===========
-          <div className="pt-4 flex  gap-5 flex-wrap">
+          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
             {Array.from({ length: 10 }).map((item, index) => {
               return (
                 <div
@@ -323,7 +294,7 @@ export default function Music() {
             </div>
 
             <InputSelectField
-              items={videOptions}
+              items={vibeOptions}
               label="Vibe"
               name="vibe"
               placeholder="Select hare"
@@ -404,7 +375,7 @@ export default function Music() {
             </div>
 
             <InputSelectField
-              items={videOptions}
+              items={vibeOptions}
               label="Vibe"
               name="vibe"
               placeholder="Select hare"

@@ -55,7 +55,7 @@ export function FromInput({
             <Input
               id={inputId}
               className={cn(
-                "h-12 w-full rounded-[20px] pl-4 pr-3  text-white  text-sm",
+                "h-12 w-full rounded-[20px] pl-4 pr-3  text-white  text-sm  [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                 className
               )}
               {...field}

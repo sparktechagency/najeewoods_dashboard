@@ -56,7 +56,7 @@ export default function Vibes() {
         </div>
       </ShadowBox>
       <WapperBox>
-        <div className="pt-4 flex gap-5 flex-wrap">
+        <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
           {users?.map((item, index) => (
             <ImgBox
               src={photo1}
