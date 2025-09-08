@@ -2,6 +2,7 @@
 import { AnalyticsCharts } from "@/components/common/chart/earning-chart";
 import PostingCart from "@/components/common/chart/posting-chart";
 import ShadowBox from "@/components/common/shadow-box";
+import WapperBox from "@/components/reuseble/wapper-box";
 import FavIcon from "@/icon/favIcon";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import React from "react";
@@ -77,16 +78,20 @@ export default function RootHome() {
           </div>
         </div>
       </ShadowBox>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div>
-          <h1 className="text-2xl font-semibold mb-10">Posting preference</h1>
-          {/* <PostingCart /> */}
+      <WapperBox>
+        <div className="pt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-7">
+            <div className="col-span-2">
+              <h1 className="text-2xl font-semibold mb-4">Posting preference</h1>
+              <PostingCart />
+            </div>
+            <div className="col-span-3">
+              <h1 className="text-2xl font-semibold mb-4">Earning Statistics</h1>
+              <AnalyticsCharts />
+            </div>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-semibold mb-10">Posting preference</h1>
-          {/* <AnalyticsCharts /> */}
-        </div>
-      </div>
+      </WapperBox>
     </div>
   );
 }
