@@ -1,7 +1,7 @@
 "use client";
 import ShadowBox from "@/components/common/shadow-box";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Form from "@/components/reuseble/from";
 import { FieldValues, useForm } from "react-hook-form";
@@ -19,7 +19,7 @@ const intAva = {
   preview: null,
 };
 
-export default function Profile() {
+function ProfileChild() {
   const params = useSearchParams();
   const tab = params.get("tab") || "overview";
   const [isTab, setIsTab] = useState(tab === "password" ? "tab-2" : "tab-1");
@@ -127,5 +127,13 @@ export default function Profile() {
         </div>
       </WapperBox>
     </div>
+  );
+}
+
+export default function ProfileParent() {
+  return (
+    <Suspense>
+      <ProfileChild />
+    </Suspense>
   );
 }
