@@ -12,26 +12,10 @@ import {
 import { cn } from "@/lib/utils";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-// ✅ Default State
-const initialDialogState: ConfirmDialogState = {
-  open: false,
-  title: "Are you sure to delete this video?",
-  subTitle: "Delete Provider",
-  description: "Users can't find your video anymore.",
-  confirmText: "Delete",
-  cancelText: "Cancel",
-  className: "",
-  titleStyle: "",
-  btnStyle: "",
-  onConfirm: undefined,
-  onCancel: undefined,
-  resolve: undefined,
-};
-
-// ✅ Types
-type ConfirmDialogOptions = Partial<
-  Omit<ConfirmDialogState, "open" | "resolve">
->;
+/* =======================
+   ✅ Types
+======================= */
+type ConfirmDialogOptions = Partial<Omit<ConfirmDialogState, "open" | "resolve">>;
 
 interface ConfirmDialogState {
   open: boolean;
@@ -52,38 +36,54 @@ interface ConfirmDialogContextType {
   confirm: (options?: ConfirmDialogOptions) => Promise<boolean>;
 }
 
-const ConfirmDialogContext = createContext<
-  ConfirmDialogContextType | undefined
->(undefined);
-
 interface ConfirmDialogProviderProps {
   children: ReactNode;
 }
 
-export const ConfirmDialogProvider = ({
-  children,
-}: ConfirmDialogProviderProps) => {
-  const [dialogState, setDialogState] =
-    useState<ConfirmDialogState>(initialDialogState);
+/* =======================
+   ✅ Default State
+======================= */
+const initialDialogState: ConfirmDialogState = {
+  open: false,
+  title: "Are you sure to delete this video?",
+  subTitle: "Delete Provider",
+  description: "Users can't find your video anymore.",
+  confirmText: "Delete",
+  cancelText: "Cancel",
+  className: "",
+  titleStyle: "",
+  btnStyle: "",
+  onConfirm: undefined,
+  onCancel: undefined,
+  resolve: undefined,
+};
 
-  // ✅ Main confirm function
+/* =======================
+   ✅ Context
+======================= */
+const ConfirmDialogContext = createContext<ConfirmDialogContextType | undefined>(
+  undefined
+);
+
+/* =======================
+   ✅ Provider
+======================= */
+export const ConfirmDialogProvider = ({ children }: ConfirmDialogProviderProps) => {
+  const [dialogState, setDialogState] = useState<ConfirmDialogState>(initialDialogState);
+
+  // Main confirm function
   const confirm = (options: ConfirmDialogOptions = {}): Promise<boolean> => {
-    // Use provided options, falling back to defaults for missing properties
     const finalState = {
-      ...initialDialogState,   // Default values
-      ...options,              // Custom options override defaults
-      open: true,              // Ensure dialog is open
+      ...initialDialogState, // fallback to defaults if any field missing
+      ...options,            // override with provided options
+      open: true,            // open the dialog
     };
-
     return new Promise((resolve) => {
-      setDialogState({
-        ...finalState,  // Apply final state combining default and custom options
-        resolve,        // Resolve the promise when the dialog is closed
-      });
+      setDialogState({ ...finalState, resolve });
     });
   };
 
-  // ✅ Confirm & Cancel Handlers
+  // Handlers
   const handleConfirm = () => {
     dialogState.resolve?.(true);
     dialogState.onConfirm?.();
@@ -96,28 +96,38 @@ export const ConfirmDialogProvider = ({
     closeDialog();
   };
 
-  // ✅ Reset everything after closing
+  // ✅ Close without resetting content (prevents default flashing on exit)
   const closeDialog = () => {
-    setDialogState(initialDialogState);
+    setDialogState((prev) => ({
+      ...prev,
+      open: false,        // শুধু বন্ধ করা হবে
+      resolve: undefined, // promise cleanup
+      onConfirm: undefined,
+      onCancel: undefined,
+    }));
   };
 
   return (
     <ConfirmDialogContext.Provider value={{ confirm }}>
       {children}
-      <AlertDialog open={dialogState.open} onOpenChange={closeDialog}>
+      <AlertDialog
+        open={dialogState.open}
+        onOpenChange={(open) => {
+          if (!open) closeDialog(); // শুধু বন্ধ, reset নয়
+        }}
+      >
         <AlertDialogContent
-          className={cn(
-            "rounded-xl w-[420px] px-10 py-6",
-            dialogState?.className
-          )}
+          className={cn("rounded-xl w-[420px] px-10 py-6", dialogState?.className)}
         >
           <AlertDialogHeader>
             <AlertDialogTitle>
+              {/* Subtitle Header Bar */}
               <div className="h-12 grid place-items-center justify-center absolute top-0 left-0 w-full rounded-t-xl bg-reds-figma text-white">
                 {dialogState.subTitle}
               </div>
+
+              {/* Icon + Title */}
               <ul>
-                {/* Icon */}
                 <li className="flex justify-center mb-2 mt-10">
                   <svg
                     width="48"
@@ -133,7 +143,6 @@ export const ConfirmDialogProvider = ({
                   </svg>
                 </li>
 
-                {/* Title */}
                 <li
                   className={cn(
                     "text-center text-reds text-2xl mb-2",
@@ -145,27 +154,28 @@ export const ConfirmDialogProvider = ({
               </ul>
             </AlertDialogTitle>
 
-            {/* Description */}
-            <AlertDialogDescription className="text-center text-secondery-figma">
-              {dialogState.description}
-            </AlertDialogDescription>
+            {dialogState.description ? (
+              <AlertDialogDescription className="text-center text-secondery-figma">
+                {dialogState.description}
+              </AlertDialogDescription>
+            ) : null}
           </AlertDialogHeader>
 
-          {/* Footer Buttons */}
           <AlertDialogFooter className="sm:justify-center mt-3">
             <AlertDialogCancel
               onClick={handleCancel}
               className={cn(
-                "cursor-pointer bg-[#2D2D2D] hover:bg-[#2D2D2D] border-none hover:text-white  rounded-xl py-5  px-8",
+                "cursor-pointer bg-[#2D2D2D] hover:bg-[#2D2D2D] border-none hover:text-white rounded-xl py-5 px-8",
                 dialogState?.btnStyle
               )}
             >
               {dialogState.cancelText}
             </AlertDialogCancel>
+
             <AlertDialogAction
               onClick={handleConfirm}
               className={cn(
-                "cursor-pointer bg-reds-figma hover:bg-reds-figma border-none hover:text-white  rounded-xl py-5  px-8",
+                "cursor-pointer bg-reds-figma hover:bg-reds-figma border-none hover:text-white rounded-xl py-5 px-8",
                 dialogState?.btnStyle
               )}
             >
@@ -178,14 +188,13 @@ export const ConfirmDialogProvider = ({
   );
 };
 
-// ✅ Hook
+/* =======================
+   ✅ Hook
+======================= */
 export default function useConfirmation(): ConfirmDialogContextType {
   const context = useContext(ConfirmDialogContext);
   if (!context) {
-    throw new Error(
-      "useConfirmation must be used within a ConfirmDialogProvider"
-    );
+    throw new Error("useConfirmation must be used within a ConfirmDialogProvider");
   }
   return context;
 }
-
