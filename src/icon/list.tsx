@@ -1022,4 +1022,33 @@ export const favIcon = {
       <path d="M11.5 5H9.5V11H15.5V9H11.5V5Z" fill="#AFAFAF" />
     </svg>
   ),
+  circleGlus: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="113"
+      height="113"
+      viewBox="0 0 113 113"
+      fill="none"
+    >
+      <circle
+        cx="56.5"
+        cy="56.5"
+        r="56.5"
+        fill="url(#paint0_linear_127_3243)"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_127_3243"
+          x1="56.5"
+          y1="0"
+          x2="56.5"
+          y2="113"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FF8787" />
+          <stop offset="1" stopColor="#8578B4" />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
 };

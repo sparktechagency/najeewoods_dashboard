@@ -53,7 +53,7 @@ export default function Navber() {
           </div>
           <div>
             <div className="flex gap-2 items-center">
-              <Link href="/notification">
+              <Link href="/dashboard/notification">
                 <Button className="size-12 cursor-pointer blur-bg has-[>svg]:px-0 rounded-full">
                   <FavIcon className="size-5" name="noti" />
                 </Button>
@@ -86,7 +86,7 @@ export default function Navber() {
                     >
                       <div className="flex flex-col space-y-3 p-4">
                         <Link
-                          href={`/profile?tab=overview`}
+                          href={`/dashboard/profile?tab=overview`}
                           className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2"
                         >
                           <span className="flex gap-x-2 items-center">
@@ -96,7 +96,7 @@ export default function Navber() {
                           <ArrowUpRight className="size-5" />
                         </Link>
                         <Link
-                          href={`/profile?tab=password`}
+                          href={`/dashboard/profile?tab=password`}
                           className="bg-[#1D1D1D]/20 rounded-md h-10 flex items-center justify-between px-2"
                         >
                           <span className="flex gap-x-2 items-center">

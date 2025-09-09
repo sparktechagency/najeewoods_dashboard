@@ -140,7 +140,7 @@ export default function Subscribers() {
             <h1 className="text-2xl font-semibold">Subscribers</h1>
             <h1 className="text-xl">Total subscribers: 500</h1>
           </div>
-          <Link href={"/plan-management"}>
+          <Link href={"/dashboard/plan-management"}>
             <Button size={"lg"} variant={"primary"}>
               <FavIcon name="dubbleSetting" />
               Plan management

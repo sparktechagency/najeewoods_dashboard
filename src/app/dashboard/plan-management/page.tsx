@@ -181,7 +181,7 @@ export default function Planmanagement() {
               >
                 <div
                   // style={{
-                  //   background: `linear-gradient(180deg, #d41414 0%, #d41414 0%)`,
+                  //   background:`linear-gradient(180deg, #d41414 0%, #d41414 0%)`,
                   // }}
                   className="w-[200px] h-[150px] absolute bottom-0 z-0 right-0"
                 ></div>

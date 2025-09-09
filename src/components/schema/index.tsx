@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { email, z } from "zod";
 
 export const moodSchema = z.object({
   mood_name: z.string().nonempty("Mood name is required"),
@@ -21,7 +21,6 @@ export const podcastSchema = musicSchema.extend({
   guests: z.array(z.string()).nonempty("Guest is required"),
 });
 
-
 export const passwordChangeSchema = z
   .object({
     current_password: z.string().nonempty("Current Password is required"),
@@ -30,5 +29,27 @@ export const passwordChangeSchema = z
   })
   .refine((value) => value.new_password === value.c_password, {
     path: ["c_password"],
+    message: "Passwords must be match.",
+  });
+
+// loginSchema
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .nonempty("Email is required")
+    .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+      message: "Invalid email address",
+    }),
+  password: z.string().nonempty("Password is required"),
+});
+
+// newPasswordSchema
+export const newPasswordSchema = z
+  .object({
+    password: z.string().nonempty("Password is required"),
+    confirmPassword: z.string().nonempty("Confirm Password is required"),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    path: ["confirmPassword"],
     message: "Passwords must be match.",
   });

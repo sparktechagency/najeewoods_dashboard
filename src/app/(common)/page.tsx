@@ -1,97 +1,93 @@
-"use client"
-import { AnalyticsCharts } from "@/components/common/chart/earning-chart";
-import PostingCart from "@/components/common/chart/posting-chart";
-import ShadowBox from "@/components/common/shadow-box";
-import WapperBox from "@/components/reuseble/wapper-box";
-import FavIcon from "@/icon/favIcon";
-import { ArrowDown, ArrowUp } from "lucide-react";
+"use client";
+import Form from "@/components/reuseble/from";
+import { FromInput } from "@/components/reuseble/from-input";
+import { loginSchema } from "@/components/schema";
+import { Button, Checkbox, Label } from "@/components/ui";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FieldValues, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import Link from "next/link";
 import React from "react";
+import bgImg from "@/assets/bg.png";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-const data = [
-  {
-    title: "Total earnings",
-    value: "$1600",
-    percentage: "+20%",
-    icon: "earningsIcon", // This can be replaced with the actual icon class or image path
-    trend: "up",
-  },
-  {
-    title: "Total vibes",
-    value: "500",
-    percentage: "-20%",
-    icon: "videIcon",
-    trend: "down",
-  },
-  {
-    title: "Total music's",
-    value: "720",
-    percentage: "+20%",
-    icon: "musicIcon",
-    trend: "up",
-  },
-  {
-    title: "Total podcasts",
-    value: "50",
-    percentage: "+20%",
-    icon: "podcastsIcon",
-    trend: "up",
-  },
-];
+export default function RootPage() {
+    const router = useRouter();
+  const from = useForm({
+    // resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-export default function RootHome() {
+  const handleSubmit = async (values: FieldValues) => {
+    toast.success("Login Successfully", {
+      description: "You have successfully logged in",
+    });
+    router.push("/dashboard");
+    console.log(values);
+  };
+
   return (
-    <div>
-      <ShadowBox className="md:-top-26">
-        <div>
-          <h1 className="text-2xl 2xl:text-3xl font-semibold">
-            Dashboard Overview
+    <div className="h-screen w-screen flex flex-col justify-center items-center">
+      <div className="w-11/12 relative lg:w-fit lg:min-w-lg z-50  xl:min-w-xl px-10  py-20 rounded-xl border">
+        <Image
+          src={bgImg}
+          alt="title"
+          fill
+          className="object-cover z-[-1] rounded-md"
+        />
+        <div className="z-10">
+          <h1 className="text-center text-2xl font-medium">
+            Login to your account
           </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-7">
-            {data.map((item, index) => (
-              <div
-                key={index}
-                className="rounded-2xl p-6 space-y-2 border text-white relative overflow-hidden"
-              >
-                {/* Music Icon */}
-                <div className="size-12 grid place-items-center rounded-xl bgOne">
-                  <FavIcon className="size-6" name={item.icon as any} />
-                </div>
-                <p className="font-medium text-xl">{item.title}</p>
-                <div className="flex items-end justify-between">
-                  <span className="text-3xl font-semibold">{item.value}</span>
-                  <div>
-                    {item.trend === "up" ? (
-                      <span className="*:text-green-figma flex items-center space-x-1">
-                        <ArrowUp className="size-[17px]" />
-                        <span className="font-medium">{item.percentage}</span>
-                      </span>
-                    ) : (
-                      <span className="*:text-reds-figma  flex items-center space-x-1">
-                        <ArrowDown className="size-[17px]" />
-                        <span className="font-medium">{item.percentage}</span>
-                      </span>
-                    )}
+          <h1 className="text-center text-secondery-figma">
+            Please enter your email & password to continue
+          </h1>
+          <div className="pt-20">
+            <Form
+              from={from}
+              className="space-y-7"
+              onSubmit={handleSubmit}
+            >
+              <FromInput
+                name="email"
+                label="Email"
+                placeholder="Enter your email"
+                stylelabel="bg-background"
+                type="email"
+              />
+              <div>
+                <FromInput
+                  eye={true}
+                  name="password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  stylelabel="bg-background"
+                />
+                <div className="flex items-center mt-3 justify-between text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox className="" id="remember-me" />
+                    <Label htmlFor="remember-me">Remember me</Label>
                   </div>
+                  <Link
+                    href="/forgot-password"
+                    className="text-[#EC7C5C] font-semibold hover:underline"
+                  >
+                    Forgot Password?
+                  </Link>
                 </div>
               </div>
-            ))}
+
+              <div className="flex justify-center">
+                <Button size={"lg"} className="!px-10" variant={"primary"}>Sign In</Button>
+              </div>
+            </Form>
           </div>
         </div>
-      </ShadowBox>
-      <WapperBox>
-        <div className="pt-4">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-7">
-            <div className="col-span-2">
-              <h1 className="text-2xl font-semibold mb-4">Posting preference</h1>
-              <PostingCart />
-            </div>
-            <div className="col-span-3">
-              <h1 className="text-2xl font-semibold mb-4">Earning Statistics</h1>
-              <AnalyticsCharts />
-            </div>
-          </div>
-        </div>
-      </WapperBox>
+      </div>
     </div>
   );
 }
