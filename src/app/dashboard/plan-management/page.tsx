@@ -1,28 +1,19 @@
 "use client";
 import ShadowBox from "@/components/common/shadow-box";
 import { BackBtn } from "@/components/reuseble/back-btn";
-import { ImgBox } from "@/components/reuseble/img-box";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { ArrowUp, Plus, X } from "lucide-react";
-import photo1 from "@/assets/unuse/photo1.jpg";
-import FavIcon from "@/icon/favIcon";
-import { useState } from "react";
-import Avatars from "@/components/reuseble/avater";
-import ModalOne from "@/components/reuseble/modal-one";
-import { PlaceholderImg } from "@/lib";
-import img1 from "@/assets/unuse/img1.jpg";
-import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import { Button } from "@/components/ui";
 import { FieldValues, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Modal from "@/components/reuseble/modal";
 import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
 import { InputWordSelectField } from "@/components/reuseble/from-word-select";
-import { Deletebtn, Editbtn } from "@/components/reuseble/icon-list";
 import ColorPicker from "react-best-gradient-color-picker";
 import tinycolor from "tinycolor2";
+import { Plus, X } from "lucide-react";
+import FavIcon from "@/icon/favIcon";
+import { useState } from "react";
 
 const pricingPlans = [
   {
@@ -30,8 +21,6 @@ const pricingPlans = [
     title: "Video Creator Pro",
     price: "$9.99",
     period: "/ month",
-    gradient: "from-purple-600 to-purple-800",
-    buttonGradient: "from-purple-500 to-purple-700",
     color: "#513a89",
     features: [
       "All features from other plans included.",
@@ -47,8 +36,6 @@ const pricingPlans = [
     title: "Premium Vibe Planning",
     price: "$3.99",
     period: "/ month",
-    gradient: "from-orange-500 to-orange-700",
-    buttonGradient: "from-orange-400 to-orange-600",
     color: "#7d3d0d",
     features: [
       "Customize shopping with colors and animated text/font styles.",
@@ -62,8 +49,6 @@ const pricingPlans = [
     title: "Local Music Station Pro",
     price: "$2.99",
     period: "/ month",
-    gradient: "from-teal-500 to-teal-700",
-    buttonGradient: "from-teal-400 to-teal-600",
     color: "#0d6f69",
     features: [
       "Gives full access to the live community, powered music streams.",
@@ -79,8 +64,6 @@ const pricingPlans = [
     title: "Voice Podcast Builder",
     price: "$1.00",
     period: "/ month",
-    gradient: "from-red-500 to-red-700",
-    buttonGradient: "from-red-400 to-red-600",
     color: "#8a3333",
     features: [
       "Unlocks voice recording & posting.",
@@ -177,13 +160,14 @@ export default function Planmanagement() {
             {pricingPlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`rounded-2xl flex flex-col bg-blur justify-between py-6 pl-6  border text-white relative overflow-hidden`}
+                className={`rounded-2xl flex flex-col bg-blur bg-blacks/20  justify-between py-6 pl-6  border text-white relative overflow-hidden`}
               >
                 <div
-                  // style={{
-                  //   background:`linear-gradient(180deg, #d41414 0%, #d41414 0%)`,
-                  // }}
-                  className="w-[200px] h-[150px] absolute bottom-0 z-0 right-0"
+                  style={{
+                    background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${plan.color})`,
+                    opacity: 0.3,
+                  }}
+                  className="w-[360px] h-[300px] absolute bottom-0 z-0 right-0"
                 ></div>
                 <div className="z-1">
                   {/* Header */}
