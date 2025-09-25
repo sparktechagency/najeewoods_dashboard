@@ -189,17 +189,64 @@
 }
 
 .ql-snow .ql-tooltip {
-  background: #202020 !important;
-  border: 1px solid #202020 !important;
+  background: #1e1d1d !important;
+  border: 1px solid rgba(87, 87, 87, 0.1) !important;
   border-radius: 8px !important;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
   color: white !important;
 }
 
 .ql-snow .ql-picker-options {
-  background: #202020 !important;
-  border: 1px solid #202020 !important;
+  background: #1e1d1d !important;
+  border: 1px solid rgba(87, 87, 87, 0.1) !important;
   border-radius: 8px !important;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
   color: white !important;
+}
+
+/* Fix autofill styles for WebKit browsers */
+@layer utilities {
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--foreground);
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input:-moz-autofill,
+  textarea:-moz-autofill,
+  select:-moz-autofill {
+    -moz-text-fill-color: var(--foreground) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+/* media query added */
+@media only screen and (min-width: 1000px) {
+  .nav-sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    height: 80px;
+  }
+}
+
+.fallbackStyle {
+  @apply bg-[#cb4ec9]/70 text-white;
+}
+
+
+.\[\&_\.recharts-rectangle\.recharts-tooltip-cursor\]\:fill-muted {
+  & .recharts-rectangle.recharts-tooltip-cursor {
+    fill: var(--background);
+  }
 }
