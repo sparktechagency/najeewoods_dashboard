@@ -7,3 +7,30 @@
 - **TypeScript**: Adds type safety and development efficiency to JavaScript.
 - **Framer Motion**: Library for creating smooth animations and transitions in React.
 - **Figma**: Design and prototyping tool for creating beautiful user interfaces.
+
+
+## 📂 Project Structure 
+```
+├─ app
+│  ├─ (common)
+│  ├─ dashboard
+│  ├─ style
+│  └─ layout.tsx
+├─ assets
+├─ components
+│  ├─ common
+│  ├─ context
+│  ├─ hooks
+│  ├─ provider
+│  ├─ reuseble
+│  ├─ schema
+│  └─ ui
+├─ icon
+├─ lib
+├─ types
+├─ .env
+├─ tailwind.config.js
+├─ tsconfig.json
+└─ package.json
+```
+
