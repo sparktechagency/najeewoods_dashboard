@@ -21,7 +21,8 @@ import AudioUpload from "@/components/reuseble/audio-box";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema, podcastSchema } from "@/components/schema";
 import { InputWordSelectField } from "@/components/reuseble/from-word-select";
-import { vibeOptions } from "@/dummy-json";
+import { vibeOptions } from "@/components/dummy-json";
+
 
 export default function Podcasts() {
   const { confirm } = useConfirmation();

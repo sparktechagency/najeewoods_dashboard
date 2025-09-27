@@ -20,7 +20,8 @@ import { InputSelectField } from "@/components/reuseble/from-select";
 import AudioUpload from "@/components/reuseble/audio-box";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema } from "@/components/schema";
-import { vibeOptions } from "@/dummy-json";
+import { vibeOptions } from "@/components/dummy-json";
+
 
 
 
