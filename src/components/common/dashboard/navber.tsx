@@ -7,11 +7,11 @@ import { formatDate } from "@/lib";
 import { Button} from "@/components/ui";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight} from "lucide-react";
+import { ArrowUpRight, Menu} from "lucide-react";
 import Link from "next/link";
 
 
-export default function Navber() {
+export default function Navber({sidebarOpen, setSidebarOpen}:any) {
   const contentRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -40,12 +40,13 @@ export default function Navber() {
   return (
     <div
       ref={navRef}
-      className="h-42 [transition:0.5s]  relative w-full px-5 pt-5"
+      className="h-23 lg:h-42 [transition:0.5s] relative w-full px-5 pt-5"
     >
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
-      <div className="relative pl-[80px] z-10">
+      <div className="relative lg:pl-[80px] z-10">
         <div className="flex justify-between items-center">
-          <div>
+          <div onClick={()=>setSidebarOpen(!sidebarOpen)} className="cursor-pointer block lg:hidden"><Menu size={25}/></div>
+          <div className="hidden lg:block">
             <div className="flex items-center gap-x-1 blur-bg h-12 rounded-xl px-5 w-fit">
               <FavIcon name="calender" />
               {formatDate(new Date())}
@@ -114,16 +115,6 @@ export default function Navber() {
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .nav-sticky {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 50;
-          height: 80px;
-        }
-      `}</style>
     </div>
   );
 }

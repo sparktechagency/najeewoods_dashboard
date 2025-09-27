@@ -35,7 +35,7 @@ export default function Modal({
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
         className={cn(
-          "sm:max-w-md p-0 gap-0 bg-blacks rounded-2xl overflow-hidden border-none",
+          "sm:max-w-md p-0 gap-0 bg-blacks rounded-2xl overflow-y-auto   max-h-[95vh] h-fit scrollbar-hide border-none",
           className
         )}
       >

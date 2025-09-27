@@ -33,7 +33,7 @@ export default function ModalOne({
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
         className={cn(
-          `sm:max-w-md p-0 gap-0 bg-[#121212]/20 backdrop-blur-3xl rounded-2xl overflow-hidden border`,
+          `sm:max-w-md p-0 gap-0 bg-[#121212]/20 backdrop-blur-3xl rounded-2xl overflow-y-auto   max-h-[95vh] h-fit scrollbar-hide border-none`,
           className
         )}
       >

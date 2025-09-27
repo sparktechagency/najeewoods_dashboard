@@ -2,14 +2,16 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import FavIcon from "@/icon/favIcon";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface NavItem {
   icon: any;
   href?: string;
   submenu?: NavItem[];
+  active_i: any;
+  text?:string
 }
 
 export default function NavItem({ items }: { items: NavItem[] }) {
@@ -20,7 +22,8 @@ export default function NavItem({ items }: { items: NavItem[] }) {
   useEffect(() => {
     menuRefs.current.forEach((menu, index) => {
       if (menu) {
-        menu.style.maxHeight = activeSubmenu === index ? `${menu.scrollHeight}px` : "0";
+        menu.style.maxHeight =
+          activeSubmenu === index ? `${menu.scrollHeight}px` : "0";
         menu.style.opacity = activeSubmenu === index ? "1" : "0";
       }
     });
@@ -30,21 +33,24 @@ export default function NavItem({ items }: { items: NavItem[] }) {
     setActiveSubmenu((prev) => (prev === index ? null : index));
   };
 
+  // /md:w-12 md:h-12 
   return (
-    <ul className="flex flex-col items-center space-y-5">
-      {items?.map(({ icon, href, submenu }, parentIndex) => (
+    <ul className="flex flex-col p-4 md:p-0 md:items-center space-y-4 md:space-y-5">
+      {items?.map(({ icon, active_i, href, submenu,text }, parentIndex) => (
         <li key={parentIndex} className="group relative">
           {href ? (
             <Link
               href={href}
               className={`${
                 pathname === href ? "bgOne" : ""
-              } w-12 h-12 flex items-center justify-center rounded-xl transition-colors duration-200`}
+              } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-md md:rounded-xl transition-colors duration-200`}
             >
-              <FavIcon
-                activeColor={pathname === href ? "#ffffff" : ""}
-                name={icon}
-              />
+              {pathname === href ? (
+                <FavIcon name={active_i} />
+              ) : (
+                <FavIcon name={icon} />
+              )}
+              <span className="block md:hidden">{text}</span>
             </Link>
           ) : (
             <div
@@ -52,9 +58,14 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               className="flex items-center px-3 py-2 relative justify-between cursor-pointer rounded-xl transition-colors duration-200"
             >
               <span className="flex items-center gap-x-2 font-medium">
-                <FavIcon name={icon} />
+                {pathname === href ? (
+                  <FavIcon name={active_i} />
+                ) : (
+                  <FavIcon name={icon} />
+                )}
+                 <span className="block md:hidden">{text}</span>
               </span>
-              <span className="absolute top-1/2 -translate-y-1/2 -right-3">
+              <span className="md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-3">
                 {activeSubmenu === parentIndex ? (
                   <ChevronUp className="size-5 text-[#AFAFAF] font-extrabold transition-transform duration-200" />
                 ) : (
@@ -71,25 +82,30 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               }}
               initial={{ maxHeight: 0, opacity: 0 }}
               animate={{
-                maxHeight: activeSubmenu === parentIndex ? `${menuRefs.current[parentIndex]?.scrollHeight}px` : "0",
+                maxHeight:
+                  activeSubmenu === parentIndex
+                    ? `${menuRefs.current[parentIndex]?.scrollHeight}px`
+                    : "0",
                 opacity: activeSubmenu === parentIndex ? 1 : 0,
               }}
               transition={{ duration: 0.3 }}
-             className="overflow-hidden transition-all space-y-1 pt-1 duration-300 ease-out max-h-0"
+              className="overflow-hidden transition-all space-y-1 pt-1 duration-300 ease-out max-h-0"
             >
-              {submenu.map(({ href, icon }, subIndex) => (
+              {submenu.map(({ href, icon,text, active_i }, subIndex) => (
                 <li key={subIndex}>
                   {href && (
                     <Link
                       href={href}
                       className={`${
                         pathname === href ? "bgOne" : ""
-                      } w-12 h-12 flex items-center justify-center rounded-xl transition-colors duration-200`}
+                      } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-xl transition-colors duration-200`}
                     >
-                      <FavIcon
-                        activeColor={pathname === href ? "#ffffff" : ""}
-                        name={icon}
-                      />
+                      {pathname === href ? (
+                        <FavIcon name={active_i} />
+                      ) : (
+                        <FavIcon name={icon} />
+                      )}
+                       <span className="block md:hidden">{text}</span>
                     </Link>
                   )}
                 </li>
