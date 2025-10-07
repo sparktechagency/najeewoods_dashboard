@@ -53,10 +53,11 @@
   --radius-xl: calc(var(--radius) + 4px);
   --color-green-figma: #00ae26;
   --color-reds-figma: #fb5e5e;
-  --color-secondery-figma:#AFAFAF;
-  --color-modal-figma:#2D2D2D;
-  --color-blacks:#202020;
-  --color-card-figma:#3D3D3D;
+  --color-secondery-figma: #afafaf;
+  --color-modal-figma: #2d2d2d;
+  --color-blacks: #202020;
+  --color-card-figma: #3d3d3d;
+  --color-input-bg: #1c1c1c;
 }
 
 :root {
@@ -74,7 +75,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: rgba(255, 255, 255, 0.10);
+  --border: rgba(255, 255, 255, 0.1);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -137,7 +138,9 @@
   }
 }
 
-
+body {
+  overflow-x: hidden;
+}
 
 .blur-bg {
   @apply bg-[#1D1D1D]/20 backdrop-blur-xl;
@@ -167,7 +170,6 @@
 .ql-toolbar .ql-picker {
   color: white !important; /* for text buttons/dropdowns */
 }
-
 
 .ql-container {
   border: none !important;
@@ -206,7 +208,6 @@
 
 /* Fix autofill styles for WebKit browsers */
 @layer utilities {
-
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -243,7 +244,6 @@
 .fallbackStyle {
   @apply bg-[#cb4ec9]/70 text-white;
 }
-
 
 .\[\&_\.recharts-rectangle\.recharts-tooltip-cursor\]\:fill-muted {
   & .recharts-rectangle.recharts-tooltip-cursor {

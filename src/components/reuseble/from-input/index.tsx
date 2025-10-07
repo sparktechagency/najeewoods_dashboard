@@ -86,7 +86,7 @@ export function FromInput({
             </Label>
           </div>
           {error?.message && (
-            <h3 className="text-sm pt-[1px] text-end text-red-400 flex gap-1 items-center justify-end">
+            <h3 className="text-sm pt-[1px] text-end text-[#dd4343] flex gap-1 items-center justify-end">
               {error.message}
               <CircleAlert size={14} />
             </h3>

@@ -5,17 +5,20 @@ import { loginSchema } from "@/components/schema";
 import { Button, Checkbox, Label } from "@/components/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import React from "react";
 import bgImg from "@/assets/bg.png";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useLoginInMutation } from "@/redux/api/authApi";
+import { authKey, helpers } from "@/lib";
 
 export default function RootPage() {
-    const router = useRouter();
+  const [LoginIn, { isLoading }] = useLoginInMutation();
+  const router = useRouter();
   const from = useForm({
-    // resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -23,11 +26,15 @@ export default function RootPage() {
   });
 
   const handleSubmit = async (values: FieldValues) => {
-    toast.success("Login Successfully", {
-      description: "You have successfully logged in",
-    });
-    router.push("/dashboard");
-    console.log(values);
+    const res = await LoginIn(values).unwrap();
+    if (res.success) {
+      helpers.setAuthCookie(authKey, res?.data?.token);
+      router.push("/dashboard");
+      from.reset();
+      toast.success("Login Successful", {
+        description: "Welcome back! You have been logged in successfully.",
+      });
+    }
   };
 
   return (
@@ -43,20 +50,16 @@ export default function RootPage() {
           <h1 className="text-center text-2xl font-medium">
             Login to your account
           </h1>
-          <h1 className="text-center text-secondery-figma">
+          <h1 className="text-center  text-secondery-figma">
             Please enter your email & password to continue
           </h1>
           <div className="pt-20">
-            <Form
-              from={from}
-              className="space-y-7"
-              onSubmit={handleSubmit}
-            >
+            <Form from={from} className="space-y-7" onSubmit={handleSubmit}>
               <FromInput
                 name="email"
                 label="Email"
                 placeholder="Enter your email"
-                stylelabel="bg-background"
+                stylelabel="bg-input-bg"
                 type="email"
               />
               <div>
@@ -65,7 +68,7 @@ export default function RootPage() {
                   name="password"
                   label="Password"
                   placeholder="Enter your password"
-                  stylelabel="bg-background"
+                  stylelabel="bg-input-bg"
                 />
                 <div className="flex items-center mt-3 justify-between text-sm">
                   <div className="flex items-center space-x-2">
@@ -82,7 +85,14 @@ export default function RootPage() {
               </div>
 
               <div className="flex justify-center">
-                <Button size={"lg"} className="!px-10" variant={"primary"}>Sign In</Button>
+                <Button
+                  disabled={isLoading}
+                  size="lg"
+                  className="!px-10"
+                  variant="primary"
+                >
+                  Sign In
+                </Button>
               </div>
             </Form>
           </div>

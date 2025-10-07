@@ -1,7 +1,7 @@
 import { email, z } from "zod";
 
 export const moodSchema = z.object({
-  mood_name: z.string().nonempty("Mood name is required"),
+  name: z.string().nonempty("Mood name is required"),
   icon: z
     .any()
     .refine((file) => file instanceof File, { message: "Photo is required" }),
@@ -40,7 +40,10 @@ export const loginSchema = z.object({
     .refine((val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
       message: "Invalid email address",
     }),
-  password: z.string().nonempty("Password is required"),
+  password: z
+    .string()
+    .nonempty("Password is required")
+    .min(6, "Password must be at least 6 characters long"),
 });
 
 // newPasswordSchema

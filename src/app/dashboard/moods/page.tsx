@@ -17,6 +17,8 @@ import ImgUpload from "@/components/reuseble/img-upload";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { moodSchema } from "@/components/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useGetMoodsQuery, useStoreMoodsMutation } from "@/redux/api/moodsApi";
+import { helpers } from "@/lib";
 
 const intImg = {
   ImgPreview: "",
@@ -28,12 +30,15 @@ export default function Moods() {
   const [isStore, setIsStore] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isImg, setIsImg] = useState<any>(intImg);
+  const [storeMoods, { isLoading }] = useStoreMoodsMutation();
+  const {data}=useGetMoodsQuery({})
+  console.log(data)
 
   const from = useForm({
     resolver: zodResolver(moodSchema),
     defaultValues: {
       icon: null,
-      mood_name: "",
+      name: "",
     },
   });
 
@@ -47,9 +52,12 @@ export default function Moods() {
 
   // handleSubmit
   const handleSubmit = async (values: FieldValues) => {
-    console.log(values);
-    from.reset();
-    setIsImg(intImg);
+    const data=helpers.fromData(values)
+    const res = storeMoods(data).unwrap();
+    // if (res.success) {
+    //   from.reset();
+    //   setIsImg(intImg);
+    // }
   };
 
   // Updatefrom
@@ -57,7 +65,7 @@ export default function Moods() {
     resolver: zodResolver(moodSchema),
     defaultValues: {
       icon: null,
-      mood_name: "",
+      name: "",
     },
   });
   // UpdateSubmit
@@ -84,10 +92,10 @@ export default function Moods() {
     <div>
       <ShadowBox>
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
-            <div>
-              <h1 className="text-2xl font-semibold">Moods</h1>
-              <h1 className="text-base">Total moods: 05</h1>
-            </div>
+          <div>
+            <h1 className="text-2xl font-semibold">Moods</h1>
+            <h1 className="text-base">Total moods: 05</h1>
+          </div>
           <Button
             onClick={() => setIsStore(!isStore)}
             variant="primary"
@@ -109,7 +117,7 @@ export default function Moods() {
                   <Image src={emoji} alt="img" width={60} height={20} />
                 </div>
                 <div className="text-center text-white text-lg  mt-1 mb-2 font-medium">
-                 Angry
+                  Angry
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <span>
@@ -184,7 +192,7 @@ export default function Moods() {
               </div>
             </ImgUpload>
 
-            <FromInput name="mood_name" label="Mood name" />
+            <FromInput name="name" label="Mood name" />
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => {
@@ -199,7 +207,12 @@ export default function Moods() {
                 <X className="size-5" />
                 Cancel
               </Button>
-              <Button variant="primary" size="lg" className="w-full">
+              <Button
+                disabled={isLoading}
+                variant="primary"
+                size="lg"
+                className="w-full"
+              >
                 {" "}
                 <Plus className="size-5" />
                 Create
@@ -208,7 +221,7 @@ export default function Moods() {
           </div>
         </Form>
       </Modal>
-       {/*===============modal update ====================*/}
+      {/*===============modal update ====================*/}
       <Modal
         open={isUpdate}
         setIsOpen={setIsUpdate}
@@ -223,7 +236,7 @@ export default function Moods() {
                   ...isImg,
                   ImgPreview: URL.createObjectURL(file),
                 });
-               Updatefrom.setValue("icon", file, { shouldValidate: true });
+                Updatefrom.setValue("icon", file, { shouldValidate: true });
               }}
             >
               <div>
@@ -262,7 +275,7 @@ export default function Moods() {
               </div>
             </ImgUpload>
 
-            <FromInput name="mood_name" label="Mood name" />
+            <FromInput name="name" label="Mood name" />
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => {
@@ -279,8 +292,8 @@ export default function Moods() {
               </Button>
               <Button variant="primary" size="lg" className="w-full">
                 {" "}
-               <FavIcon name="save"/>
-               Save changes
+                <FavIcon name="save" />
+                Save changes
               </Button>
             </div>
           </div>

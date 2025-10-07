@@ -3,15 +3,14 @@ import React, { useState, useRef, useEffect } from "react";
 import navbg from "@/assets/navber-bg.png";
 import Image from "next/image";
 import FavIcon from "@/icon/favIcon";
-import { formatDate } from "@/lib";
-import { Button} from "@/components/ui";
+import { Button } from "@/components/ui";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight, Menu} from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
+import { helpers } from "@/lib";
 
-
-export default function Navber({sidebarOpen, setSidebarOpen}:any) {
+export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
   const contentRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -45,11 +44,16 @@ export default function Navber({sidebarOpen, setSidebarOpen}:any) {
       <Image src={navbg} alt="title" fill className="object-cover z-0" />
       <div className="relative lg:pl-[80px] z-10">
         <div className="flex justify-between items-center">
-          <div onClick={()=>setSidebarOpen(!sidebarOpen)} className="cursor-pointer block lg:hidden"><Menu size={25}/></div>
+          <div
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="cursor-pointer block lg:hidden"
+          >
+            <Menu size={25} />
+          </div>
           <div className="hidden lg:block">
             <div className="flex items-center gap-x-1 blur-bg h-12 rounded-xl px-5 w-fit">
               <FavIcon name="calender" />
-              {formatDate(new Date())}
+              {helpers.formatDate(new Date())}
             </div>
           </div>
           <div>

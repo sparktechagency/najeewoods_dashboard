@@ -3,23 +3,16 @@ import { baseApi } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    //   signUp: build.mutation({
-    //     query: (data) => ({
-    //       url: "/auth/register",
-    //       method: "POST",
-    //       ContentType: "multipart/form-data",
-    //       data,
-    //     }),
-    //   }),
-    //   signIn: build.mutation({
-    //     query: (data) => ({
-    //       url: "/auth/login",
-    //       method: "POST",
-    //       ContentType: "multipart/form-data",
-    //       data,
-    //     }),
-    //     invalidatesTags: [tagTypes.profile],
-    //   }),
+    LoginIn: build.mutation({
+      query: (data) => {
+        return {
+          url: "/auth/login",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: [tagTypes.profile],
+    }),
     //   forgotPassword: build.mutation({
     //     query: (data) => ({
     //       url: "/auth/forget-password",
@@ -80,4 +73,4 @@ export const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const {} = authApi;
+export const { useLoginInMutation } = authApi;
