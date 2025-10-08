@@ -11,8 +11,9 @@ import { useResetPasswordMutation } from "@/redux/api/authApi";
 import bgImg from "@/assets/bg2.png";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Suspense } from "react";
 
-export default function NewPassword() {
+function NewPasswordChild() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const router = useRouter();
@@ -93,5 +94,13 @@ export default function NewPassword() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PasswordParent() {
+  return (
+    <Suspense>
+      <NewPasswordChild />
+    </Suspense>
   );
 }
