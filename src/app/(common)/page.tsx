@@ -8,13 +8,14 @@ import { FieldValues, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import bgImg from "@/assets/bg.png";
 import Image from "next/image";
 import { useLoginInMutation } from "@/redux/api/authApi";
 import { authKey, helpers } from "@/lib";
 
 export default function RootPage() {
+  const [error, setError] = useState("");
   const [LoginIn, { isLoading }] = useLoginInMutation();
   const router = useRouter();
   const from = useForm({
@@ -26,14 +27,19 @@ export default function RootPage() {
   });
 
   const handleSubmit = async (values: FieldValues) => {
-    const res = await LoginIn(values).unwrap();
-    if (res.success) {
-      helpers.setAuthCookie(authKey, res?.data?.token);
-      router.push("/dashboard");
-      from.reset();
-      toast.success("Login Successful", {
-        description: "Welcome back! You have been logged in successfully.",
-      });
+    setError("");
+    try {
+      const res = await LoginIn(values).unwrap();
+      if (res.success) {
+        helpers.setAuthCookie(authKey, res?.data?.token);
+        router.push("/dashboard");
+        from.reset();
+        toast.success("Login Successful", {
+          description: "Welcome back! You have been logged in successfully.",
+        });
+      }
+    } catch (err: any) {
+      setError(err?.data?.message);
     }
   };
 
@@ -75,6 +81,7 @@ export default function RootPage() {
                     <Checkbox className="" id="remember-me" />
                     <Label htmlFor="remember-me">Remember me</Label>
                   </div>
+                  {error && <h1 className="text-red-400 text-sm">{error}</h1>}
                   <Link
                     href="/forgot-password"
                     className="text-[#EC7C5C] font-semibold hover:underline"

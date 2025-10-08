@@ -6,15 +6,19 @@ import { useSearchParams } from "next/navigation";
 import Form from "@/components/reuseble/from";
 import { FieldValues, useForm } from "react-hook-form";
 import { FromInput } from "@/components/reuseble/from-input";
-import { PlaceholderImg } from "@/lib";
+import { helpers } from "@/lib";
 import FavIcon from "@/icon/favIcon";
 import Image from "next/image";
 import ImgUpload from "@/components/reuseble/img-upload";
 import { Button } from "@/components/ui";
 import PasswordChange from "@/components/common/password-change";
 import { toast } from "sonner";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "@/redux/api/authApi";
 
-const intAva = {
+const intImg = {
   file: null,
   preview: null,
 };
@@ -23,29 +27,51 @@ function ProfileChild() {
   const params = useSearchParams();
   const tab = params.get("tab") || "overview";
   const [isTab, setIsTab] = useState(tab === "password" ? "tab-2" : "tab-1");
-  const [avatar, setAvatar] = useState<any>(intAva);
+  const [img, setImg] = useState<any>(intImg);
+  const { data, isLoading: ProLoading } = useGetProfileQuery({});
+  const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   useEffect(() => {
     setIsTab(tab === "password" ? "tab-2" : "tab-1");
   }, [tab]);
 
   const profilefrom = useForm({
-    // resolver: zodResolver(podcastSchema),
     defaultValues: {
-      name: "julfiker",
-      email: "julfiker@gmail.com",
+      name: "",
+      email: "",
     },
   });
+
+  // set data from
+  const { name, email, avatar } = data?.data || {};
+
+  useEffect(() => {
+    if (!ProLoading) {
+      profilefrom.reset({
+        name,
+        email,
+      });
+      setImg((pre: any) => ({
+        ...pre,
+        preview: process.env.NEXT_PUBLIC_IMG_URL + avatar,
+      }));
+    }
+  }, [data]);
+
+  // handleProfileSubmit
   const handleProfileSubmit = async (values: FieldValues) => {
     const value = {
       name: values.name,
-      ...(avatar?.file && { image: avatar?.file }),
+      ...(img?.file && { avatar: img?.file }),
     };
-    toast.success("Profile Updated", {
-      description: "Your profile has been successfully updated",
-      position: "bottom-right",
-    });
-    console.log(value);
+    const item = helpers.fromData(value);
+    const res = await updateProfile(item).unwrap();
+    if (res.success) {
+      toast.success("Profile Updated", {
+        description: "Your profile has been successfully updated",
+        position: "bottom-right",
+      });
+    }
   };
 
   return (
@@ -89,7 +115,7 @@ function ProfileChild() {
             >
               <div className="relative mx-auto size-28 rounded-full">
                 <Image
-                  src={avatar?.preview || PlaceholderImg() || "/blur.png"}
+                  src={img?.preview || "/blur.png"}
                   alt={"title"}
                   fill
                   className={"object-cover rounded-full"}
@@ -97,8 +123,8 @@ function ProfileChild() {
                 <ImgUpload
                   className="grid place-items-center shadow-md  rounded-full absolute -bottom-1 -right-2 cursor-pointer"
                   onFileSelect={(file: File) => {
-                    setAvatar({
-                      ...avatar,
+                    setImg({
+                      ...img,
                       file,
                       preview: URL.createObjectURL(file),
                     });
@@ -113,9 +139,10 @@ function ProfileChild() {
                 name="email"
                 label="Email"
                 stylelabel="bg-background"
+                readOnly
               />
               <div className="flex justify-center">
-                <Button variant={"primary"}>
+                <Button disabled={isLoading} variant="primary">
                   <FavIcon name="save" />
                   Save Change
                 </Button>

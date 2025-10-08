@@ -54,6 +54,7 @@ export default function Moods() {
   const handleSubmit = async (values: FieldValues) => {
     const data=helpers.fromData(values)
     const res = storeMoods(data).unwrap();
+    console.log(res)
     // if (res.success) {
     //   from.reset();
     //   setIsImg(intImg);

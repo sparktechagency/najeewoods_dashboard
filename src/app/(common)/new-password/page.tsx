@@ -1,33 +1,43 @@
 "use client";
 import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
-import {newPasswordSchema } from "@/components/schema";
+import { newPasswordSchema } from "@/components/schema";
 import { Button } from "@/components/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
-import React from "react";
+import { BackBtn2 } from "@/components/reuseble/back-btn";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useResetPasswordMutation } from "@/redux/api/authApi";
 import bgImg from "@/assets/bg2.png";
 import Image from "next/image";
-import { BackBtn2 } from "@/components/reuseble/back-btn";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function NewPassword() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
   const router = useRouter();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const from = useForm({
     resolver: zodResolver(newPasswordSchema),
     defaultValues: {
-      password: "",
-      confirmPassword: "",
+      new_password: "",
+      c_password: "",
     },
   });
 
   const handleSubmit = async (values: FieldValues) => {
-    toast.success("Password updated successfully", {
-        description: "Please login with your new password."
-    });
-    console.log(values)
-    router.push('/');
+    const data = {
+      ...values,
+      email,
+    };
+    const res = await resetPassword(data).unwrap();
+    if (res.success) {
+      toast.success("Password updated successfully", {
+        description: "Please login with your new password.",
+      });
+      router.push("/");
+      from.reset();
+    }
   };
 
   return (
@@ -44,34 +54,39 @@ export default function NewPassword() {
         </div>
         <div className="z-10">
           <h1 className="text-center text-2xl font-medium">
-           Set a new password
+            Set a new password
           </h1>
           <h1 className="text-center max-w-xs mx-auto text-secondery-figma">
             Create a new password. Ensure that its different from previous one.
           </h1>
           <div className="pt-20">
-            <Form
-              from={from}
-              className="space-y-7"
-              onSubmit={handleSubmit}
-            >
+            <Form from={from} className="space-y-7" onSubmit={handleSubmit}>
               <FromInput
-                name="password"
+                name="new_password"
                 label="Password"
                 placeholder="Enter your password"
-                stylelabel="bg-background"
+                stylelabel="bg-input-bg"
+                eye={true}
                 type="password"
               />
               <FromInput
-                name="confirmPassword"
+                name="c_password"
                 label="Confirm Password"
                 placeholder="Enter your confirm password"
-                stylelabel="bg-background"
+                stylelabel="bg-input-bg"
+                eye={true}
                 type="password"
               />
 
               <div className="flex justify-center">
-                <Button size={"lg"} className="!px-10" variant={"primary"}>Update password</Button>
+                <Button
+                  disabled={isLoading}
+                  size={"lg"}
+                  className="!px-10"
+                  variant="primary"
+                >
+                  Update password
+                </Button>
               </div>
             </Form>
           </div>

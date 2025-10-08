@@ -1,14 +1,15 @@
 "use client";
+import { useGetProfileQuery } from "@/redux/api/authApi";
 import React, { useState, useRef, useEffect } from "react";
 import navbg from "@/assets/navber-bg.png";
-import Image from "next/image";
-import FavIcon from "@/icon/favIcon";
-import { Button } from "@/components/ui";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu } from "lucide-react";
+import { authKey, helpers } from "@/lib";
 import Link from "next/link";
-import { helpers } from "@/lib";
+import Image from "next/image";
+import FavIcon from "@/icon/favIcon";
+import { Button, Skeleton } from "@/components/ui";
 
 export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -35,6 +36,11 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  const token = helpers.getAuthCookie(authKey);
+  const { data: profile } = useGetProfileQuery(
+    {},
+    { refetchOnFocus: true, skip: !token }
+  );
 
   return (
     <div
@@ -70,12 +76,23 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
                 >
                   <ImgBox
                     alt="profile"
-                    className="size-12 cursor-pointer"
-                    src="/profile.svg"
+                    className="size-12 rounded-full cursor-pointer"
+                    src={
+                      (profile?.data?.avatar &&
+                        process.env.NEXT_PUBLIC_IMG_URL +
+                          profile?.data?.avatar) ||
+                      "/blur.png"
+                    }
                   />
-                  <div className="text-start leading-5">
-                    <h1 className="font-medium">Elizabeth Olson</h1>
-                    <h1>example@gmail.com</h1>
+                  <div className="text-start space-y-1 leading-5">
+                    <h1 className="font-medium">
+                      {profile?.data?.name || <Skeleton className="h-4 w-30" />}
+                    </h1>
+                    <h1>
+                      {profile?.data?.email || (
+                        <Skeleton className="h-4 w-40" />
+                      )}
+                    </h1>
                   </div>
                 </button>
 

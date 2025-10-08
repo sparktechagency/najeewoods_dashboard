@@ -5,14 +5,17 @@ import { loginSchema } from "@/components/schema";
 import { Button } from "@/components/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
-import React from "react";
-import bgImg from "@/assets/bg2.png";
-import Image from "next/image";
 import { BackBtn2 } from "@/components/reuseble/back-btn";
 import { useRouter } from "next/navigation";
+import { useForgotPasswordMutation } from "@/redux/api/authApi";
+import { toast } from "sonner";
+import bgImg from "@/assets/bg2.png";
+import Image from "next/image";
+import React from "react";
 
 export default function ForgotPassword() {
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const from = useForm({
     resolver: zodResolver(loginSchema.partial()),
     defaultValues: {
@@ -21,8 +24,21 @@ export default function ForgotPassword() {
   });
 
   const handlePasswordSubmit = async (values: FieldValues) => {
-    console.log(values.email);
-    router.push(`/verify-otp?email=${values.email}`);
+    try {
+      const res = await forgotPassword(values).unwrap();
+      if (res.success) {
+        toast.success("Successful", {
+          description: "Password reset code sent to your email",
+        });
+        router.push(`/verify-otp?email=${values.email}`);
+        from.reset();
+      }
+    } catch (err: any) {
+      from.setError("email", {
+        type: "manual",
+        message: err.data?.message,
+      });
+    }
   };
 
   return (
@@ -54,12 +70,17 @@ export default function ForgotPassword() {
                 name="email"
                 label="Email"
                 placeholder="Enter your email"
-                stylelabel="bg-background"
+                stylelabel="bg-input-bg"
                 type="email"
               />
 
               <div className="flex justify-center">
-                <Button size={"lg"} className="!px-10" variant={"primary"}>
+                <Button
+                  disabled={isLoading}
+                  size={"lg"}
+                  className="!px-10"
+                  variant={"primary"}
+                >
                   Send code
                 </Button>
               </div>

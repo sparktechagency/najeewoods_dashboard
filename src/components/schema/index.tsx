@@ -23,7 +23,7 @@ export const podcastSchema = musicSchema.extend({
 
 export const passwordChangeSchema = z
   .object({
-    current_password: z.string().nonempty("Current Password is required"),
+    old_password: z.string().nonempty("Current Password is required"),
     new_password: z.string().nonempty("New Password is required"),
     c_password: z.string().nonempty("Confirm password is required"),
   })
@@ -49,10 +49,16 @@ export const loginSchema = z.object({
 // newPasswordSchema
 export const newPasswordSchema = z
   .object({
-    password: z.string().nonempty("Password is required"),
-    confirmPassword: z.string().nonempty("Confirm Password is required"),
+    new_password: z
+      .string()
+      .nonempty("Password is required")
+      .min(6, "Password must be at least 6 characters long"),
+    c_password: z
+      .string()
+      .nonempty("Confirm Password is required")
+      .min(6, "Password must be at least 6 characters long"),
   })
-  .refine((value) => value.password === value.confirmPassword, {
-    path: ["confirmPassword"],
+  .refine((value) => value.new_password === value.c_password, {
+    path: ["c_password"],
     message: "Passwords must be match.",
   });

@@ -1,7 +1,7 @@
 import { tagTypes } from "../tag-types";
 import { baseApi } from "./baseApi";
 
-export const authApi = baseApi.injectEndpoints({
+export const moodsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getMoods: build.query({
       query: (arg?: Record<string, any>) => ({
@@ -52,4 +52,4 @@ export const {
   useStoreMoodsMutation,
   useUpdateMoodsMutation,
   useDeleteMoodsMutation,
-} = authApi;
+} = moodsApi;

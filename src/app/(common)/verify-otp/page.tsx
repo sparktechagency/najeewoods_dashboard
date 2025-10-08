@@ -11,6 +11,8 @@ import React, {
   KeyboardEvent,
   Suspense,
 } from "react";
+import { useOtpVarifyMutation } from "@/redux/api/authApi";
+import { toast } from "sonner";
 
 function VarifyOTpChild() {
   const searchParams = useSearchParams();
@@ -20,6 +22,7 @@ function VarifyOTpChild() {
   const [isError, setIsError] = useState<string>("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
+  const [otpVarify, { isLoading }] = useOtpVarifyMutation();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, i: number) => {
     const { value } = e.target;
@@ -61,9 +64,16 @@ function VarifyOTpChild() {
       if (joinedCode.length < 6) {
         setError("Please enter all 6 digits.");
       } else {
-        const value = { email, otp: code.join("") };
-        console.log(value);
-        router.push("/new-password");
+        const value = { email, code: code.join("") };
+        const res = await otpVarify(value).unwrap();
+        if (res.success) {
+            toast.success("OTP Verified Successfully", {
+            description: "You can now set a new password",
+            });
+          setCode([]);
+          router.push(`/new-password?email=${email}`);
+        }
+        // router.push("/new-password");
         setError("");
       }
     } catch (err: any) {
@@ -122,6 +132,7 @@ function VarifyOTpChild() {
                 type="button"
                 variant="primary"
                 onClick={handleVerify}
+                disabled={isLoading}
               >
                 Verify
               </Button>
