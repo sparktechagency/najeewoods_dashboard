@@ -2,14 +2,9 @@
 import ShadowBox from "@/components/common/shadow-box";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { CircleAlert, Plus, X } from "lucide-react";
-import FavIcon from "@/icon/favIcon";
-import { useEffect, useState } from "react";
 import useConfirmation from "@/components/context/delete-modal";
-import { Button } from "@/components/ui";
-import emoji from "@/assets/unuse/angry.png";
-import Image from "next/image";
+import { Button, Skeleton } from "@/components/ui";
 import { Deletebtn, Editbtn } from "@/components/reuseble/icon-list";
-import Modal from "@/components/reuseble/modal";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
@@ -17,23 +12,43 @@ import ImgUpload from "@/components/reuseble/img-upload";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { moodSchema } from "@/components/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useGetMoodsQuery, useStoreMoodsMutation } from "@/redux/api/moodsApi";
+import {
+  useDeleteMoodsMutation,
+  useGetMoodsQuery,
+  useStoreMoodsMutation,
+  useUpdateMoodsMutation,
+} from "@/redux/api/moodsApi";
+import { useModalState } from "@/components/hooks/useModalState";
+import Modal2 from "@/components/reuseble/modal2";
+import { CloseIcon } from "@/components/reuseble/btn-modal";
+import RepeatCount from "@/components/reuseble/repeat-count/count";
+import { NoItemData } from "@/components/reuseble/table-no-item";
+import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const intImg = {
   ImgPreview: "",
-  UpdatePreview: "",
+  UpPreview: "",
+};
+
+const intState = {
+  isStore: false,
+  isUpdate: false,
 };
 
 export default function Moods() {
   const { confirm } = useConfirmation();
-  const [isStore, setIsStore] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [state, updateState] = useModalState(intState);
   const [isImg, setIsImg] = useState<any>(intImg);
-  const [storeMoods, { isLoading }] = useStoreMoodsMutation();
-  const {data}=useGetMoodsQuery({})
-  console.log(data)
+  const [isDetails, setIsDetails] = useState<any>({});
+  const [storeMoods, { isLoading: storeLoading }] = useStoreMoodsMutation();
+  const [updateMoods, { isLoading: updateLoading }] = useUpdateMoodsMutation();
+  const { data: moodsItem, isLoading } = useGetMoodsQuery({});
+  const [deleteMoods] = useDeleteMoodsMutation();
 
+  //  == Store Moods ==
   const from = useForm({
     resolver: zodResolver(moodSchema),
     defaultValues: {
@@ -42,38 +57,43 @@ export default function Moods() {
     },
   });
 
-  //reset form
-  useEffect(() => {
-    if (!isStore) {
-      from.reset();
-      setIsImg(intImg);
-    }
-  }, [isStore, from]);
-
-  // handleSubmit
-  const handleSubmit = async (values: FieldValues) => {
-    const data=helpers.fromData(values)
-    const res = storeMoods(data).unwrap();
-    console.log(res)
-    // if (res.success) {
-    //   from.reset();
-    //   setIsImg(intImg);
-    // }
+  const handleSubmit = async (value: FieldValues) => {
+    try {
+      const values = helpers.fromData(value);
+      const res = await storeMoods(values).unwrap();
+      if (res.success) {
+        handleStoreReset();
+      }
+    } catch (err: any) {}
   };
 
-  // Updatefrom
+  //  == update Moods ==
   const Updatefrom = useForm({
-    resolver: zodResolver(moodSchema),
     defaultValues: {
       icon: null,
       name: "",
     },
   });
-  // UpdateSubmit
+
+  useEffect(() => {
+    if (isDetails) {
+      Updatefrom.reset({
+        name: isDetails.name,
+      });
+    }
+  }, [isDetails]);
+
   const updateSubmit = async (values: FieldValues) => {
-    console.log(values);
-    Updatefrom.reset();
-    setIsImg(intImg);
+    const value = {
+      ...values,
+      ...(values.icon && { icon: values.icon }),
+    };
+    const id = isDetails._id;
+    const data = helpers.fromData(value);
+    const res = await updateMoods({ id, data }).unwrap();
+    if (res.success) {
+      hanldeUpdateReset();
+    }
   };
 
   //  handleDelete
@@ -85,8 +105,22 @@ export default function Moods() {
         "After deleting, users wont be able to find this mood in your app",
     });
     if (con) {
-      console.log(id);
+      await deleteMoods(id).unwrap();
     }
+  };
+
+  //  == Reset from ==
+  const handleStoreReset = () => {
+    updateState("isStore", false);
+    from.reset();
+    setIsImg(intImg);
+  };
+
+  const hanldeUpdateReset = () => {
+    updateState("isUpdate", false);
+    Updatefrom.reset();
+    setIsImg(intImg);
+    setIsDetails({});
   };
 
   return (
@@ -95,57 +129,81 @@ export default function Moods() {
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
           <div>
             <h1 className="text-2xl font-semibold">Moods</h1>
-            <h1 className="text-base">Total moods: 05</h1>
+            <h1 className="text-base">
+              Total Moods: {moodsItem?.meta?.total || 0}
+            </h1>
           </div>
           <Button
-            onClick={() => setIsStore(!isStore)}
+            onClick={() => updateState("isStore", true)}
             variant="primary"
             size="lg"
           >
-            <Plus className="size-5" /> Add new mood
+            <Plus className="size-5" /> Add New Mood
           </Button>
         </div>
       </ShadowBox>
       <WapperBox>
         <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-          {Array.from({ length: 10 }).map((item, index) => {
-            return (
+          {isLoading ? (
+            <RepeatCount count={20}>
+              <Skeleton className="w-[200px]  h-[180px]" />
+            </RepeatCount>
+          ) : moodsItem?.data?.length > 0 ? (
+            moodsItem?.data?.map((item: any, index: any) => (
               <div
                 className="border h-fit w-[200px]  bg-card-figma rounded-xl p-5 flex flex-col justify-between"
                 key={index}
               >
                 <div className="mx-auto">
-                  <Image src={emoji} alt="img" width={60} height={20} />
+                  <Image
+                    src={
+                      process.env.NEXT_PUBLIC_IMG_URL + item.icon || "/blur.png"
+                    }
+                    alt="img"
+                    width={60}
+                    height={20}
+                  />
                 </div>
                 <div className="text-center text-white text-lg  mt-1 mb-2 font-medium">
-                  Angry
+                  {item.name}
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <span>
                     <Editbtn
-                      onClick={() => setIsUpdate(!isUpdate)}
+                      onClick={() => {
+                        setIsDetails(item);
+                        setIsImg((prevState: any) => ({
+                          ...prevState,
+                          UpPreview:
+                            process.env.NEXT_PUBLIC_IMG_URL + item.icon,
+                        }));
+                        updateState("isUpdate", true);
+                      }}
                       className="border-1"
                     />
                   </span>
                   <span>
                     <Deletebtn
-                      onClick={() => handleDelete("123")}
+                      onClick={() => handleDelete(item._id)}
                       className="border-1"
                     />
                   </span>
                 </div>
               </div>
-            );
-          })}
+            ))
+          ) : (
+            <NoItemData title="No mood data available" />
+          )}
         </div>
       </WapperBox>
-      {/* =================modal custom ================ */}
-      <Modal
-        open={isStore}
-        setIsOpen={setIsStore}
-        title="Create new mood"
+      {/* ================= Create New Mood ================ */}
+      <Modal2
+        open={state.isStore}
+        setIsOpen={(v) => updateState("isStore", v)}
+        title="Create New Mood"
         titleStyle="text-center"
       >
+        <CloseIcon onClose={() => handleStoreReset()} />
         <Form from={from} onSubmit={handleSubmit}>
           <div className="space-y-4">
             <ImgUpload
@@ -178,7 +236,7 @@ export default function Moods() {
                           <FavIcon name="upload" />
                         </div>
                         <span className="text-white text-lg font-medium">
-                          Upload mood image
+                          Upload Mood image
                         </span>
                       </div>
                     </div>
@@ -193,14 +251,14 @@ export default function Moods() {
               </div>
             </ImgUpload>
 
-            <FromInput name="name" label="Mood name" />
+            <FromInput
+              name="name"
+              label="Mood name"
+              placeholder="Enter Your Mood Name"
+            />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  from.reset();
-                  setIsImg(intImg);
-                  setIsStore(!isStore);
-                }}
+                onClick={() => handleStoreReset()}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -209,7 +267,7 @@ export default function Moods() {
                 Cancel
               </Button>
               <Button
-                disabled={isLoading}
+                disabled={storeLoading}
                 variant="primary"
                 size="lg"
                 className="w-full"
@@ -221,69 +279,45 @@ export default function Moods() {
             </div>
           </div>
         </Form>
-      </Modal>
-      {/*===============modal update ====================*/}
-      <Modal
-        open={isUpdate}
-        setIsOpen={setIsUpdate}
-        title="Edit mood"
+      </Modal2>
+      {/*=============== Edit Mood ====================*/}
+      <Modal2
+        open={state.isUpdate}
+        setIsOpen={(v) => updateState("isUpdate", v)}
+        title="Edit Mood"
         titleStyle="text-center"
       >
+        <CloseIcon onClose={() => hanldeUpdateReset()} />
         <Form from={Updatefrom} onSubmit={updateSubmit}>
           <div className="space-y-4">
             <ImgUpload
               onFileSelect={(file: File) => {
                 setIsImg({
                   ...isImg,
-                  ImgPreview: URL.createObjectURL(file),
+                  UpPreview: URL.createObjectURL(file),
                 });
-                Updatefrom.setValue("icon", file, { shouldValidate: true });
+                Updatefrom.setValue("icon", file as any, {
+                  shouldValidate: true,
+                });
               }}
             >
-              <div>
-                {isImg.ImgPreview ? (
-                  <div className="mx-auto relative p-2 py-3 w-[170px]  h-fit rounded-md border-2 border-dashed">
-                    <ImgBox
-                      className="size-20 mx-auto"
-                      src={isImg.ImgPreview}
-                      alt="img"
-                    />
-                    <span className="absolute top-1 right-1 border p-[5px] rounded-sm">
-                      {" "}
-                      <FavIcon name="chnage" />
-                    </span>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="relative block w-fit h-fit p-5 mx-auto border-2 border-dashed rounded-2xl cursor-pointer transition-colors duration-200">
-                      <div className="flex flex-col items-center justify-center h-full text-center">
-                        <div className="relative mb-4">
-                          <FavIcon name="upload" />
-                        </div>
-                        <span className="text-white text-lg font-medium">
-                          Upload mood image
-                        </span>
-                      </div>
-                    </div>
-                    {Updatefrom?.formState?.errors?.icon && (
-                      <p className="text-red-400 justify-center mt-1 flex items-center gap-1 text-sm">
-                        {Updatefrom?.formState?.errors?.icon?.message as string}
-                        <CircleAlert size={14} />
-                      </p>
-                    )}
-                  </div>
-                )}
+              <div className="mx-auto relative p-2 py-3 w-[170px]  h-fit rounded-md border-2 border-dashed">
+                <ImgBox
+                  className="size-20 mx-auto"
+                  src={isImg.UpPreview || "/blur.png"}
+                  alt="img"
+                />
+                <span className="absolute top-1 right-1 border p-[5px] rounded-sm">
+                  {" "}
+                  <FavIcon name="chnage" />
+                </span>
               </div>
             </ImgUpload>
 
-            <FromInput name="name" label="Mood name" />
+            <FromInput name="name" label="Mood Name" />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  Updatefrom.reset();
-                  setIsImg(intImg);
-                  setIsUpdate(!isUpdate);
-                }}
+                onClick={() => hanldeUpdateReset()}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -291,7 +325,12 @@ export default function Moods() {
                 <X className="size-5" />
                 Cancel
               </Button>
-              <Button variant="primary" size="lg" className="w-full">
+              <Button
+                disabled={updateLoading}
+                variant="primary"
+                size="lg"
+                className="w-full"
+              >
                 {" "}
                 <FavIcon name="save" />
                 Save changes
@@ -299,7 +338,7 @@ export default function Moods() {
             </div>
           </div>
         </Form>
-      </Modal>
+      </Modal2>
     </div>
   );
 }
