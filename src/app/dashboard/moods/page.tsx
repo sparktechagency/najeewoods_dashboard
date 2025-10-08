@@ -27,6 +27,7 @@ import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { Pagination } from "@/components/reuseble/pagination";
 
 const intImg = {
   ImgPreview: "",
@@ -43,10 +44,13 @@ export default function Moods() {
   const [state, updateState] = useModalState(intState);
   const [isImg, setIsImg] = useState<any>(intImg);
   const [isDetails, setIsDetails] = useState<any>({});
+  const [isPage, setIsPage]=useState(1)
   const [storeMoods, { isLoading: storeLoading }] = useStoreMoodsMutation();
   const [updateMoods, { isLoading: updateLoading }] = useUpdateMoodsMutation();
-  const { data: moodsItem, isLoading } = useGetMoodsQuery({});
+  const { data: moodsItem, isLoading } = useGetMoodsQuery({page:isPage});
   const [deleteMoods] = useDeleteMoodsMutation();
+
+
 
   //  == Store Moods ==
   const from = useForm({
@@ -195,6 +199,14 @@ export default function Moods() {
             <NoItemData title="No mood data available" />
           )}
         </div>
+        <ul className="flex flex-wrap justify-end pt-14">
+          <li className="font-medium">
+            <Pagination
+              onPageChange={(v: any) => setIsPage(v)}
+              {...moodsItem?.meta}
+            ></Pagination>
+          </li>
+        </ul>
       </WapperBox>
       {/* ================= Create New Mood ================ */}
       <Modal2
