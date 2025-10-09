@@ -5,8 +5,16 @@ import { navItems } from "./nav-data";
 import FavIcon from "@/icon/favIcon";
 import Navitem from "./nav-item";
 import { Button } from "@/components/ui";
+import { authKey, helpers } from "@/lib";
+import { useRouter } from "next/navigation";
 
-export default function Sideber({sidebarOpen, setSidebarOpen}:any) {
+export default function Sideber({ sidebarOpen, setSidebarOpen }: any) {
+  const router = useRouter();
+  const handlelogout = () => {
+    helpers.removeAuthCookie(authKey);
+    router.push("/");
+  };
+
   return (
     <div className="block">
       {sidebarOpen && (
@@ -32,7 +40,10 @@ export default function Sideber({sidebarOpen, setSidebarOpen}:any) {
           </div>
           <div className="flex flex-col pb-10  justify-between overflow-y-scroll scrollbar-hide h-[calc(100vh-120px)]">
             <Navitem items={navItems} />
-            <Button className="bg-figma-primary cursor-pointer hover:bg-figma-primary  w-fit mx-auto md:bg-transparent md:hover:bg-transparent">
+            <Button
+              onClick={() => handlelogout()}
+              className="bg-figma-primary cursor-pointer hover:bg-figma-primary  w-fit mx-auto md:bg-transparent md:hover:bg-transparent"
+            >
               {" "}
               <FavIcon className="size-4 md:size-6" name="logout" />{" "}
               <span className="block md:hidden">Logout</span>
@@ -41,23 +52,5 @@ export default function Sideber({sidebarOpen, setSidebarOpen}:any) {
         </div>
       </aside>
     </div>
-    // <div className="flex fixed left-0 top-0 z-60">
-    //   {/* Sidebar */}
-    //   <aside
-    //     className={`w-20 overflow-y-scroll scrollbar-hide border-r border-white/10  bg-sideber blur-bg backdrop-blur-2xl`}
-    //   >
-    //     <div className="flex flex-col relative">
-    //       <div className="flex items-center justify-center h-[120px]  rounded-md">
-    //         <span className="relative mb-6"> <Image src={logo} alt="img" width={40} height={20} /></span>
-    //       </div>
-    //       <div className="flex flex-col pb-10 justify-between overflow-y-scroll scrollbar-hide h-[calc(100vh-120px)]">
-    //         <Navitem items={navItems} />
-    //         <div className="w-max mt-8 mx-auto">
-    //           <FavIcon name="logout" />
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </aside>
-    // </div>
   );
 }

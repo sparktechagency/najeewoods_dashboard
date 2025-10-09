@@ -12,12 +12,13 @@ import { TableSkeleton } from "@/components/reuseble/table-skeleton";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { TableCell, TableRow } from "@/components/ui";
 import FavIcon from "@/icon/favIcon";
+import { useGetUserQuery } from "@/redux/api/userApi";
 import { ArrowUp, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 
-const data = [
+const data1 = [
   {
     name: "Elizabeth Olson",
     email: "example@gmail.com",
@@ -114,9 +115,8 @@ export default function Users() {
     "Followers",
     "Action",
   ];
-  const isLoading = false;
-
-
+  const { data, isLoading } = useGetUserQuery({});
+  console.log(data);
 
   const handleDelete = async (id: string) => {
     const con = await confirm({
@@ -149,8 +149,8 @@ export default function Users() {
         <CustomTable headers={headers}>
           {isLoading ? (
             <TableSkeleton colSpan={headers?.length} tdStyle="!pl-2" />
-          ) : data?.length > 0 ? (
-            data?.map((item, index) => (
+          ) : data1?.length > 0 ? (
+            data1?.map((item, index) => (
               <TableRow key={index} className="border">
                 <TableCell className="relative">
                   <div className="flex items-center gap-3">
@@ -221,7 +221,10 @@ export default function Users() {
                 <h1 className="text-secondery-figma">example@gmail.com</h1>
               </div>
             </div>
-            <div onClick={() => handleDelete("55")} className="border cursor-pointer size-10  grid place-items-center rounded-md">
+            <div
+              onClick={() => handleDelete("55")}
+              className="border cursor-pointer size-10  grid place-items-center rounded-md"
+            >
               <FavIcon name="delete" className="size-5" />
             </div>
           </div>

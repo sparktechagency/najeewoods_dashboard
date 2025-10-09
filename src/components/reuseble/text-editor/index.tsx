@@ -19,12 +19,13 @@ interface TextEditorProps {
   value: string;
   onChange: (content: string) => void;
   className?: string;
+  isLoading?:boolean
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
   value,
   onChange,
-  className,
+  className
 }) => {
   const modules = {
     toolbar: [
