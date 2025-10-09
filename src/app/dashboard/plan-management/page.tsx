@@ -2,8 +2,7 @@
 import ShadowBox from "@/components/common/shadow-box";
 import { BackBtn } from "@/components/reuseble/back-btn";
 import WapperBox from "@/components/reuseble/wapper-box";
-import useConfirmation from "@/components/context/delete-modal";
-import { Button } from "@/components/ui";
+import { Button, Skeleton } from "@/components/ui";
 import { FieldValues, useForm } from "react-hook-form";
 import Modal from "@/components/reuseble/modal";
 import Form from "@/components/reuseble/from";
@@ -11,121 +10,43 @@ import { FromInput } from "@/components/reuseble/from-input";
 import { InputWordSelectField } from "@/components/reuseble/from-word-select";
 import ColorPicker from "react-best-gradient-color-picker";
 import tinycolor from "tinycolor2";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetPlanQuery } from "@/redux/api/subscribersApi";
 import { getColor } from "@/lib";
-
-const pricingPlans = [
-  {
-    id: 1,
-    title: "Video Creator Pro",
-    price: "$9.99",
-    period: "/ month",
-    color: "#513a89",
-    features: [
-      "All features from other plans included.",
-      "Plus:",
-      "Pin multiple vids at once.",
-      "Add clickable links via music, silent, preset.",
-      "Access to the new sharing charts, reactions, photos.",
-      "Profile badge that marks them as a 'Verified VIP Creator'.",
-    ],
-  },
-  {
-    id: 2,
-    title: "Premium Vibe Planning",
-    price: "$3.99",
-    period: "/ month",
-    color: "#7d3d0d",
-    features: [
-      "Customize shopping with colors and animated text/font styles.",
-      "Spend unlimited money/buy up to 5x.",
-      "About music or voice long-live.",
-      "Higher tier placement on the voice map.",
-    ],
-  },
-  {
-    id: 3,
-    title: "Local Music Station Pro",
-    price: "$2.99",
-    period: "/ month",
-    color: "#0d6f69",
-    features: [
-      "Gives full access to the live community, powered music streams.",
-      "Unlocks live ability list.",
-      "Up to 5 music live sound clips.",
-      "View unknown songs.",
-      "Get higher priority on track playtime.",
-      "Listeners without a subscription can only hear live station.",
-    ],
-  },
-  {
-    id: 4,
-    title: "Voice Podcast Builder",
-    price: "$1.00",
-    period: "/ month",
-    color: "#8a3333",
-    features: [
-      "Unlocks voice recording & posting.",
-      "Users can add audio files to mini podcast.",
-      "Voice notes appear as pins or feed content.",
-      "Useful for creators using only their phone.",
-    ],
-  },
-];
+import RepeatCount from "@/components/reuseble/repeat-count/count";
 
 export default function Planmanagement() {
-  const [isStore, setIsStore] = useState(false);
+  const colorPickerRef = useRef<HTMLDivElement | null>(null);
   const [isUpdate, setIsUpdate] = useState(false);
   const { data: plans, isLoading } = useGetPlanQuery({});
-
+  const [isPlan, setIsPlan] = useState<any>({});
   const [isColor, setIsColor] = useState({
-    add: false,
-    addColor: "rgb(59,130,246)",
     update: false,
     updateColor: "rgb(59,130,246)",
   });
-  const { confirm } = useConfirmation();
 
-  // handleDelete
-  const handleDelete = async (id: string) => {
-    const con = await confirm({
-      title: "You are going to delete this plan",
-      subTitle: "Delete plan",
-      description:
-        "After deleting, users wont be able to see and purchase this plan.",
-    });
-    if (con) {
-      console.log(id);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        colorPickerRef.current &&
+        !colorPickerRef.current.contains(event.target as Node)
+      ) {
+        setIsColor((prev) => ({ ...prev, update: false }));
+      }
+    };
+
+    if (isColor.update) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-  };
 
-  const from = useForm({
-    // resolver: zodResolver(podcastSchema),
-    defaultValues: {
-      color: "",
-      name: "",
-      price: "",
-      feature: [],
-    },
-  });
-
-  // useEffect(() => {
-  //   if (!isStore) {
-  //     from.reset();
-  //     setIsAudio({ audioPreview: "" });
-  //   }
-  // }, [isStore, from]);
-
-  const handleSubmit = async (values: FieldValues) => {
-    console.log(values);
-  };
-
-  // update form
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isColor.update]);
+  // Update form
   const fromUpdate = useForm({
-    // resolver: zodResolver(podcastSchema),
     defaultValues: {
       color: "#db8505",
       name: "",
@@ -133,6 +54,8 @@ export default function Planmanagement() {
       feature: [],
     },
   });
+
+  useEffect(() => {}, [fromUpdate]);
 
   const handleSubmitUpdate = async (values: FieldValues) => {
     console.log(values);
@@ -151,199 +74,99 @@ export default function Planmanagement() {
               </h1>
             </div>
           </div>
-          <Button
-            variant="primary"
-            onClick={() => setIsStore(!isStore)}
-            size="lg"
-          >
-            <Plus className="size-5" /> Add new plan
-          </Button>
         </div>
       </ShadowBox>
       <WapperBox>
         <div className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-10">
-            {plans?.data?.map((plan: any) => (
-              <div
-                key={plan._id}
-                className={`rounded-2xl flex flex-col bg-blur bg-blacks/20  justify-between py-6 pl-6  border text-white relative overflow-hidden`}
-              >
+            {isLoading ? (
+              <RepeatCount count={6}>
+                <Skeleton className="h-[450px] w-full" />
+              </RepeatCount>
+            ) : (
+              plans?.data?.map((plan: any) => (
                 <div
-                  style={{
-                    background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${getColor(
-                      plan.level
-                    )})`,
-                    opacity: 0.3,
-                  }}
-                  className="w-[360px] h-[300px] absolute bottom-0 z-0 right-0"
-                ></div>
-                <div className="z-1">
-                  {/* Header */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
-                    <div className="flex items-baseline">
-                      <span className="text-3xl font-semibold">
-                        {plan.price}
-                      </span>
-                      <span className="ml-1 text-secondery-figma">
-                        / {plan.interval}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Features */}
-                  <div className="mb-8">
-                    <div className="flex items-center justify-center">
-                      <h1 className="text-lg font-medium mr-2"> Features</h1>
-                      <h1 className="bg-border h-px w-full mt-1"></h1>
-                    </div>
-                    <ul className="space-y-2 mt-5">
-                      {plan.features.map((feature: any, index: any) => (
-                        <li key={index} className="flex items-start">
-                          <span className="text-white/80 mr-2 mt-1 flex-shrink-0">
-                            •
-                          </span>
-                          <span className="text-white/90 leading-relaxed">
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="flex z-1 justify-center gap-3">
-                  <span>
+                  key={plan._id}
+                  className={`rounded-2xl relative flex flex-col bg-blur bg-blacks/20  justify-between py-6 pl-6  border text-white overflow-hidden`}
+                >
+                  <span className="absolute right-2 top-2">
                     <Button
-                      onClick={() => setIsUpdate(!isUpdate)}
-                      size={"lg"}
-                      variant={"outline"}
-                      className="!px-10"
+                      onClick={() => {
+                        setIsPlan(plan);
+                        setIsUpdate(!isUpdate);
+                      }}
+                      size="icon"
+                      variant="outline"
+                      className="rounded-md"
                     >
                       <FavIcon className="size-4" name="edit" />
-                      Edit
                     </Button>
                   </span>
-                  <span>
-                    <Button
-                      onClick={() => handleDelete("345")}
-                      size={"lg"}
-                      variant={"outline"}
-                      className="!px-10"
-                    >
-                      <FavIcon className="size-4" name="delete" />
-                      Delete
-                    </Button>
-                  </span>
+                  <div
+                    style={{
+                      background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${getColor(
+                        plan.level
+                      )})`,
+                      opacity: 0.3,
+                    }}
+                    className="w-[360px] h-[300px] absolute bottom-0 z-0 right-0"
+                  ></div>
+                  <div className="z-1">
+                    {/* Header */}
+                    <div className="mb-6">
+                      <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
+                      <div className="flex items-baseline">
+                        <span className="text-3xl font-semibold">
+                          {plan.price}
+                        </span>
+                        <span className="ml-1 text-secondery-figma">
+                          / {plan.interval}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <div className="mb-8">
+                      <div className="flex items-center justify-center">
+                        <h1 className="text-lg font-medium mr-2"> Features</h1>
+                        <h1 className="bg-border h-px w-full mt-1"></h1>
+                      </div>
+                      <ul className="space-y-2 mt-5">
+                        {plan.features.map((feature: any, index: any) => (
+                          <li key={index} className="flex items-start">
+                            <span className="text-white/80 mr-2 mt-1 flex-shrink-0">
+                              •
+                            </span>
+                            <span className="text-white/90 leading-relaxed">
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </WapperBox>
-      {/* =================Upload plan  ================ */}
-      <Modal
-        open={isStore}
-        setIsOpen={setIsStore}
-        title="Create new plan"
-        titleStyle="text-center"
-      >
-        <Form from={from} onSubmit={handleSubmit}>
-          <div className="space-y-5">
-            <div className="grid py-1 place-items-center relative border rounded-2xl">
-              <div
-                onClick={() => setIsColor({ ...isColor, add: !isColor.add })}
-                className="w-[95%] cursor-pointer mx-auto p-2 rounded-sm  m-2"
-                style={{
-                  background: isColor.addColor,
-                }}
-              ></div>
-              <span className="text-secondery-figma text-base font-medium absolute -top-3 left-7 bg-blacks px-3">
-                Color Select
-              </span>
-              {isColor.add && (
-                <div className="absolute top-8 left-0 z-60">
-                  <ColorPicker
-                    hideInputs={true}
-                    hideOpacity={true}
-                    hideControls={true}
-                    hideColorTypeBtns={true}
-                    hidePresets={true}
-                    hideEyeDrop={true}
-                    hideAdvancedSliders={true}
-                    hideColorGuide={true}
-                    hideInputType={true}
-                    hideGradientType={true}
-                    hideGradientAngle={true}
-                    hideGradientStop={true}
-                    hideGradientControls={true}
-                    width={300}
-                    height={200}
-                    value={from.watch("color")}
-                    onChange={(color) => {
-                      const hexValue = tinycolor(color).toHexString();
-                      setIsColor({ ...isColor, addColor: color });
-                      from.setValue("color", hexValue);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            <FromInput
-              name="name"
-              label="Plan name"
-              placeholder="Plan name hare"
-            />
-            <FromInput
-              name="price"
-              label="Price"
-              type="number"
-              placeholder="Price hare for number"
-            />
 
-            <InputWordSelectField
-              name="feature"
-              label="Features"
-              placeholder="Add Features name (press Enter)"
-              matching={false}
-              className="w-full"
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => {
-                  from.reset();
-                  setIsStore(!isStore);
-                }}
-                size="lg"
-                type="button"
-                className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
-              >
-                <X className="size-5" />
-                Cancel
-              </Button>
-              <Button variant="primary" size="lg" className="w-full">
-                {" "}
-                <Plus className="size-5" />
-                Add
-              </Button>
-            </div>
-          </div>
-        </Form>
-      </Modal>
       {/* =================Update plan  ================ */}
       <Modal
         open={isUpdate}
         setIsOpen={setIsUpdate}
-        title="Update plan"
+        title="Update Plan"
         titleStyle="text-center"
       >
         <Form from={fromUpdate} onSubmit={handleSubmitUpdate}>
-          <div className="space-y-5">
+          <div ref={colorPickerRef} className="space-y-5">
             <div className="grid py-1 place-items-center relative border rounded-2xl">
               <div
-                onClick={() =>
-                  setIsColor({ ...isColor, update: !isColor.update })
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsColor({ ...isColor, update: !isColor.update });
+                }}
                 className="w-[95%] cursor-pointer mx-auto p-2 rounded-sm  m-2"
                 style={{
                   background: isColor.updateColor,
@@ -370,7 +193,7 @@ export default function Planmanagement() {
                     hideGradientControls={true}
                     width={300}
                     height={200}
-                    value={from.watch("color")}
+                    value={fromUpdate.watch("color")}
                     onChange={(color) => {
                       const hexValue = tinycolor(color).toHexString();
                       setIsColor({ ...isColor, updateColor: color });
@@ -382,7 +205,7 @@ export default function Planmanagement() {
             </div>
             <FromInput
               name="name"
-              label="Plan name"
+              label="Plan Name"
               placeholder="Plan name hare"
             />
             <FromInput
