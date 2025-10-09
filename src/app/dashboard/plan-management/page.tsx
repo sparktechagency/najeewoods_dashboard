@@ -14,6 +14,8 @@ import tinycolor from "tinycolor2";
 import { Plus, X } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useState } from "react";
+import { useGetPlanQuery } from "@/redux/api/subscribersApi";
+import { getColor } from "@/lib";
 
 const pricingPlans = [
   {
@@ -77,6 +79,8 @@ const pricingPlans = [
 export default function Planmanagement() {
   const [isStore, setIsStore] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const { data: plans, isLoading } = useGetPlanQuery({});
+
   const [isColor, setIsColor] = useState({
     add: false,
     addColor: "rgb(59,130,246)",
@@ -142,7 +146,9 @@ export default function Planmanagement() {
             <BackBtn />
             <div>
               <h1 className="text-2xl font-semibold">Plan management</h1>
-              <h1 className="text-base">4 active plans</h1>
+              <h1 className="text-base">
+                {plans?.data?.length || 0} Active Plans
+              </h1>
             </div>
           </div>
           <Button
@@ -157,14 +163,16 @@ export default function Planmanagement() {
       <WapperBox>
         <div className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-10">
-            {pricingPlans.map((plan) => (
+            {plans?.data?.map((plan: any) => (
               <div
-                key={plan.id}
+                key={plan._id}
                 className={`rounded-2xl flex flex-col bg-blur bg-blacks/20  justify-between py-6 pl-6  border text-white relative overflow-hidden`}
               >
                 <div
                   style={{
-                    background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${plan.color})`,
+                    background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${getColor(
+                      plan.level
+                    )})`,
                     opacity: 0.3,
                   }}
                   className="w-[360px] h-[300px] absolute bottom-0 z-0 right-0"
@@ -172,13 +180,13 @@ export default function Planmanagement() {
                 <div className="z-1">
                   {/* Header */}
                   <div className="mb-6">
-                    <h3 className="text-xl font-medium mb-2">{plan.title}</h3>
+                    <h3 className="text-xl font-medium mb-2">{plan.name}</h3>
                     <div className="flex items-baseline">
                       <span className="text-3xl font-semibold">
                         {plan.price}
                       </span>
                       <span className="ml-1 text-secondery-figma">
-                        {plan.period}
+                        / {plan.interval}
                       </span>
                     </div>
                   </div>
@@ -190,20 +198,14 @@ export default function Planmanagement() {
                       <h1 className="bg-border h-px w-full mt-1"></h1>
                     </div>
                     <ul className="space-y-2 mt-5">
-                      {plan.features.map((feature, index) => (
+                      {plan.features.map((feature: any, index: any) => (
                         <li key={index} className="flex items-start">
-                          {feature === "Plus:" ? (
-                            <span className="font-medium">{feature}</span>
-                          ) : (
-                            <>
-                              <span className="text-white/80 mr-2 mt-1 flex-shrink-0">
-                                •
-                              </span>
-                              <span className="text-white/90 leading-relaxed">
-                                {feature}
-                              </span>
-                            </>
-                          )}
+                          <span className="text-white/80 mr-2 mt-1 flex-shrink-0">
+                            •
+                          </span>
+                          <span className="text-white/90 leading-relaxed">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>

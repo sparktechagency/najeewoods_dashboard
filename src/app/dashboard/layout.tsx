@@ -5,7 +5,7 @@ import { childrenProps } from "@/types";
 import React, { useState } from "react";
 
 export default function CommonLayout({ children }: childrenProps) {
-  const [sidebarOpen, setSidebarOpen]=useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="flex overflow-hidden">
       {/* <!-- ===== Sidebar Start ===== --> */}

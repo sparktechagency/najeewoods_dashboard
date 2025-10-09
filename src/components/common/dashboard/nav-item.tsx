@@ -11,7 +11,7 @@ interface NavItem {
   href?: string;
   submenu?: NavItem[];
   active_i: any;
-  text?:string
+  text?: string;
 }
 
 export default function NavItem({ items }: { items: NavItem[] }) {
@@ -33,19 +33,26 @@ export default function NavItem({ items }: { items: NavItem[] }) {
     setActiveSubmenu((prev) => (prev === index ? null : index));
   };
 
-  // /md:w-12 md:h-12 
+  const isActive = (href: string) => {
+    if (href === "/dashboard") {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
+
+  // /md:w-12 md:h-12
   return (
     <ul className="flex flex-col p-4 md:p-0 md:items-center space-y-4 md:space-y-5">
-      {items?.map(({ icon, active_i, href, submenu,text }, parentIndex) => (
+      {items?.map(({ icon, active_i, href, submenu, text }, parentIndex) => (
         <li key={parentIndex} className="group relative">
           {href ? (
             <Link
               href={href}
               className={`${
-                pathname === href ? "bgOne" : ""
+                isActive(href) ? "bgOne" : ""
               } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-md md:rounded-xl transition-colors duration-200`}
             >
-              {pathname === href ? (
+              {isActive(href) ? (
                 <FavIcon name={active_i} />
               ) : (
                 <FavIcon name={icon} />
@@ -58,12 +65,12 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               className="flex items-center px-3 py-2 relative justify-between cursor-pointer rounded-xl transition-colors duration-200"
             >
               <span className="flex items-center gap-x-2 font-medium">
-                {pathname === href ? (
+                {isActive(href as string) ? (
                   <FavIcon name={active_i} />
                 ) : (
                   <FavIcon name={icon} />
                 )}
-                 <span className="block md:hidden">{text}</span>
+                <span className="block md:hidden">{text}</span>
               </span>
               <span className="md:absolute md:top-1/2 md:-translate-y-1/2 md:-right-3">
                 {activeSubmenu === parentIndex ? (
@@ -91,21 +98,21 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               transition={{ duration: 0.3 }}
               className="overflow-hidden transition-all space-y-1 pt-1 duration-300 ease-out max-h-0"
             >
-              {submenu.map(({ href, icon,text, active_i }, subIndex) => (
+              {submenu.map(({ href, icon, text, active_i }, subIndex) => (
                 <li key={subIndex}>
                   {href && (
                     <Link
                       href={href}
                       className={`${
-                        pathname === href ? "bgOne" : ""
+                        isActive(href) ? "bgOne" : ""
                       } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-xl transition-colors duration-200`}
                     >
-                      {pathname === href ? (
+                      {isActive(href) ? (
                         <FavIcon name={active_i} />
                       ) : (
                         <FavIcon name={icon} />
                       )}
-                       <span className="block md:hidden">{text}</span>
+                      <span className="block md:hidden">{text}</span>
                     </Link>
                   )}
                 </li>

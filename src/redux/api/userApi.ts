@@ -23,14 +23,14 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.users],
     }),
-    deleteUser: build.mutation({
+    userAcToggle: build.mutation({
       query: (id) => ({
-        url: `/users/${id}`,
-        method: "DELETE",
+        url: `/auth/active-inactive/${id}`,
+        method: "POST",
       }),
-      invalidatesTags: [tagTypes.moods],
+      invalidatesTags: [tagTypes.users],
     }),
   }),
 });
 
-export const { useGetUserQuery, useSingleUserQuery, useDeleteUserMutation } =userApi;
+export const { useGetUserQuery, useSingleUserQuery,useUserAcToggleMutation} = userApi;

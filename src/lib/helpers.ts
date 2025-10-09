@@ -32,6 +32,16 @@ export class helpers {
   static formatDateTime(date: string | Date): string {
     return dayjs(date).format("h:s A - DD MMM YYYY");
   }
+  //  ===== localStorage  =====
+  static getStorageItem = (key: string) => {
+   return localStorage.getItem(key);
+  };
+  static setStorageItem = (key: string, value: string | any) => {
+    return localStorage.setItem(key, value);
+  };
+  static removeStorageItem = (key: string) => {
+    return localStorage.removeItem(key);
+  };
 
   // ===== Strings =====
   static capitalize(text: string): string {
@@ -51,5 +61,10 @@ export class helpers {
     const formData = new FormData();
     Object.keys(values).forEach((key) => formData.append(key, values[key]));
     return formData;
+  }
+  // ========= imgSource =============
+  static imgSource(href: string): string {
+    if (href?.startsWith("http") || href?.startsWith("https")) return href;
+    return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
   }
 }
