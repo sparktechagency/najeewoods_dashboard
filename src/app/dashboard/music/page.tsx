@@ -6,12 +6,11 @@ import FavIcon from "@/icon/favIcon";
 import { useEffect, useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
-import { PlaceholderImg } from "@/lib";
+import { helpers, PlaceholderImg, userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";
-import { Button } from "@/components/ui";
-import Modal from "@/components/reuseble/modal";
+import { Button, Skeleton } from "@/components/ui";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
@@ -20,28 +19,50 @@ import { InputSelectField } from "@/components/reuseble/from-select";
 import AudioUpload from "@/components/reuseble/audio-box";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema } from "@/components/schema";
-import { vibeOptions } from "@/components/dummy-json";
+import { vibeIcon, vibeOptions } from "@/components/dummy-json";
+import Modal2 from "@/components/reuseble/modal2";
+import { CloseIcon } from "@/components/reuseble/btn-modal";
+import {
+  useDeletePostMutation,
+  useGetPostQuery,
+  useStorePostMutation,
+} from "@/redux/api/commonApi";
+import { toast } from "sonner";
+import RepeatCount from "@/components/reuseble/repeat-count/count";
+import { NoItemData } from "@/components/reuseble/table-no-item";
+import { Pagination } from "@/components/reuseble/pagination";
+import AudioBers from "@/components/reuseble/audio-bers";
+import { useGlobalState } from "@/components/hooks";
+import MusicProgress from "@/components/reuseble/music-progress";
 
-
-
-
+const intGlobal: any = {
+  isPage: 1,
+  isPreview: false,
+  isStore: false,
+  isUpdate: false,
+  audioPreview: "",
+  isShow: null,
+  isDetails: {},
+};
 
 export default function Music() {
   const { confirm } = useConfirmation();
-  const [isPreview, setIsPreview] = useState(false);
+  const [global, updateGlobal] = useGlobalState(intGlobal);
   const [isActive, setIsActive] = useState("Owned");
-  const [isShow, setIsShow] = useState<number | null>(null);
-  const [isStore, setIsStore] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [isAudio, setIsAudio] = useState<any>({ audioPreview: "" });
-  const [isPlay,setIsPlay]=useState(false)
-   
+  const [storePost, { isLoading }] = useStorePostMutation();
+  const [deletePost] = useDeletePostMutation();
+  const query = {
+    post_type: "audio",
+    page: global.isPage,
+    get: isActive === "Owned" ? "me" : "all",
+  };
+  const { data: music, isLoading: postIsLoading } = useGetPostQuery(query);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest(".menu-container")) {
-        setIsShow(null);
+        updateGlobal("isShow", null);
       }
     };
 
@@ -62,17 +83,25 @@ export default function Music() {
     },
   });
 
-  useEffect(() => {
-    if (!isStore) {
-      from.reset();
-      setIsAudio({ audioPreview: "" });
-    }
-  }, [isStore,from]);
-
   const handleSubmit = async (values: FieldValues) => {
-    console.log(values);
+    const value = {
+      post_type: "audio",
+      mood: values.vibe,
+      privacy: values?.visibility,
+      location: values?.location,
+      audio: values?.audio,
+      captions: values?.caption,
+    };
+    const fromData = helpers.fromData(value);
+    const res = await storePost(fromData).unwrap();
+    if (res.success) {
+      handleUploadReset();
+      toast.success("Audio uploaded successfully", {
+        description: "Your audio has been uploaded successfully.",
+      });
+    }
   };
-// update music
+  // update music
   const fromUpdate = useForm({
     resolver: zodResolver(musicSchema),
     defaultValues: {
@@ -83,11 +112,9 @@ export default function Music() {
       visibility: "",
     },
   });
-   const handleSubmitMusic = async (values: FieldValues) => {
-    console.log(values);
-  };
+  const handleSubmitMusic = async (values: FieldValues) => {};
 
-  // hanldedelete
+  // === hanldedelete ===
   const handleDelete = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this music",
@@ -96,9 +123,10 @@ export default function Music() {
         "After deleting, users wont be able to find this music in your app",
     });
     if (con) {
-      console.log(id);
+      await deletePost(id).unwrap();
     }
   };
+  // === handleDeletePodcast ===
   const handleDeletePodcast = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this podcast",
@@ -107,9 +135,24 @@ export default function Music() {
         "After deleting, users wont be able to find this podcast in your app",
     });
     if (con) {
-      console.log(id);
+      await deletePost(id).unwrap();
     }
   };
+  // reset from store
+  const handleUploadReset = () => {
+    updateGlobal("audioPreview", "");
+    from.reset();
+    updateGlobal("isStore", false);
+  };
+
+  const handleUpdateReset = () => {
+    updateGlobal("audioPreview", "");
+    fromUpdate.reset();
+    updateGlobal("isUpdate", false);
+  };
+
+  const vibe=vibeIcon(global?.isDetails?.user?.salt)
+  console.log(vibe)
 
   return (
     <div>
@@ -117,10 +160,12 @@ export default function Music() {
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
           <div>
             <h1 className="text-2xl font-semibold">Music&apos;s</h1>
-            <h1 className="text-base">Total music: 36</h1>
+            <h1 className="text-base">
+              Total music: {music?.meta?.total || 0}
+            </h1>
           </div>
           <Button
-            onClick={() => setIsStore(!isStore)}
+            onClick={() => updateGlobal("isStore", true)}
             variant="primary"
             size="lg"
           >
@@ -147,113 +192,203 @@ export default function Music() {
         </div>
         {isActive == "Owned" ? (
           // ========="Owned=========
-          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-            {Array.from({ length: 10 }).map((item, index) => {
-              return (
-                <div
-                  className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
-                  key={index}
-                >
-                  <div className="flex justify-between relative items-center menu-container">
-                    <FavIcon name="musicBers" />
-                    <div
-                      onClick={() => setIsShow(index)}
-                      className="border cursor-pointer size-10 grid place-items-center rounded-full"
-                    >
-                      <EllipsisVertical />
-                    </div>
-                    {isShow === index && (
-                      <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-3 right-2">
-                        <h1
-                          onClick={() => setIsUpdate(!isUpdate)}
-                          className="flex items-center px-2 cursor-pointer"
-                        >
-                          <FavIcon name="edit" className="mr-2" />
-                          Edit
+          <div className="pt-4">
+            {postIsLoading ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                <RepeatCount count={20}>
+                  <Skeleton className="w-[200px]  h-[180px]" />
+                </RepeatCount>
+              </div>
+            ) : music?.data?.length > 0 ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                {music?.data?.map((item: any, index: any) => (
+                  <AudioBers
+                    key={index}
+                    uniqueId={item._id}
+                    audioSource={item?.audio[0]}
+                  >
+                    {({
+                      isPlaying,
+                      duration,
+                      progress,
+                      togglePlay,
+                      handleProgressBarClick,
+                    }) => (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateGlobal("isDetails", item);
+                          updateGlobal("isPreview", true);
+                          // modal open song off
+                          if (isPlaying) {
+                            togglePlay(new MouseEvent("click"));
+                          }
+                        }}
+                        className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
+                      >
+                        <div className="flex justify-between relative items-center menu-container">
+                          <FavIcon name="musicBers" />
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateGlobal("isShow", index);
+                            }}
+                            className="border cursor-pointer size-10 grid place-items-center rounded-full"
+                          >
+                            <EllipsisVertical />
+                          </div>
+                          {global.isShow === index && (
+                            <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-5 right-3">
+                              <h1
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  updateGlobal("isUpdate", true);
+                                }}
+                                className="flex items-center px-2 cursor-pointer"
+                              >
+                                <FavIcon name="edit" className="mr-2" /> Edit
+                              </h1>
+                              <h2 className="border-b my-1"></h2>
+                              <h1
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeletePodcast(item._id);
+                                }}
+                                className="flex items-center px-2 cursor-pointer"
+                              >
+                                <FavIcon name="delete" className="mr-2" />{" "}
+                                Delete
+                              </h1>
+                            </div>
+                          )}
+                        </div>
+
+                        <h1 className="text-start text-secondery-figma text-lg font-medium">
+                          {duration}
                         </h1>
-                        <h2 className="border-b my-1"></h2>
-                        <h1
-                          onClick={() => handleDeletePodcast("1234")}
-                          className="flex items-center px-2 cursor-pointer"
-                        >
-                          <FavIcon name="delete" className="mr-2" />
-                          Delete
-                        </h1>
+                        {/* Progress bar */}
+                        <MusicProgress
+                          onClick={(e: any) => {
+                            e.stopPropagation();
+                            handleProgressBarClick(e);
+                          }}
+                          progress={progress}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium flex items-center">
+                            <FavIcon name="like" className="mr-1" />{" "}
+                            {item?.likes}
+                          </span>
+                          <span onClick={togglePlay} className="cursor-pointer">
+                            {isPlaying ? (
+                              <FavIcon name="pluse" className="size-9" />
+                            ) : (
+                              <FavIcon name="play" className="size-9" />
+                            )}
+                          </span>
+                        </div>
                       </div>
                     )}
-                  </div>
-                  <h1 className="text-start text-secondery-figma text-lg font-medium">
-                    0:50
-                  </h1>
-                  <h1 className="bg-secondery-figma relative w-full h-px">
-                    <span style={{
-                      width:'20%'
-                    }} className="bg-white h-px absolute inset"></span>
-                  </h1>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium flex items-center">
-                      {" "}
-                      <FavIcon name="like" className="mr-1" /> 120
-                    </span>
-                    <span>
-                      <FavIcon name="play" />
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                  </AudioBers>
+                ))}
+              </div>
+            ) : (
+              <NoItemData title="No Owned Data Available" />
+            )}
           </div>
         ) : (
           // ==========Users ===========
-          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-            {Array.from({ length: 10 }).map((item, index) => {
-              return (
-                <div
-                  className="cursor-pointer h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
-                  key={index}
-                  onClick={() => setIsPreview(!isPreview)}
-                >
-                  <h1 className="flex justify-center">
-                    <FavIcon name="musicBers" />
-                  </h1>
-                  <h1 className="text-center text-secondery-figma text-lg font-medium">
-                    0:50
-                  </h1>
-                  <h1 className="bg-[#F7F7F7] w-full h-px"></h1>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium flex items-center">
-                      {" "}
-                      <FavIcon name="like" className="mr-1" /> 120
-                    </span>
-                    <span>
-                      <FavIcon name="play" />
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="pt-4">
+            {postIsLoading ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                <RepeatCount count={20}>
+                  <Skeleton className="w-[200px]  h-[180px]" />
+                </RepeatCount>
+              </div>
+            ) : music?.data?.length > 0 ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                {music?.data?.map((item: any, index: any) => (
+                  <AudioBers
+                    key={index}
+                    uniqueId={item._id}
+                    audioSource={item?.audio[0]}
+                  >
+                    {({
+                      isPlaying,
+                      duration,
+                      progress,
+                      togglePlay,
+                      handleProgressBarClick,
+                    }) => (
+                      <div
+                        className="cursor-pointer h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
+                        key={index}
+                        onClick={() => updateGlobal("isPreview", true)}
+                      >
+                        <h1 className="flex justify-center">
+                          <FavIcon name="musicBers" />
+                        </h1>
+                        <h1 className="text-center text-secondery-figma text-lg font-medium">
+                          {duration}
+                        </h1>
+                        <MusicProgress
+                          onClick={handleProgressBarClick}
+                          progress={progress}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium flex items-center">
+                            {" "}
+                            <FavIcon name="like" className="mr-1" />{" "}
+                            {item?.likes}
+                          </span>
+                          <span onClick={togglePlay} className="cursor-pointer">
+                            {isPlaying ? (
+                              <FavIcon name="pluse" className="size-9" />
+                            ) : (
+                              <FavIcon name="play" className="size-9" />
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </AudioBers>
+                ))}
+              </div>
+            ) : (
+              <NoItemData title="No Owned Data Available" />
+            )}
           </div>
         )}
+        {/* pagination */}
+        <ul className="flex flex-wrap justify-end mt-10 lg:mt-20">
+          <li className="font-medium">
+            <Pagination
+              onPageChange={(v: any) => updateGlobal("isPage", v)}
+              {...music?.meta}
+            ></Pagination>
+          </li>
+        </ul>
       </WapperBox>
       {/* =================upload music  ================ */}
-      <Modal
-        open={isStore}
-        setIsOpen={setIsStore}
-        title="Upload new music"
+      <Modal2
+        open={global.isStore}
+        setIsOpen={(v) => updateGlobal("isStore", v)}
+        title="Upload New Music"
         titleStyle="text-center"
       >
+        <CloseIcon className="mt-2 mr-2" onClose={() => handleUploadReset()} />
         <Form from={from} onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div>
-              {isAudio?.audioPreview ? (
+              {global.audioPreview ? (
                 <div className="mw-full h-fit rounded-md">
-                  <MusicPlayer />
+                  <MusicPlayer
+                    key={global.audioPreview}
+                    audioSource={global.audioPreview}
+                  />
                   <AudioUpload
                     onFileSelect={(file: File) => {
-                      setIsAudio({
-                        ...isAudio,
-                        audioPreview: URL.createObjectURL(file),
-                      });
+                      updateGlobal("audioPreview", URL.createObjectURL(file));
                       from.setValue("audio", file, { shouldValidate: true });
                     }}
                   >
@@ -267,10 +402,7 @@ export default function Music() {
               ) : (
                 <AudioUpload
                   onFileSelect={(file: File) => {
-                    setIsAudio({
-                      ...isAudio,
-                      audioPreview: URL.createObjectURL(file),
-                    });
+                    updateGlobal("audioPreview", URL.createObjectURL(file));
                     from.setValue("audio", file, { shouldValidate: true });
                   }}
                 >
@@ -329,10 +461,7 @@ export default function Music() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  from.reset();
-                  setIsStore(!isStore);
-                }}
+                onClick={() => handleUploadReset()}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -340,7 +469,12 @@ export default function Music() {
                 <X className="size-5" />
                 Cancel
               </Button>
-              <Button variant="primary" size="lg" className="w-full">
+              <Button
+                disabled={isLoading}
+                variant="primary"
+                size="lg"
+                className="w-full"
+              >
                 {" "}
                 <Plus className="size-5" />
                 Upload
@@ -348,24 +482,22 @@ export default function Music() {
             </div>
           </div>
         </Form>
-      </Modal>
+      </Modal2>
       {/* =================update music  ================ */}
-      <Modal
-        open={isUpdate}
-        setIsOpen={setIsUpdate}
+      <Modal2
+        open={global.isUpdate}
+        setIsOpen={(v) => updateGlobal("isUpdate", v)}
         title="Edit music"
         titleStyle="text-center"
       >
+        <CloseIcon className="mt-2 mr-2" onClose={() => handleUpdateReset()} />
         <Form from={fromUpdate} onSubmit={handleSubmitMusic}>
           <div className="space-y-5">
             <div className="mw-full h-fit rounded-md">
-              <MusicPlayer />
+              <MusicPlayer audioSource="/original-song-239607.mp3" />
               <AudioUpload
                 onFileSelect={(file: File) => {
-                  setIsAudio({
-                    ...isAudio,
-                    audioPreview: URL.createObjectURL(file),
-                  });
+                  updateGlobal("audioPreview", URL.createObjectURL(file));
                   fromUpdate.setValue("audio", file, { shouldValidate: true });
                 }}
               >
@@ -410,10 +542,7 @@ export default function Music() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  fromUpdate.reset();
-                  setIsUpdate(!isUpdate)
-                }}
+                onClick={() => handleUpdateReset()}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -429,25 +558,25 @@ export default function Music() {
             </div>
           </div>
         </Form>
-      </Modal>
+      </Modal2>
       {/* =============audio modal========== */}
       <ModalOne
-        open={isPreview}
-        setIsOpen={setIsPreview}
+        open={global.isPreview}
+        setIsOpen={(v) => updateGlobal("isPreview", v)}
         className="sm:max-w-xs"
         headerStyle="pt-4 px-4 pb-0"
         profile={
           <>
             <Avatars
-              src={PlaceholderImg()}
-              fallback={"E"}
+              src={helpers.imgSource(global?.isDetails?.user?.avatar)}
+              fallback={global?.isDetails?.user?.name}
               alt="profile"
               fallbackStyle="bg-[#cb4ec9]/70 text-white"
             />
             <div className="leading-5">
               <h1 className="flex font-medium items-center">
-                Elizabeth Olson{" "}
-                <FavIcon className="ml-2 size-4" name="internet" />
+                {global?.isDetails?.user?.name}
+                <span className="ml-2"> {userVisibiliy[global?.isDetails?.privacy] || "public"}</span>
               </h1>
               <h1 className="text-secondery-figma">😥Mental</h1>
             </div>
@@ -455,7 +584,7 @@ export default function Music() {
         }
       >
         <div className="space-y-3">
-          <MusicPlayer />
+          <MusicPlayer audioSource="/original-song-239607.mp3" />
           <p className="text-[#FFF]">
             Lorem ipsum dolor sit amet consectetur. Semper vel phasellus commodo
             neque. Duis turpis nascetur tincidunt egestas laoreet elementum
