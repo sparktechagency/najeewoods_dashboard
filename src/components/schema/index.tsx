@@ -8,14 +8,19 @@ export const moodSchema = z.object({
 });
 
 export const musicSchema = z.object({
-  vibe: z.string().nonempty("Vide is required"),
-  location: z.string().nonempty("Location is required"),
+  mood: z.string().nonempty("Vide is required"),
+  location: z
+    .any()
+    .refine((obj) => obj && Object.keys(obj).length > 0, {
+      message: "Location is required",
+    }),
   caption: z.string().nonempty("Caption is required"),
   visibility: z.string().nonempty("Visibility is required"),
   audio: z
     .any()
     .refine((file) => file instanceof File, { message: "Audio is required" }),
 });
+
 
 export const podcastSchema = musicSchema.extend({
   guests: z.array(z.string()).nonempty("Guest is required"),

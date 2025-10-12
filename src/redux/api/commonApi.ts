@@ -31,8 +31,19 @@ export const commonApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.post],
     }),
+    likePost: build.mutation({
+      query: (id) => ({
+        url: `/posts/like/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: [tagTypes.post],
+    }),
   }),
 });
 
-export const { useGetPostQuery, useStorePostMutation, useDeletePostMutation } =
-  commonApi;
+export const {
+  useGetPostQuery,
+  useStorePostMutation,
+  useDeletePostMutation,
+  useLikePostMutation,
+} = commonApi;

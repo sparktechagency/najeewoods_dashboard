@@ -7,15 +7,20 @@ import FavIcon from "@/icon/favIcon";
 
 type MusicPlayerProps = {
   audioSource: any;
+  custom?: boolean;
 };
 
-export default function MusicPlayer({ audioSource }: MusicPlayerProps) {
+export default function MusicPlayer({ audioSource, custom=true }: MusicPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+
+  const audioLink = custom
+    ? process.env.NEXT_PUBLIC_IMG_URL + audioSource
+    : audioSource;
 
   const togglePlay = (e: any) => {
     e.stopPropagation();
@@ -127,8 +132,8 @@ export default function MusicPlayer({ audioSource }: MusicPlayerProps) {
 
           {/* Hidden Audio Element */}
           <audio ref={audioRef}>
-            <source src={audioSource} type="audio/mpeg" />
-            <source src={audioSource} type="audio/ogg" />
+            <source src={audioLink} type="audio/mpeg" />
+            <source src={audioLink} type="audio/ogg" />
             Your browser does not support the audio element.
           </audio>
         </div>

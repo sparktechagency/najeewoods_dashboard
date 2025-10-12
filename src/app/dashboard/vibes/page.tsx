@@ -86,7 +86,7 @@ export default function Vibes() {
               </ImgBox>
             ))
           ) : (
-            <NoItemData title="No mood data available" />
+            <NoItemData className="w-full" title="No mood data available" />
           )}
         </div>
         <ul className="flex flex-wrap justify-end my-7">

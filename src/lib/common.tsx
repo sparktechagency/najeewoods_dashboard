@@ -3,5 +3,5 @@ import FavIcon from "@/icon/favIcon";
 export const userVisibiliy:any = {
   public: <FavIcon className="size-4" name="internet" />,
   friends: <FavIcon className="size-5" name="friends" />,
-  only: <FavIcon className="size-4" name="lock" />,
+  solo: <FavIcon className="size-4" name="lock" />,
 };

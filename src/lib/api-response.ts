@@ -1,6 +1,6 @@
 // ========= buildResponse =========
 export function buildResponse(item: any) {
-  const { current_page, limit, total_items, data } = item?.data;
+  const { current_page, limit, total_items, data } = item?.data || {}
   return {
     data: data,
     meta: {

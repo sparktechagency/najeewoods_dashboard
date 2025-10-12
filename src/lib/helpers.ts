@@ -34,7 +34,7 @@ export class helpers {
   }
   //  ===== localStorage  =====
   static getStorageItem = (key: string) => {
-   return localStorage.getItem(key);
+    return localStorage.getItem(key);
   };
   static setStorageItem = (key: string, value: string | any) => {
     return localStorage.setItem(key, value);
@@ -59,9 +59,19 @@ export class helpers {
   // ========= from data =============
   static fromData(values: Record<string, any>): FormData {
     const formData = new FormData();
-    Object.keys(values).forEach((key) => formData.append(key, values[key]));
+    Object.keys(values).forEach((key) => {
+      const value = values[key];
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else if (typeof value === "object" && value !== null) {
+        formData.append(key, JSON.stringify(value));
+      } else {
+        formData.append(key, value);
+      }
+    });
     return formData;
   }
+
   // ========= imgSource =============
   static imgSource(href: string): string {
     if (href?.startsWith("http") || href?.startsWith("https")) return href;

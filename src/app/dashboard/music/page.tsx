@@ -6,7 +6,7 @@ import FavIcon from "@/icon/favIcon";
 import { useEffect, useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
-import { helpers, PlaceholderImg, userVisibiliy } from "@/lib";
+import { helpers, userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";
@@ -19,12 +19,13 @@ import { InputSelectField } from "@/components/reuseble/from-select";
 import AudioUpload from "@/components/reuseble/audio-box";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema } from "@/components/schema";
-import { vibeIcon, vibeOptions } from "@/components/dummy-json";
+import { vibeOptions } from "@/components/dummy-json";
 import Modal2 from "@/components/reuseble/modal2";
 import { CloseIcon } from "@/components/reuseble/btn-modal";
 import {
   useDeletePostMutation,
   useGetPostQuery,
+  useLikePostMutation,
   useStorePostMutation,
 } from "@/redux/api/commonApi";
 import { toast } from "sonner";
@@ -34,6 +35,8 @@ import { Pagination } from "@/components/reuseble/pagination";
 import AudioBers from "@/components/reuseble/audio-bers";
 import { useGlobalState } from "@/components/hooks";
 import MusicProgress from "@/components/reuseble/music-progress";
+import { InputSelectMood } from "@/components/reuseble/mood-select";
+import FromLocation from "@/components/reuseble/from-location";
 
 const intGlobal: any = {
   isPage: 1,
@@ -54,7 +57,7 @@ export default function Music() {
   const query = {
     post_type: "audio",
     page: global.isPage,
-    get: isActive === "Owned" ? "me" : "all",
+    get: isActive === "Owned" ? "owned" : "user",
   };
   const { data: music, isLoading: postIsLoading } = useGetPostQuery(query);
 
@@ -70,15 +73,15 @@ export default function Music() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [updateGlobal]);
 
   const from = useForm({
     resolver: zodResolver(musicSchema),
     defaultValues: {
       audio: null,
-      location: "",
+      location: null,
       caption: "",
-      vibe: "",
+      mood: "",
       visibility: "",
     },
   });
@@ -86,7 +89,7 @@ export default function Music() {
   const handleSubmit = async (values: FieldValues) => {
     const value = {
       post_type: "audio",
-      mood: values.vibe,
+      mood: values.mood,
       privacy: values?.visibility,
       location: values?.location,
       audio: values?.audio,
@@ -106,9 +109,9 @@ export default function Music() {
     resolver: zodResolver(musicSchema),
     defaultValues: {
       audio: null,
-      location: "",
+      location: null,
       caption: "",
-      vibe: "",
+      mood: "",
       visibility: "",
     },
   });
@@ -119,25 +122,16 @@ export default function Music() {
     const con = await confirm({
       title: "You are going to delete this music",
       subTitle: "Delete Music",
-      description:
-        "After deleting, users wont be able to find this music in your app",
+      description: `After deleting, ${isActive} wont be able to find this music in your app`,
     });
     if (con) {
-      await deletePost(id).unwrap();
+      const res = await deletePost(id).unwrap();
+      if (res.success && global?.isPreview) {
+        updateGlobal("isPreview", false);
+      }
     }
   };
-  // === handleDeletePodcast ===
-  const handleDeletePodcast = async (id: string) => {
-    const con = await confirm({
-      title: "You are going to delete this podcast",
-      subTitle: "Delete podcast",
-      description:
-        "After deleting, users wont be able to find this podcast in your app",
-    });
-    if (con) {
-      await deletePost(id).unwrap();
-    }
-  };
+
   // reset from store
   const handleUploadReset = () => {
     updateGlobal("audioPreview", "");
@@ -151,8 +145,8 @@ export default function Music() {
     updateGlobal("isUpdate", false);
   };
 
-  const vibe=vibeIcon(global?.isDetails?.user?.salt)
-  console.log(vibe)
+  console.log(global.isDetails);
+  console.log(music);
 
   return (
     <div>
@@ -202,94 +196,71 @@ export default function Music() {
             ) : music?.data?.length > 0 ? (
               <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
                 {music?.data?.map((item: any, index: any) => (
-                  <AudioBers
-                    key={index}
-                    uniqueId={item._id}
-                    audioSource={item?.audio[0]}
-                  >
-                    {({
-                      isPlaying,
-                      duration,
-                      progress,
-                      togglePlay,
-                      handleProgressBarClick,
-                    }) => (
-                      <div
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateGlobal("isDetails", item);
-                          updateGlobal("isPreview", true);
-                          // modal open song off
-                          if (isPlaying) {
-                            togglePlay(new MouseEvent("click"));
-                          }
-                        }}
-                        className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
-                      >
-                        <div className="flex justify-between relative items-center menu-container">
-                          <FavIcon name="musicBers" />
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateGlobal("isShow", index);
-                            }}
-                            className="border cursor-pointer size-10 grid place-items-center rounded-full"
-                          >
-                            <EllipsisVertical />
-                          </div>
-                          {global.isShow === index && (
-                            <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-5 right-3">
-                              <h1
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateGlobal("isUpdate", true);
-                                }}
-                                className="flex items-center px-2 cursor-pointer"
-                              >
-                                <FavIcon name="edit" className="mr-2" /> Edit
-                              </h1>
-                              <h2 className="border-b my-1"></h2>
-                              <h1
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeletePodcast(item._id);
-                                }}
-                                className="flex items-center px-2 cursor-pointer"
-                              >
-                                <FavIcon name="delete" className="mr-2" />{" "}
-                                Delete
-                              </h1>
-                            </div>
-                          )}
-                        </div>
-
-                        <h1 className="text-start text-secondery-figma text-lg font-medium">
-                          {duration}
-                        </h1>
-                        {/* Progress bar */}
-                        <MusicProgress
-                          onClick={(e: any) => {
+                  <div key={index}>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateGlobal("isDetails", item);
+                        updateGlobal("isPreview", true);
+                      }}
+                      className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
+                    >
+                      <div className="flex justify-between relative items-center menu-container">
+                        <FavIcon name="musicBers" />
+                        <div
+                          onClick={(e) => {
                             e.stopPropagation();
-                            handleProgressBarClick(e);
+                            updateGlobal("isShow", index);
                           }}
-                          progress={progress}
-                        />
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium flex items-center">
-                            <FavIcon name="like" className="mr-1" />{" "}
-                            {item?.likes}
-                          </span>
-                          <span onClick={togglePlay} className="cursor-pointer">
-                            {isPlaying ? (
-                              <FavIcon name="pluse" className="size-9" />
-                            ) : (
-                              <FavIcon name="play" className="size-9" />
-                            )}
-                          </span>
+                          className="border cursor-pointer size-10 grid place-items-center rounded-full"
+                        >
+                          <EllipsisVertical />
+                        </div>
+                        {global.isShow === index && (
+                          <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-5 right-3">
+                            <h1
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateGlobal("isDetails", item);
+                                updateGlobal("isUpdate", true);
+                              }}
+                              className="flex items-center px-2 cursor-pointer"
+                            >
+                              <FavIcon name="edit" className="mr-2" /> Edit
+                            </h1>
+                            <h2 className="border-b my-1"></h2>
+                            <h1
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(item._id);
+                              }}
+                              className="flex items-center px-2 cursor-pointer"
+                            >
+                              <FavIcon name="delete" className="mr-2" /> Delete
+                            </h1>
+                          </div>
+                        )}
+                      </div>
+
+                      <h1 className="text-start text-secondery-figma text-lg font-medium">
+                        55
+                      </h1>
+                      {/* Progress bar */}
+                      <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
+                        <div className="bg-secondery-figma relative w-full h-px">
+                          <span className="bg-white h-px absolute inset-y-0 left-0"></span>
                         </div>
                       </div>
-                    )}
-                  </AudioBers>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium flex items-center">
+                          <FavIcon name="like" className="mr-1" /> {item?.likes}
+                        </span>
+                        <span className="cursor-pointer">
+                          <FavIcon name="play" className="size-9" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -355,7 +326,7 @@ export default function Music() {
                 ))}
               </div>
             ) : (
-              <NoItemData title="No Owned Data Available" />
+              <NoItemData title="No User Data Available" />
             )}
           </div>
         )}
@@ -369,7 +340,7 @@ export default function Music() {
           </li>
         </ul>
       </WapperBox>
-      {/* =================upload music  ================ */}
+      {/* ================= Upload music  ================ */}
       <Modal2
         open={global.isStore}
         setIsOpen={(v) => updateGlobal("isStore", v)}
@@ -385,6 +356,7 @@ export default function Music() {
                   <MusicPlayer
                     key={global.audioPreview}
                     audioSource={global.audioPreview}
+                    custom={false}
                   />
                   <AudioUpload
                     onFileSelect={(file: File) => {
@@ -427,15 +399,15 @@ export default function Music() {
                 </AudioUpload>
               )}
             </div>
-
-            <InputSelectField
-              items={vibeOptions}
-              label="Vibe"
-              name="vibe"
+            <InputSelectMood
+              label="Mood"
+              name="mood"
               placeholder="Select hare"
               iconStyle="mt-1"
+              open={global.isStore}
             />
-            <FromInput name="location" label="Location" />
+            {/* <FromInput name="location" label="Location" /> */}
+            <FromLocation label="Location" name="location" />
             <FromTextArea
               label="Caption"
               name="caption"
@@ -511,8 +483,8 @@ export default function Music() {
 
             <InputSelectField
               items={vibeOptions}
-              label="Vibe"
-              name="vibe"
+              label="mood"
+              name="mood"
               placeholder="Select hare"
               iconStyle="mt-1"
             />
@@ -576,24 +548,37 @@ export default function Music() {
             <div className="leading-5">
               <h1 className="flex font-medium items-center">
                 {global?.isDetails?.user?.name}
-                <span className="ml-2"> {userVisibiliy[global?.isDetails?.privacy] || "public"}</span>
+                <span className="ml-2">
+                  {" "}
+                  {userVisibiliy[global?.isDetails?.privacy] || "public"}
+                </span>
               </h1>
-              <h1 className="text-secondery-figma">😥Mental</h1>
+              <div className="text-secondery-figma flex  items-center">
+                <picture>
+                  <img
+                    className="size-6 mt-[2px]"
+                    src={helpers.imgSource(global?.isDetails?.mood?.icon)}
+                    alt="img"
+                  />
+                </picture>
+                <span className="ml-[2px]">
+                  {helpers.capitalize(global?.isDetails?.mood?.name)}
+                </span>
+              </div>
             </div>
           </>
         }
       >
         <div className="space-y-3">
-          <MusicPlayer audioSource="/original-song-239607.mp3" />
-          <p className="text-[#FFF]">
-            Lorem ipsum dolor sit amet consectetur. Semper vel phasellus commodo
-            neque. Duis turpis nascetur tincidunt egestas laoreet elementum
-            bibendum.
-          </p>
+          <MusicPlayer audioSource={global?.isDetails?.audio?.[0]} />
+          <p className="text-[#FFF]">{global?.isDetails?.captions}</p>
           <div className="mt-4 flex justify-between items-center">
-            <LikeToggle />
+            <LikeToggle
+              isLike={global?.isDetails.is_liked}
+              likes={global?.isDetails?.likes}
+            />
             <div
-              onClick={() => handleDelete("123")}
+              onClick={() => handleDelete(global?.isDetails?._id)}
               className="border cursor-pointer size-10  grid place-items-center rounded-md"
             >
               <FavIcon name="delete" className="size-5" />

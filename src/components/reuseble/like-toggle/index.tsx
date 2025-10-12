@@ -1,25 +1,19 @@
 import FavIcon from "@/icon/favIcon";
-import React, { useState } from "react";
+import React from "react";
 
-export default function LikeToggle() {
-  const [isLike, setIsLike] = useState(false);
-  const [likeCount, setLikeCount] = useState(120);
+interface LikeToggleProps {
+  isLike: boolean;
+  likes: any;
+}
 
-  const handleLikeToggle = () => {
-    setIsLike(!isLike);
-    setLikeCount(prevCount => isLike ? prevCount - 1 : prevCount + 1);
-  };
-
+export default function LikeToggle({ isLike, likes }: LikeToggleProps) {
   return (
     <div className="border rounded-md h-10 flex space-x-2 items-center px-2">
-      <span onClick={handleLikeToggle}>
+      <span>
         {" "}
-        <FavIcon
-          className="cursor-pointer"
-          name={isLike ? "like" : "likeLine"}
-        />
+        <FavIcon name={isLike ? "like" : "likeLine"} />
       </span>
-      <span>{likeCount}</span>
+      <span>{likes}</span>
     </div>
   );
 }
