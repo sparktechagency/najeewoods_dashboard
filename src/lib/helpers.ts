@@ -77,4 +77,10 @@ export class helpers {
     if (href?.startsWith("http") || href?.startsWith("https")) return href;
     return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
   }
+  // ========= song ===============
+  static songMinutes(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  }
 }

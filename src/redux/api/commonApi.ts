@@ -24,6 +24,15 @@ export const commonApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.post],
     }),
+    updatePost: build.mutation({
+      query: ({ id, data }) => ({
+        url: `/posts/${id}`,
+        method: "PATCH",
+        ContentType: "multipart/form-data",
+        data,
+      }),
+      invalidatesTags: [tagTypes.post],
+    }),
     deletePost: build.mutation({
       query: (id) => ({
         url: `/posts/${id}`,
@@ -46,4 +55,5 @@ export const {
   useStorePostMutation,
   useDeletePostMutation,
   useLikePostMutation,
+  useUpdatePostMutation
 } = commonApi;

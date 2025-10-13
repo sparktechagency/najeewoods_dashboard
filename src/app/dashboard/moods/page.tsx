@@ -27,7 +27,6 @@ import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Pagination } from "@/components/reuseble/pagination";
 
 const intImg = {
   ImgPreview: "",
@@ -44,13 +43,10 @@ export default function Moods() {
   const [state, updateState] = useModalState(intState);
   const [isImg, setIsImg] = useState<any>(intImg);
   const [isDetails, setIsDetails] = useState<any>({});
-  const [isPage, setIsPage]=useState(1)
   const [storeMoods, { isLoading: storeLoading }] = useStoreMoodsMutation();
   const [updateMoods, { isLoading: updateLoading }] = useUpdateMoodsMutation();
-  const { data: moodsItem, isLoading } = useGetMoodsQuery({page:isPage});
+  const { data: moodsItem, isLoading } = useGetMoodsQuery({});
   const [deleteMoods] = useDeleteMoodsMutation();
-
-
 
   //  == Store Moods ==
   const from = useForm({
@@ -134,7 +130,7 @@ export default function Moods() {
           <div>
             <h1 className="text-2xl font-semibold">Moods</h1>
             <h1 className="text-base">
-              Total Moods: {moodsItem?.meta?.total || 0}
+              Total Moods: {moodsItem?.data?.length || 0}
             </h1>
           </div>
           <Button
@@ -160,9 +156,7 @@ export default function Moods() {
               >
                 <div className="mx-auto">
                   <Image
-                    src={
-                      process.env.NEXT_PUBLIC_IMG_URL + item.icon || "/blur.png"
-                    }
+                    src={helpers.imgSource(item?.icon)}
                     alt="img"
                     width={60}
                     height={20}
@@ -199,14 +193,6 @@ export default function Moods() {
             <NoItemData title="No mood data available" />
           )}
         </div>
-        <ul className="flex flex-wrap justify-end pt-14">
-          <li className="font-medium">
-            <Pagination
-              onPageChange={(v: any) => setIsPage(v)}
-              {...moodsItem?.meta}
-            ></Pagination>
-          </li>
-        </ul>
       </WapperBox>
       {/* ================= Create New Mood ================ */}
       <Modal2

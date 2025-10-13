@@ -32,7 +32,6 @@ interface FormSelectProps {
   className?: string;
   itemStyle?: string;
   iconStyle?: string;
-  open?: boolean;
 }
 
 export function InputSelectMood({
@@ -44,58 +43,29 @@ export function InputSelectMood({
   className,
   itemStyle,
   iconStyle,
-  open,
 }: FormSelectProps) {
-  const { ref, inView } = useInView();
   const [selectMoods, setSelectMoods] = useState<any[]>([]);
   const { control } = useFormContext();
-  const [isPage, setIsPage] = useState(1);
-  const {
-    data: moodsItem,
-    isLoading,
-
-  } = useGetMoodsQuery({ page: isPage,skip:!open });
+  const { data: moodsItem, isLoading } = useGetMoodsQuery({});
 
   useEffect(() => {
-    setSelectMoods([]);
-  }, [open]);
-
-  useEffect(() => {
-    if (moodsItem?.data?.length) {
-      const existingIds = new Set(selectMoods.map((v: any) => v.value));
-
-      // Filter out items that are already in the state to avoid duplicates
-      const newItems = moodsItem.data.filter(
-        (item: any) => !existingIds.has(item._id)
-      );
-
-      if (newItems.length > 0) {
-        const newMoods = newItems.map((item: any) => ({
-          label: item.name,
-          value: item._id,
-          icon: (
-            <ImgBox
-              className="size-7"
-              src={process.env.NEXT_PUBLIC_IMG_URL + item.icon}
-              alt="img"
-            />
-          ),
-        }));
-
-        // Add new items to the current list only if they are not already present
-        setSelectMoods((prev) => [...prev, ...newMoods]);
-      }
+    if (moodsItem?.data) {
+      const newMoods = moodsItem.data.map((item: any) => ({
+        label: item.name,
+        value: item._id,
+        icon: (
+          <ImgBox
+            className="size-7"
+            src={process.env.NEXT_PUBLIC_IMG_URL + item.icon}
+            alt="img"
+          />
+        ),
+      }));
+      setSelectMoods(newMoods);
     }
-  }, [moodsItem?.data, open]);
+  }, [moodsItem]);
 
-  const isMoodsEmpty = moodsItem?.data?.length === 0;
 
-  // Fetch the next page of data when scrolled to the bottom
-  useEffect(() => {
-    if (inView && !isLoading && !isMoodsEmpty) {
-      setIsPage((prev) => prev + 1);
-    }
-  }, [inView, isLoading, isMoodsEmpty]);
 
   return (
     <Controller
@@ -120,31 +90,33 @@ export function InputSelectMood({
             </SelectTrigger>
             <SelectContent className="rounded-md h-[290px] bg-blacks p-0">
               <SelectGroup className="p-0 m-0">
-                {selectMoods.map((item, index) => (
-                  <SelectItem
-                    className={cn(
-                      "border-b last:border-b-0 cursor-pointer py-2 pl-4 text-white rounded-none",
-                      itemStyle
-                    )}
-                    key={index} // Use item.value or item._id for unique keys
-                    value={item.value}
-                  >
-                    <span className="flex justify-center items-center">
-                      {item.icon && (
-                        <span className={cn("mr-1", iconStyle)}>
-                          {item.icon}
-                        </span>
+                {isLoading ? (
+                  <div className="py-10">
+                    {" "}
+                    <Loader className="animate-spin text-blacks/20" />
+                  </div>
+                ) : (
+                  selectMoods?.map((item: any, index: any) => (
+                    <SelectItem
+                      className={cn(
+                        "border-b last:border-b-0 cursor-pointer py-2 pl-4 text-white rounded-none",
+                        itemStyle
                       )}
-                      {helpers.capitalize(item.label)}
-                    </span>
-                  </SelectItem>
-                ))}
+                      key={index}
+                      value={item.value}
+                    >
+                      <span className="flex justify-center items-center">
+                        {item.icon && (
+                          <span className={cn("mr-1", iconStyle)}>
+                            {item.icon}
+                          </span>
+                        )}
+                        {helpers.capitalize(item.label)}
+                      </span>
+                    </SelectItem>
+                  ))
+                )}
               </SelectGroup>
-              {!isLoading && !isMoodsEmpty && (
-                <div ref={ref} className="mx-auto flex justify-center mt-5">
-                  <Loader className="animate-spin text-blacks/20" />
-                </div>
-              )}
             </SelectContent>
           </Select>
           {!matching && (

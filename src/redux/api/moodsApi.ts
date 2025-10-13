@@ -10,10 +10,6 @@ export const moodsApi = baseApi.injectEndpoints({
         method: "GET",
         params: arg,
       }),
-      transformResponse: (res: any) => {
-        const rest = buildResponse(res);
-        return rest;
-      },
       providesTags: [tagTypes.moods],
     }),
     storeMoods: build.mutation({
@@ -41,6 +37,13 @@ export const moodsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.moods],
     }),
+    singleMoods: build.query({
+      query: (id: string) => ({
+        url: `/moods/${id}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.moods],
+    }),
   }),
 });
 
@@ -49,4 +52,5 @@ export const {
   useStoreMoodsMutation,
   useUpdateMoodsMutation,
   useDeleteMoodsMutation,
+  useSingleMoodsQuery
 } = moodsApi;
