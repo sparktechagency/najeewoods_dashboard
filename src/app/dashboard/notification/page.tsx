@@ -3,7 +3,10 @@ import ShadowBox from "@/components/common/shadow-box";
 import WapperBox from "@/components/reuseble/wapper-box";
 import FavIcon from "@/icon/favIcon";
 import { Button, Skeleton } from "@/components/ui";
-import { useGetNotificationQuery, useReadNotificationMutation } from "@/redux/api/notificationsApi";
+import {
+  useGetNotificationQuery,
+  useReadNotificationMutation,
+} from "@/redux/api/notificationsApi";
 import { helpers } from "@/lib";
 import { Pagination } from "@/components/reuseble/pagination";
 import { useState } from "react";
@@ -17,9 +20,9 @@ export default function Notifications() {
   });
   const [readNotification] = useReadNotificationMutation();
 
-  const hanldeRead=async(id:string)=>{
-     await readNotification({id:id}).unwrap()
-  }
+  const hanldeRead = async (id: string) => {
+    await readNotification(id).unwrap();
+  };
 
   return (
     <div>
@@ -31,7 +34,11 @@ export default function Notifications() {
               {notification?.meta?.total || 0} notifications
             </h1>
           </div>
-          <Button variant="primary" size="lg">
+          <Button
+            onClick={async() => await readNotification("").unwrap()}
+            variant="primary"
+            size="lg"
+          >
             <FavIcon color="#ffffff" name="messageRead" /> Read all
           </Button>
         </div>
@@ -50,15 +57,13 @@ export default function Notifications() {
                   className={`${
                     item?.isRead ? "bg-modal-figma" : "bg-[#202020]"
                   } text-white border-l-4  p-3 grid grid-cols-1 lg:grid-cols-3 rounded-md`}
-                  onClick={()=>hanldeRead(item._id)}
+                  onClick={() => hanldeRead(item._id)}
                 >
                   <div className="mb-2 md:mb-0">
                     <h3 className="lg:text-base xl:text-xl font-semibold ">
                       {item.title}
                     </h3>
-                    <p className="text-sm ">
-                      {item.message}
-                    </p>
+                    <p className="text-sm ">{item.message}</p>
                   </div>
                   <ul className="md:left-1/2 relative space-y-2 *:text-secondery-figma">
                     <li className="flex items-center gap-1">

@@ -17,10 +17,9 @@ export const notificationApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.notification],
     }),
     readNotification: build.mutation({
-      query: ({ arg }: any) => ({
-        url: `/notifications/read`,
+      query: (arg):any => ({
+        url: `/notifications/read?id=${arg}`,
         method: "POST",
-        params:arg
       }),
       invalidatesTags: [tagTypes.notification],
     }),
