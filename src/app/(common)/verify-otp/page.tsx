@@ -17,7 +17,7 @@ import { toast } from "sonner";
 function VarifyOTpChild() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
-  const [code, setCode] = useState<string[]>(Array(6).fill(""));
+  const [code, setCode] = useState<string[]>(Array(4).fill(""));
   const [error, setError] = useState<string>("");
   const [isError, setIsError] = useState<string>("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -98,7 +98,7 @@ function VarifyOTpChild() {
           <h1 className="text-center text-2xl font-medium">Verify Code</h1>
           <div className="*:text-center *:text-secondery-figma">
             <h1> We have sent an email to</h1>
-            <h1>{email || "Not provided Email"} with a 6 digit code.</h1>
+            <h1>{email || "Not provided Email"} with a 4 digit code.</h1>
           </div>
           <div className="pt-20">
             <div className="flex justify-center space-x-3 mb-2">

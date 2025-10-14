@@ -1,9 +1,7 @@
 "use client";
 import ShadowBox from "@/components/common/shadow-box";
-import useConfirmation from "@/components/context/delete-modal";
-import { dummyJson } from "@/components/dummy-json";
 import Avatars from "@/components/reuseble/avater";
-import { Deletebtn, Previewbtn } from "@/components/reuseble/icon-list";
+import { Previewbtn } from "@/components/reuseble/icon-list";
 import Modal from "@/components/reuseble/modal";
 import { Pagination } from "@/components/reuseble/pagination";
 import { CustomTable } from "@/components/reuseble/table";
@@ -11,94 +9,23 @@ import { TableNoItem } from "@/components/reuseble/table-no-item";
 import { TableSkeleton } from "@/components/reuseble/table-skeleton";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { Button, TableCell, TableRow } from "@/components/ui";
+import {
+  useGetSubscribersQuery,
+  useSubAcToggleMutation,
+} from "@/redux/api/subscribersApi";
+import { ArrowUpRight } from "lucide-react";
+import React, { useState } from "react";
 import FavIcon from "@/icon/favIcon";
-import { ArrowUp, ArrowUpRight } from "lucide-react";
+import { helpers } from "@/lib";
 import Link from "next/link";
-import React, { use, useState } from "react";
-import { useDebounce } from "use-debounce";
-
-const subscribersitem = [
-  {
-    name: "Elizabeth Olson",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "17 Jul, 2025",
-    ending_date: "16 Aug, 2025",
-  },
-  {
-    name: "John Doe",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "18 Jul, 2025",
-    ending_date: "17 Aug, 2025",
-  },
-  {
-    name: "Emma Watson",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "19 Jul, 2025",
-    ending_date: "18 Aug, 2025",
-  },
-  {
-    name: "Chris Hemsworth",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "20 Jul, 2025",
-    ending_date: "19 Aug, 2025",
-  },
-  {
-    name: "Scarlett Johansson",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "21 Jul, 2025",
-    ending_date: "20 Aug, 2025",
-  },
-  {
-    name: "Robert Downey Jr.",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "22 Jul, 2025",
-    ending_date: "21 Aug, 2025",
-  },
-  {
-    name: "Mark Ruffalo",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "23 Jul, 2025",
-    ending_date: "22 Aug, 2025",
-  },
-  {
-    name: "Tom Hiddleston",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "24 Jul, 2025",
-    ending_date: "23 Aug, 2025",
-  },
-  {
-    name: "Benedict Cumberbatch",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "25 Jul, 2025",
-    ending_date: "24 Aug, 2025",
-  },
-  {
-    name: "Chadwick Boseman",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "26 Jul, 2025",
-    ending_date: "25 Aug, 2025",
-  },
-  {
-    name: "Tom Holland",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "27 Jul, 2025",
-    ending_date: "26 Aug, 2025",
-  },
-  {
-    name: "Zendaya",
-    subscriber_type: "Vibes creator pro",
-    starting_date: "28 Jul, 2025",
-    ending_date: "27 Aug, 2025",
-  },
-];
 
 export default function Subscribers() {
-  const [isPreview, setIsPreview] = useState(false);
   const [subscriberToggle, setSubscriberToggle] = useState<any>();
+  const [isDetails, setIsDetails] = useState<any>({});
   const [isUser, setIsUser] = useState(false);
-  const { confirm } = useConfirmation();
   const [isPage, setIsPage] = useState(1);
-  const [value] = useDebounce("searchText", 1000);
+  const { data: s_user, isLoading } = useGetSubscribersQuery({ page: isPage });
+  const [subAcToggle] = useSubAcToggleMutation();
   const headers = [
     "Name",
     "Subscriber type",
@@ -106,31 +33,6 @@ export default function Subscribers() {
     "Ending date",
     "Action",
   ];
-  const isLoading = false;
-
-  const handleDelete = async (id: string) => {
-    const con = await confirm({
-      title: "You are going to delete this subscriber",
-      subTitle: "Delete subscriber",
-      description:
-        "After deleting, users wont be able to find this subscriber in your app",
-    });
-    if (con) {
-      console.log(id);
-    }
-  };
-
-  // handleDeleteuser
-  const handleDeleteuser = async (id: string) => {
-    const con = await confirm({
-      title: "You are going to delete this user",
-      subTitle: "Delete User",
-      description: "After deleting, this user wont be able to use your app ",
-    });
-    if (con) {
-      console.log(id);
-    }
-  };
 
   return (
     <div>
@@ -152,43 +54,49 @@ export default function Subscribers() {
         <CustomTable headers={headers}>
           {isLoading ? (
             <TableSkeleton colSpan={headers?.length} tdStyle="!pl-2" />
-          ) : subscribersitem?.length > 0 ? (
-            subscribersitem?.map((item, index) => (
+          ) : s_user?.data?.length > 0 ? (
+            s_user?.data?.map((item: any, index: any) => (
               <TableRow key={index} className="border">
                 <TableCell className="relative">
                   <div className="flex items-center gap-3">
                     <Avatars
-                      src={""}
-                      fallback={item.name}
+                      src={helpers.imgSource(item?.user?.avatar)}
+                      fallback={item.user?.name || "N/A"}
                       alt="profile"
                       fallbackStyle="bg-[#cb4ec9]/70 text-white"
                     />
-                    <span>{item.name}</span>
+                    <span>{item?.user?.name || "N/A"}</span>
                   </div>
                 </TableCell>
 
-                <TableCell>{item.subscriber_type}</TableCell>
-                <TableCell>{item.starting_date}</TableCell>
-                <TableCell>{item.ending_date}</TableCell>
+                <TableCell>{item.plan?.name || "N/A"}</TableCell>
+                <TableCell>
+                  {helpers.formatDate(item?.current_period_start) || "N/A"}
+                </TableCell>
+                <TableCell>
+                  {helpers.formatDate(item?.current_period_end) || "N/A"}
+                </TableCell>
                 <TableCell>
                   <ul className="flex gap-2">
                     <li>
-                      <Previewbtn onClick={() => setIsPreview(!isPreview)} />
+                      <Previewbtn
+                        onClick={() => {
+                          setIsUser(!isUser);
+                          setIsDetails(item);
+                        }}
+                      />
                     </li>
                     <li>
                       <button
-                        onClick={() => setSubscriberToggle(index)}
+                        onClick={async () => await subAcToggle(item?.id)}
                         className="size-10 bg-transparent border-2 grid place-items-center  rounded-lg cursor-pointer"
                       >
-                        {subscriberToggle === index ? (
-                          <FavIcon name="off" />
-                        ) : (
+                        {item.subscription_status === "active" ? (
                           <FavIcon name="on" />
+                        ) : (
+                          <FavIcon name="off" />
                         )}
                       </button>
-                    </li>
-                    <li>
-                      <Deletebtn onClick={() => handleDelete(item.name)} />
                     </li>
                   </ul>
                 </TableCell>
@@ -197,7 +105,7 @@ export default function Subscribers() {
           ) : (
             <TableNoItem
               colSpan={headers?.length}
-              title="No users are available at the moment"
+              title="No Subscribers at the moment"
               tdStyle="!bg-background"
             />
           )}
@@ -207,12 +115,12 @@ export default function Subscribers() {
         <li className="font-medium">
           <Pagination
             onPageChange={(v: any) => setIsPage(v)}
-            {...dummyJson.meta}
+            {...s_user?.meta}
           ></Pagination>
         </li>
       </ul>
       {/* =============subscriber details=========== */}
-      <Modal
+      {/* <Modal
         open={isPreview}
         setIsOpen={setIsPreview}
         title="Subscriber details"
@@ -282,7 +190,7 @@ export default function Subscribers() {
             <ArrowUpRight className="size-5" />
           </Button>
         </div>
-      </Modal>
+      </Modal> */}
       {/* =============users=========== */}
       <Modal
         open={isUser}
@@ -291,53 +199,63 @@ export default function Subscribers() {
         titleStyle="text-center"
         className="sm:max-w-3xl"
       >
-        <div className="p-1 py-10 space-y-3">
+        <div className="p-1  space-y-3">
           <div className="border flex justify-between rounded-lg p-2">
             <div className="flex items-center space-x-2">
               <Avatars
-                src={""}
-                fallback={"T"}
+                src={helpers.imgSource(isDetails?.user?.avatar)}
+                fallback={isDetails?.user?.name || "N/A"}
                 alt="profile"
                 fallbackStyle="bg-[#cb4ec9]/70 text-white"
               />
               <div className="leading-5">
-                <h1>Elizabeth Olson</h1>
-                <h1 className="text-secondery-figma">example@gmail.com</h1>
+                <h1>{isDetails?.user?.name || "N/A"}</h1>
+                <h1 className="text-secondery-figma">
+                  {isDetails?.user?.email || "N/A"}
+                </h1>
               </div>
             </div>
-            <div
-              onClick={() => handleDeleteuser("55")}
-              className="border cursor-pointer size-10  grid place-items-center rounded-md"
+            <button
+              onClick={async () => {
+                const res = await subAcToggle(isDetails?.id);
+                if (res?.data?.data?.subscription_status) {
+                  setIsDetails((prev: any) => ({
+                    ...prev,
+                    subscription_status: res?.data?.data?.subscription_status,
+                  }));
+                }
+              }}
+              className="size-10 bg-transparent border-2 grid place-items-center  rounded-lg cursor-pointer"
             >
-              <FavIcon name="delete" className="size-5" />
-            </div>
+              {isDetails?.subscription_status === "active" ? (
+                <FavIcon name="on" />
+              ) : (
+                <FavIcon name="off" />
+              )}
+            </button>
           </div>
           <h1 className="text-2xl font-medium">Bio</h1>
           <div className="border p-3 rounded-md text-[#FFF]">
-            Lorem ipsum dolor sit amet consectetur. Nulla erat nisl cursus
-            morbi. Vitae eu non et urna hendrerit nullam mattis. Facilisis
-            consectetur bibendum mattis sed scelerisque. Quam lectus velit magna
-            lacus volutpat at lacus lacus phasellus. Eu nibh aliquet lacus
-            bibendum fusce massa purus luctus. Augue tortor pretium molestie
+            {isDetails?.user?.bio || "N/A"}
           </div>
           <div className="space-y-3 pt-2">
             <DetailsNav
               href="/dashboard/users/vibe-posted"
               icon={<FavIcon name="vibePost" className="size-5" />}
               text="Vibe posted"
-              value={50}
+              value={isDetails?.user?.vibes}
             />
             <DetailsNav
               href="/dashboard/users/music-posted"
               icon={<FavIcon name="music" className="size-5" />}
               text="Music posted"
-              value={36}
+              value={isDetails?.user?.audio}
             />
             <DetailsNav
               href="/dashboard/users/podcast-posted"
               icon={<FavIcon name="padcostDetails" className="size-5" />}
               text="Podcast posted"
-              value={10}
+              value={isDetails?.user?.podcast}
             />
           </div>
         </div>

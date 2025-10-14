@@ -61,7 +61,13 @@ export class helpers {
     const formData = new FormData();
     Object.keys(values).forEach((key) => {
       const value = values[key];
-      if (value instanceof File) {
+      if (Array.isArray(value)) {
+        value.forEach((file: File) => {
+          if (file instanceof File) {
+            formData.append(key, file);
+          }
+        });
+      } else if (value instanceof File) {
         formData.append(key, value);
       } else if (typeof value === "object" && value !== null) {
         formData.append(key, JSON.stringify(value));
@@ -84,3 +90,5 @@ export class helpers {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   }
 }
+
+// static fromData(values: Record<string, any>): FormData { const formData = new FormData(); Object.keys(values).forEach((key) => { const value = values[key]; if (value instanceof File) { formData.append(key, value); } else if (typeof value === "object" && value !== null) { formData.append(key, JSON.stringify(value)); } else { formData.append(key, value); } }); return formData; }

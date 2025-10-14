@@ -1,7 +1,7 @@
 "use client";
 import ShadowBox from "@/components/common/shadow-box";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { CircleAlert, EllipsisVertical, Plus, X } from "lucide-react";
+import { CircleAlert, EllipsisVertical, Plus, PlusIcon, X } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useEffect, useState } from "react";
 import Avatars from "@/components/reuseble/avater";
@@ -30,24 +30,23 @@ import { toast } from "sonner";
 import RepeatCount from "@/components/reuseble/repeat-count/count";
 import { NoItemData } from "@/components/reuseble/table-no-item";
 import { Pagination } from "@/components/reuseble/pagination";
-import AudioBers from "@/components/reuseble/audio-bers";
 import { useGlobalState } from "@/components/hooks";
-import MusicProgress from "@/components/reuseble/music-progress";
 import { InputSelectMood } from "@/components/reuseble/mood-select";
 import FromLocation from "@/components/reuseble/from-location";
+import AudioMulUpload from "@/components/reuseble/mutiple-audio";
 
 const intGlobal: any = {
   isPage: 1,
   isPreview: false,
   isStore: false,
   isUpdate: false,
-  audioPreview: "",
   isShow: null,
   isDetails: {},
 };
 
 export default function Music() {
   const { confirm } = useConfirmation();
+  const [audioPreview, setAudioPreview] = useState([]);
   const [global, updateGlobal] = useGlobalState(intGlobal);
   const [isActive, setIsActive] = useState("Owned");
   const [storePost, { isLoading }] = useStorePostMutation();
@@ -56,8 +55,11 @@ export default function Music() {
     post_type: "audio",
     page: global.isPage,
     get: isActive === "Owned" ? "owned" : "user",
+    // limt:"10"
   };
-  const { data: music, isLoading: postIsLoading } = useGetPostQuery({});
+  const { data: music, isLoading: postIsLoading } = useGetPostQuery({
+    ...query,
+  });
   const [updatePost, { isLoading: updateIsLoading }] = useUpdatePostMutation();
   const [isEditItem, setIsEditItem] = useState<any>({});
 
@@ -78,7 +80,7 @@ export default function Music() {
   const from = useForm({
     resolver: zodResolver(musicSchema),
     defaultValues: {
-      audio: null,
+      audio: [],
       location: null,
       caption: "",
       mood: "",
@@ -104,10 +106,11 @@ export default function Music() {
       });
     }
   };
-  // update music
+
+  // Update music
   const fromUpdate = useForm({
     defaultValues: {
-      audio: null,
+      audio: [],
       location: null,
       caption: "",
       mood: "",
@@ -126,7 +129,7 @@ export default function Music() {
     }
   }, [isEditItem, fromUpdate]);
 
-  // === handleUpdateMusic ===
+  // Handle Update Music
   const handleUpdateMusic = async (values: FieldValues) => {
     const value = {
       post_type: "audio",
@@ -143,8 +146,8 @@ export default function Music() {
       if (res.success) {
         handleUpdateReset();
         setIsEditItem({});
-        toast.success("Audio Update successfully", {
-          description: "Your audio has been Update successfully.",
+        toast.success("Audio updated successfully", {
+          description: "Your audio has been updated successfully.",
         });
       }
     } catch (err: any) {
@@ -152,12 +155,12 @@ export default function Music() {
     }
   };
 
-  // === hanldedelete ===
+  // Handle Delete Music
   const handleDelete = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this music",
       subTitle: "Delete Music",
-      description: `After deleting, ${isActive} wont be able to find this music in your app`,
+      description: `After deleting, ${isActive} won't be able to find this music in your app`,
     });
     if (con) {
       const res = await deletePost(id).unwrap();
@@ -167,17 +170,24 @@ export default function Music() {
     }
   };
 
-  // reset from store
+  // Reset form after successful upload
   const handleUploadReset = () => {
-    updateGlobal("audioPreview", "");
     from.reset();
     updateGlobal("isStore", false);
+    setAudioPreview([]);
   };
 
   const handleUpdateReset = () => {
-    updateGlobal("audioPreview", "");
     fromUpdate.reset();
     updateGlobal("isUpdate", false);
+  };
+
+  // handleFileSelect
+  const handleFileSelect = (files: File[]) => {
+    const fileUrls = files.map((file) => URL.createObjectURL(file));
+    setAudioPreview((prev) => [...prev, ...fileUrls] as any);
+    const currentAudio = from.getValues("audio");
+    from.setValue("audio", [...currentAudio, ...files]);
   };
 
   return (
@@ -217,7 +227,6 @@ export default function Music() {
           ))}
         </div>
         {isActive == "Owned" ? (
-          // ========="Owned=========
           <div className="pt-4">
             {postIsLoading ? (
               <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
@@ -298,7 +307,7 @@ export default function Music() {
             )}
           </div>
         ) : (
-          // ==========Users ===========
+          // ========= Users ==========
           <div className="pt-4">
             {postIsLoading ? (
               <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
@@ -346,17 +355,19 @@ export default function Music() {
             )}
           </div>
         )}
-        {/* pagination */}
+
+        {/* Pagination */}
         <ul className="flex flex-wrap justify-end mt-10 lg:mt-20">
           <li className="font-medium">
             <Pagination
               onPageChange={(v: any) => updateGlobal("isPage", v)}
               {...music?.meta}
-            ></Pagination>
+            />
           </li>
         </ul>
       </WapperBox>
-      {/* ================= Upload music  ================ */}
+
+      {/* ================= Upload music ================= */}
       <Modal2
         open={global.isStore}
         setIsOpen={(v) => updateGlobal("isStore", v)}
@@ -367,33 +378,31 @@ export default function Music() {
         <Form from={from} onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div>
-              {global.audioPreview ? (
-                <div className="mw-full h-fit rounded-md">
-                  <MusicPlayer
-                    key={global.audioPreview}
-                    audioSource={global.audioPreview}
-                    custom={false}
-                  />
-                  <AudioUpload
-                    onFileSelect={(file: File) => {
-                      updateGlobal("audioPreview", URL.createObjectURL(file));
-                      from.setValue("audio", file, { shouldValidate: true });
-                    }}
-                  >
-                    <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
+              {audioPreview.length > 0 ? (
+                <div className="space-y-3">
+                  <div className={`mw-full h-fit grid  space-y-3 rounded-md`}>
+                    {audioPreview.map((audioUrl: any, index: any) => (
+                      <MusicPlayer
+                        key={index}
+                        audioSource={audioUrl}
+                        custom={false}
+                      />
+                    ))}
+                  </div>
+                  <AudioMulUpload onFileSelect={handleFileSelect}>
+                    <Button
+                      size="sm"
+                      className="rounded-full"
+                      type="button"
+                      variant="outline"
+                    >
                       {" "}
-                      <FavIcon name="chnage" />
-                      <span>Replace audio</span>
-                    </span>
-                  </AudioUpload>
+                      <PlusIcon /> Audio{" "}
+                    </Button>
+                  </AudioMulUpload>
                 </div>
               ) : (
-                <AudioUpload
-                  onFileSelect={(file: File) => {
-                    updateGlobal("audioPreview", URL.createObjectURL(file));
-                    from.setValue("audio", file, { shouldValidate: true });
-                  }}
-                >
+                <AudioMulUpload onFileSelect={handleFileSelect}>
                   <div>
                     <div className="relative block w-fit h-fit p-5 mx-auto border-2 border-dashed rounded-2xl cursor-pointer transition-colors duration-200">
                       <div className="flex flex-col items-center justify-center h-full text-center">
@@ -401,7 +410,7 @@ export default function Music() {
                           <FavIcon name="upload" />
                         </div>
                         <span className="text-white text-lg font-medium">
-                          Upload New Music
+                          Upload Multiple Music
                         </span>
                       </div>
                     </div>
@@ -412,9 +421,10 @@ export default function Music() {
                       </p>
                     )}
                   </div>
-                </AudioUpload>
+                </AudioMulUpload>
               )}
             </div>
+
             <InputSelectMood
               label="Mood"
               name="mood"
@@ -469,7 +479,8 @@ export default function Music() {
           </div>
         </Form>
       </Modal2>
-      {/* =================update music  ================ */}
+
+      {/* =================Update music ================= */}
       <Modal2
         open={global.isUpdate}
         setIsOpen={(v) => updateGlobal("isUpdate", v)}
@@ -557,7 +568,8 @@ export default function Music() {
           </div>
         </Form>
       </Modal2>
-      {/* =============audio modal========== */}
+
+      {/* ================= Audio Modal ================= */}
       <ModalOne
         open={global.isPreview}
         setIsOpen={(v) => updateGlobal("isPreview", v)}
@@ -596,8 +608,12 @@ export default function Music() {
         }
       >
         <div className="space-y-3">
-          <MusicPlayer audioSource={global?.isDetails?.audio?.[0]} />
-          <p className="text-[#FFF]">{global?.isDetails?.captions}</p>
+          {global?.isDetails?.audio?.map((item: any, idx: any) => (
+            <div key={idx} className="space-y-2">
+              <MusicPlayer idx={idx} audioSource={item?.url} />
+            </div>
+          ))}
+          <p className="text-[#FFF]">{global?.isDetails?.captions || "N/A"}</p>
           <div className="mt-4 flex justify-between items-center">
             <LikeToggle likes={global?.isDetails?.likes} />
             <div

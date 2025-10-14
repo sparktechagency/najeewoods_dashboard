@@ -167,19 +167,19 @@ export default function Users() {
           </div>
           <div className="space-y-3 pt-2">
             <DetailsNav
-              href="/dashboard/users/vibe-posted"
+              href={`/dashboard/users/vibe-posted/${isDetails._id}`}
               icon={<FavIcon name="vibePost" className="size-5" />}
               text="Vibe posted"
               value={isDetails?.vibes}
             />
             <DetailsNav
-              href="/dashboard/users/music-posted"
+              href={`/dashboard/users/music-posted/${isDetails._id}`}
               icon={<FavIcon name="music" className="size-5" />}
               text="Music posted"
               value={isDetails?.audio}
             />
             <DetailsNav
-              href="/dashboard/users/podcast-posted"
+              href={`/dashboard/users/podcast-posted/${isDetails._id}`}
               icon={<FavIcon name="padcostDetails" className="size-5" />}
               text="Podcast posted"
               value={isDetails?.podcast}

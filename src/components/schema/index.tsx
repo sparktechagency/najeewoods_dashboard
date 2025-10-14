@@ -17,8 +17,8 @@ export const musicSchema = z.object({
   caption: z.string().nonempty("Caption is required"),
   visibility: z.string().nonempty("Visibility is required"),
   audio: z
-    .any()
-    .refine((file) => file instanceof File, { message: "Audio is required" }),
+    .array(z.any())
+    .refine((files) => files.length > 0 && files.every(file => file instanceof File), { message: "At least one audio file is required" }),
 });
 
 

@@ -30,7 +30,24 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.users],
     }),
+    getPostId: build.query({
+      query: ({ id, arg }: any) => ({
+        url: `/posts/user/${id}`,
+        method: "GET",
+        params: arg,
+      }),
+      transformResponse: (res: any) => {
+        const rest = buildResponse(res);
+        return rest;
+      },
+      providesTags: [tagTypes.userbyDetails],
+    }),
   }),
 });
 
-export const { useGetUserQuery, useSingleUserQuery,useUserAcToggleMutation} = userApi;
+export const {
+  useGetUserQuery,
+  useSingleUserQuery,
+  useUserAcToggleMutation,
+  useGetPostIdQuery,
+} = userApi;

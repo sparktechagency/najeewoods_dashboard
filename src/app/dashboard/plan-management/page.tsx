@@ -4,7 +4,6 @@ import { BackBtn } from "@/components/reuseble/back-btn";
 import WapperBox from "@/components/reuseble/wapper-box";
 import { Button, Skeleton } from "@/components/ui";
 import { FieldValues, useForm } from "react-hook-form";
-import Modal from "@/components/reuseble/modal";
 import Form from "@/components/reuseble/from";
 import { FromInput } from "@/components/reuseble/from-input";
 import { InputWordSelectField } from "@/components/reuseble/from-word-select";
@@ -13,18 +12,25 @@ import tinycolor from "tinycolor2";
 import { X } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useEffect, useRef, useState } from "react";
-import { useGetPlanQuery } from "@/redux/api/subscribersApi";
-import { getColor } from "@/lib";
+import {
+  useGetPlanQuery,
+  useUpdatePlanMutation,
+} from "@/redux/api/subscribersApi";
 import RepeatCount from "@/components/reuseble/repeat-count/count";
+import { InputSelectField } from "@/components/reuseble/from-select";
+import Modal2 from "@/components/reuseble/modal2";
+import { CloseIcon } from "@/components/reuseble/btn-modal";
+import { toast } from "sonner";
 
 export default function Planmanagement() {
   const colorPickerRef = useRef<HTMLDivElement | null>(null);
   const [isUpdate, setIsUpdate] = useState(false);
   const { data: plans, isLoading } = useGetPlanQuery({});
   const [isPlan, setIsPlan] = useState<any>({});
+  const [updatePlan, { isLoading: UpdateLoading }] = useUpdatePlanMutation();
   const [isColor, setIsColor] = useState({
     update: false,
-    updateColor: "rgb(59,130,246)",
+    updateColor: "",
   });
 
   useEffect(() => {
@@ -48,17 +54,45 @@ export default function Planmanagement() {
   // Update form
   const fromUpdate = useForm({
     defaultValues: {
-      color: "#db8505",
       name: "",
+      color: "",
       price: "",
-      feature: [],
+      interval: "",
+      features: [],
     },
   });
 
-  useEffect(() => {}, [fromUpdate]);
+  useEffect(() => {
+    fromUpdate.reset({
+      color: isPlan?.color,
+      name: isPlan?.name,
+      price: isPlan?.price,
+      features: isPlan?.features,
+      interval: isPlan.interval,
+    });
+    setIsColor((prev) => ({ ...prev, updateColor: isPlan.color }));
+  }, [fromUpdate, isPlan]);
 
   const handleSubmitUpdate = async (values: FieldValues) => {
-    console.log(values);
+    const value = {
+      ...values,
+      currency: "usd",
+    };
+    const res = await updatePlan({ id: isPlan._id, data: value }).unwrap();
+    if (res.success) {
+      toast.success("Plan Updated Successfully", {
+        description: "Your plan has been updated successfully.",
+      });
+      handleUpdateReset();
+    }
+  };
+
+  // handleUpdateReset
+  const handleUpdateReset = () => {
+    fromUpdate.reset();
+    setIsPlan({});
+    setIsColor((prev) => ({ ...prev, update: false }));
+    setIsUpdate(false);
   };
 
   return (
@@ -89,7 +123,7 @@ export default function Planmanagement() {
                   key={plan._id}
                   className={`rounded-2xl relative flex flex-col bg-blur bg-blacks/20  justify-between py-6 pl-6  border text-white overflow-hidden`}
                 >
-                  <span className="absolute right-2 top-2">
+                  <span className="absolute cursor-pointer right-2 top-2">
                     <Button
                       onClick={() => {
                         setIsPlan(plan);
@@ -104,9 +138,7 @@ export default function Planmanagement() {
                   </span>
                   <div
                     style={{
-                      background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${getColor(
-                        plan.level
-                      )})`,
+                      background: `linear-gradient(148deg, rgba(29, 29, 29, 0.20),rgba(29, 29, 29, 0.20), ${plan?.color})`,
                       opacity: 0.3,
                     }}
                     className="w-[360px] h-[300px] absolute bottom-0 z-0 right-0"
@@ -153,12 +185,13 @@ export default function Planmanagement() {
       </WapperBox>
 
       {/* =================Update plan  ================ */}
-      <Modal
+      <Modal2
         open={isUpdate}
         setIsOpen={setIsUpdate}
         title="Update Plan"
         titleStyle="text-center"
       >
+        <CloseIcon className="mt-2 mr-2" onClose={() => handleUpdateReset()} />
         <Form from={fromUpdate} onSubmit={handleSubmitUpdate}>
           <div ref={colorPickerRef} className="space-y-5">
             <div className="grid py-1 place-items-center relative border rounded-2xl">
@@ -214,9 +247,19 @@ export default function Planmanagement() {
               type="number"
               placeholder="Price hare for number"
             />
+            <InputSelectField
+              items={[
+                { value: "week", label: "Week" },
+                { value: "month", label: "Month" },
+                { value: "year", label: "Year" },
+              ]}
+              name="interval"
+              label="Interval"
+              placeholder="Price hare for number"
+            />
 
             <InputWordSelectField
-              name="feature"
+              name="features"
               label="Features"
               placeholder="Add Features name (press Enter)"
               matching={false}
@@ -224,10 +267,7 @@ export default function Planmanagement() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  fromUpdate.reset();
-                  setIsUpdate(!isUpdate);
-                }}
+                onClick={() => handleUpdateReset()}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -235,15 +275,19 @@ export default function Planmanagement() {
                 <X className="size-5" />
                 Cancel
               </Button>
-              <Button variant="primary" size="lg" className="w-full">
-                {" "}
+              <Button
+                disabled={UpdateLoading}
+                variant="primary"
+                size="lg"
+                className="w-full"
+              >
                 <FavIcon name="save" />
                 Save changes
               </Button>
             </div>
           </div>
         </Form>
-      </Modal>
+      </Modal2>
     </div>
   );
 }

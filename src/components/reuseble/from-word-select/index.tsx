@@ -46,17 +46,18 @@ export function InputWordSelectField({
           }
         };
 
-        const handleRemoveTag = (tag: string) => {
-          const newTags = selectedNames.filter((item:any) => item !== tag);
-          onChange(newTags);
-        };
-
         const handleSubmitTag = () => {
           if (inputValue.trim()) {
             const newTags = [...selectedNames, inputValue];
             onChange(newTags);
             setInputValue("");
           }
+        };
+
+        // ✅ Fixed: remove by index number instead of tag value
+        const handleRemoveTag = (index: number) => {
+          const newTags = selectedNames.filter((_: any, i: number) => i !== index);
+          onChange(newTags);
         };
 
         return (
@@ -80,8 +81,9 @@ export function InputWordSelectField({
                 <Plus className="size-5" />
               </Button>
             </div>
+
             <div className="flex flex-wrap gap-2 mt-2">
-              {selectedNames?.map((tag:any, index:any) => (
+              {selectedNames?.map((tag: any, index: number) => (
                 <div
                   key={index}
                   className="flex items-center bg-[#3D3D3D] text-white py-1 px-3 rounded-full"
@@ -89,7 +91,7 @@ export function InputWordSelectField({
                   {tag}
                   <button
                     type="button"
-                    onClick={() => handleRemoveTag(tag)}
+                    onClick={() => handleRemoveTag(index)} // ✅ remove by index
                     className="ml-2 cursor-pointer text-white"
                   >
                     <X className="size-4" />
@@ -97,6 +99,7 @@ export function InputWordSelectField({
                 </div>
               ))}
             </div>
+
             {!matching && (
               <Label
                 className={cn(
@@ -107,6 +110,7 @@ export function InputWordSelectField({
                 {label}
               </Label>
             )}
+
             {error?.message && (
               <h3 className="text-sm pt-[1px] text-end text-[#f73f4e] flex gap-1 items-center justify-end">
                 {error.message}
@@ -119,4 +123,3 @@ export function InputWordSelectField({
     />
   );
 }
-

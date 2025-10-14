@@ -86,7 +86,7 @@ export default function Notifications() {
 
                   <div className="text-gray-500  items-center hidden md:flex md:justify-end">
                     {item?.isRead ? (
-                      <FavIcon color="#ffffff" name="messageRead" />
+                      <FavIcon color="#ffffff" name="messageRead" className="size-4"  />
                     ) : (
                       <FavIcon name="messageUnRead" className="size-4" />
                     )}

@@ -38,7 +38,7 @@ export const commonApi = baseApi.injectEndpoints({
         url: `/posts/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [tagTypes.post],
+      invalidatesTags: [tagTypes.post,tagTypes.userbyDetails],
     }),
     likePost: build.mutation({
       query: (id) => ({

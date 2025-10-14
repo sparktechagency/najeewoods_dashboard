@@ -6,7 +6,7 @@ export const subscribersApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getSubscribers: build.query({
       query: (arg?: Record<string, any>) => ({
-        url: `/plans/users`,
+        url: `/subscriptions`,
         method: "GET",
         params: arg,
       }),
@@ -14,7 +14,7 @@ export const subscribersApi = baseApi.injectEndpoints({
         const rest = buildResponse(res);
         return rest;
       },
-      providesTags: [tagTypes.users],
+      providesTags: [tagTypes.subscribers],
     }),
     getPlan: build.query({
       query: (arg?: Record<string, any>) => ({
@@ -24,7 +24,27 @@ export const subscribersApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.plans],
     }),
+    updatePlan: build.mutation({
+      query: ({ id, data }) => ({
+        url: `/plans/upgrade-plan/${id}`,
+        method: "PATCH",
+        data,
+      }),
+      invalidatesTags: [tagTypes.plans],
+    }),
+    subAcToggle: build.mutation({
+      query: (id) => ({
+        url: `/subscriptions/pause/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: [tagTypes.subscribers],
+    }),
   }),
 });
 
-export const { useGetPlanQuery } = subscribersApi;
+export const {
+  useGetPlanQuery,
+  useGetSubscribersQuery,
+  useSubAcToggleMutation,
+  useUpdatePlanMutation
+} = subscribersApi;
