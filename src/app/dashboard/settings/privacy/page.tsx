@@ -12,11 +12,16 @@ import { toast } from "sonner";
 
 export default function Privacy() {
   const [content, setContent] = useState<string>("");
-  const { data: about } = useGetAboutQuery({ type: "privacy" });
+  const { data: about} = useGetAboutQuery({
+    type: "privacy",
+  });
   const [storeAbout, { isLoading }] = useStoreAboutMutation();
 
+  
   useEffect(() => {
-    setContent(about?.data?.content);
+    if (about?.data?.type === "privacy") {
+      setContent(about?.data?.content);
+    }
   }, [about]);
 
   async function handleSubmit() {

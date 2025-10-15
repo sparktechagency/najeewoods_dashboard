@@ -81,7 +81,7 @@ export default function Moods() {
         name: isDetails.name,
       });
     }
-  }, [isDetails]);
+  }, [isDetails,Updatefrom]);
 
   const updateSubmit = async (values: FieldValues) => {
     const value = {

@@ -49,7 +49,7 @@ export default function Podcasts() {
   }, []);
 
   const from = useForm({
-    resolver: zodResolver(podcastSchema),
+    // resolver: zodResolver(podcastSchema),
     defaultValues: {
       audio: null,
       location: "",
@@ -72,7 +72,7 @@ export default function Podcasts() {
   };
   // update music
   const fromUpdate = useForm({
-    resolver: zodResolver(podcastSchema),
+    // resolver: zodResolver(podcastSchema),
     defaultValues: {
       audio: null,
       location: "",
@@ -250,14 +250,14 @@ export default function Podcasts() {
             <div>
               {isAudio?.audioPreview ? (
                 <div className="mw-full h-fit rounded-md">
-                  <MusicPlayer />
+                  {/* <MusicPlayer /> */}
                   <AudioUpload
                     onFileSelect={(file: File) => {
                       setIsAudio({
                         ...isAudio,
                         audioPreview: URL.createObjectURL(file),
                       });
-                      from.setValue("audio", file, { shouldValidate: true });
+                      from.setValue("audio", file as any, { shouldValidate: true });
                     }}
                   >
                     <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
@@ -274,7 +274,7 @@ export default function Podcasts() {
                       ...isAudio,
                       audioPreview: URL.createObjectURL(file),
                     });
-                    from.setValue("audio", file, { shouldValidate: true });
+                    from.setValue("audio", file as any, { shouldValidate: true });
                   }}
                 >
                   <div>
@@ -370,14 +370,14 @@ export default function Podcasts() {
         <Form from={fromUpdate} onSubmit={handleSubmitMusic}>
           <div className="space-y-5">
             <div className="mw-full h-fit rounded-md">
-              <MusicPlayer />
+              {/* <MusicPlayer /> */}
               <AudioUpload
                 onFileSelect={(file: File) => {
                   setIsAudio({
                     ...isAudio,
                     audioPreview: URL.createObjectURL(file),
                   });
-                  fromUpdate.setValue("audio", file, { shouldValidate: true });
+                  fromUpdate.setValue("audio", file as any, { shouldValidate: true });
                 }}
               >
                 <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
@@ -473,7 +473,7 @@ export default function Podcasts() {
         }
       >
         <div className="space-y-4">
-          <MusicPlayer />
+          {/* <MusicPlayer /> */}
           <p className="text-[#FFF]">
             Lorem ipsum dolor sit amet consectetur. Semper vel phasellus commodo
             neque. Duis turpis nascetur tincidunt egestas laoreet elementum
@@ -492,7 +492,7 @@ export default function Podcasts() {
             </ul>
           </div>
           <div className="mt-4 flex justify-between items-center">
-            <LikeToggle />
+            <LikeToggle likes={10} />
             <div
               onClick={() => handleDelete("123")}
               className="border cursor-pointer size-10  grid place-items-center rounded-md"

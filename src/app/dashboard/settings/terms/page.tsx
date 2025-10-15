@@ -12,11 +12,15 @@ import { toast } from "sonner";
 
 export default function Terms() {
   const [content, setContent] = useState<string>("");
-  const { data: about } = useGetAboutQuery({ type: "terms" });
+  const { data: about } = useGetAboutQuery({
+    type: "terms",
+  });
   const [storeAbout, { isLoading }] = useStoreAboutMutation();
 
   useEffect(() => {
-    setContent(about?.data?.content);
+    if (about?.data?.type == "terms") {
+      setContent(about?.data?.content);
+    }
   }, [about]);
 
   async function handleSubmit() {

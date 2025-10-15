@@ -7,21 +7,22 @@ import {
   useGetAboutQuery,
   useStoreAboutMutation,
 } from "@/redux/api/settingApi";
+import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function AboutUs() {
   const [content, setContent] = useState<string>("");
-  const { data: about } = useGetAboutQuery({ type: "about" });
+  const { data: about, isLoading: aboutLoading } = useGetAboutQuery({
+    type: "about",
+  });
   const [storeAbout, { isLoading }] = useStoreAboutMutation();
 
-  console.log(content)
-
   useEffect(() => {
-    if (about?.data?.content || !isLoading) {
-      setContent(about?.data?.content)
+    if (about?.data?.type === "about") {
+      setContent(about?.data?.content);
     }
-  }, [about,isLoading]);
+  }, [about]);
 
   async function handleSubmit() {
     const values = {
@@ -56,7 +57,13 @@ export default function AboutUs() {
       </ShadowBox>
       <WapperBox>
         <div className="mt-5">
-          <TextEditor value={content} onChange={setContent} />
+          {aboutLoading ? (
+            <div className="mx-auto min-h-[280px] flex items-center justify-center">
+              <Loader className="animate-spin text-reds" />
+            </div>
+          ) : (
+            <TextEditor value={content} onChange={setContent} />
+          )}
         </div>
       </WapperBox>
     </div>

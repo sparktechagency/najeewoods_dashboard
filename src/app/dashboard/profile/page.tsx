@@ -56,7 +56,7 @@ function ProfileChild() {
         preview: process.env.NEXT_PUBLIC_IMG_URL + avatar,
       }));
     }
-  }, [data]);
+  }, [data, ProLoading, avatar, profilefrom, email, name]);
 
   // handleProfileSubmit
   const handleProfileSubmit = async (values: FieldValues) => {
