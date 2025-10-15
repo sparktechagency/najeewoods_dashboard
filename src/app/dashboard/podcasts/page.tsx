@@ -6,11 +6,11 @@ import FavIcon from "@/icon/favIcon";
 import { useEffect, useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
-import { PlaceholderImg } from "@/lib";
+import { helpers, PlaceholderImg, userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";
-import { Button } from "@/components/ui";
+import { Button, Skeleton } from "@/components/ui";
 import Modal from "@/components/reuseble/modal";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "@/components/reuseble/from";
@@ -22,23 +22,51 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { musicSchema, podcastSchema } from "@/components/schema";
 import { InputWordSelectField } from "@/components/reuseble/from-word-select";
 import { vibeOptions } from "@/components/dummy-json";
+import {
+  useDeletePostMutation,
+  useGetPostQuery,
+  useStorePostMutation,
+  useUpdatePostMutation,
+} from "@/redux/api/commonApi";
+import { useGlobalState } from "@/components/hooks";
+import { NoItemData } from "@/components/reuseble/table-no-item";
+import { Pagination } from "@/components/reuseble/pagination";
+import { MusicSkeleton } from "@/components/common/skeleton-card";
 
+const intGlobal: any = {
+  isPage: 1,
+  isPreview: false,
+  isStore: false,
+  isUpdate: false,
+  isShow: null,
+  isDetails: {},
+};
 
 export default function Podcasts() {
   const { confirm } = useConfirmation();
-  const [isPreview, setIsPreview] = useState(false);
+  const [global, updateGlobal] = useGlobalState(intGlobal);
   const [isActive, setIsActive] = useState("Owned");
-  const [isShow, setIsShow] = useState<number | null>(null);
-  const [isStore, setIsStore] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
   const [isAudio, setIsAudio] = useState<any>({ audioPreview: "" });
-  const [isPlay, setIsPlay] = useState(false);
+  const [storePost, { isLoading }] = useStorePostMutation();
+  const [deletePost] = useDeletePostMutation();
+  const query = {
+    post_type: "podcast",
+    page: global.isPage,
+    get: isActive === "Owned" ? "owned" : "user",
+    // limt:"10"
+  };
+  const { data: podcasts, isLoading: podcastIsLoading } = useGetPostQuery({
+    ...query,
+  });
+  console.log(podcasts);
+  const [updatePost, { isLoading: updateIsLoading }] = useUpdatePostMutation();
+  const [isEditItem, setIsEditItem] = useState<any>({});
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest(".menu-container")) {
-        setIsShow(null);
+        updateGlobal("isShow", null);
       }
     };
 
@@ -46,7 +74,7 @@ export default function Podcasts() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [updateGlobal]);
 
   const from = useForm({
     // resolver: zodResolver(podcastSchema),
@@ -59,13 +87,6 @@ export default function Podcasts() {
       visibility: "",
     },
   });
-
-  useEffect(() => {
-    if (!isStore) {
-      from.reset();
-      setIsAudio({ audioPreview: "" });
-    }
-  }, [isStore, from]);
 
   const handleSubmit = async (values: FieldValues) => {
     console.log(values);
@@ -91,22 +112,13 @@ export default function Podcasts() {
     const con = await confirm({
       title: "You are going to delete this music",
       subTitle: "Delete Music",
-      description:
-        "After deleting, users wont be able to find this music in your app",
+      description: `After deleting, ${isActive} won't be able to find this music in your app`,
     });
     if (con) {
-      console.log(id);
-    }
-  };
-  const handleDeletePodcast = async (id: string) => {
-    const con = await confirm({
-      title: "You are going to delete this podcast",
-      subTitle: "Delete podcast",
-      description:
-        "After deleting, users wont be able to find this podcast in your app",
-    });
-    if (con) {
-      console.log(id);
+      const res = await deletePost(id).unwrap();
+      if (res.success && global?.isPreview) {
+        updateGlobal("isPreview", false);
+      }
     }
   };
 
@@ -116,10 +128,12 @@ export default function Podcasts() {
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
           <div>
             <h1 className="text-2xl font-semibold">Podcasts</h1>
-            <h1 className="text-base">Total podcasts: 50</h1>
+            <h1 className="text-base">
+              Total Podcasts: {podcasts?.meta?.total || 0}
+            </h1>
           </div>
           <Button
-            onClick={() => setIsStore(!isStore)}
+            onClick={() => updateGlobal("isStore", true)}
             variant="primary"
             size="lg"
           >
@@ -145,106 +159,146 @@ export default function Podcasts() {
           ))}
         </div>
         {isActive == "Owned" ? (
-          // ========="Owned=========
-          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-            {Array.from({ length: 10 }).map((item, index) => {
-              return (
-                <div
-                  className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
-                  key={index}
-                >
-                  <div className="flex justify-between relative items-center menu-container">
-                    <FavIcon name="musicBers" />
+          <div className="pt-4">
+            {podcastIsLoading ? (
+              <MusicSkeleton />
+            ) : podcasts?.data?.length > 0 ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                {podcasts?.data?.map((item: any, index: any) => (
+                  <div key={index}>
                     <div
-                      onClick={() => setIsShow(index)}
-                      className="border cursor-pointer size-10 grid place-items-center rounded-full"
-                    >
-                      <EllipsisVertical />
-                    </div>
-                    {isShow === index && (
-                      <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-3 right-2">
-                        <h1
-                          onClick={() => setIsUpdate(!isUpdate)}
-                          className="flex items-center px-2 cursor-pointer"
-                        >
-                          <FavIcon name="edit" className="mr-2" />
-                          Edit
-                        </h1>
-                        <h2 className="border-b my-1"></h2>
-                        <h1
-                          onClick={() => handleDeletePodcast("1234")}
-                          className="flex items-center px-2 cursor-pointer"
-                        >
-                          <FavIcon name="delete" className="mr-2" />
-                          Delete
-                        </h1>
-                      </div>
-                    )}
-                  </div>
-                  <h1 className="text-start text-secondery-figma text-lg font-medium">
-                    0:50
-                  </h1>
-                  <h1 className="bg-secondery-figma relative w-full h-px">
-                    <span
-                      style={{
-                        width: "20%",
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateGlobal("isDetails", item);
+                        updateGlobal("isPreview", true);
                       }}
-                      className="bg-white h-px absolute inset"
-                    ></span>
-                  </h1>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium flex items-center">
-                      {" "}
-                      <FavIcon name="like" className="mr-1" /> 120
-                    </span>
-                    <span>
-                      <FavIcon name="play" />
-                    </span>
+                      className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
+                    >
+                      <div className="flex justify-between relative items-center menu-container">
+                        <FavIcon name="musicBers" />
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateGlobal("isShow", index);
+                          }}
+                          className="border cursor-pointer size-10 grid place-items-center rounded-full"
+                        >
+                          <EllipsisVertical />
+                        </div>
+                        {global.isShow === index && (
+                          <div className="absolute py-2 w-[100px] space-y-2 blur-bg rounded-md overflow-hidden border top-5 right-3">
+                            <h1
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsEditItem(item);
+                                updateGlobal("isUpdate", true);
+                              }}
+                              className="flex items-center px-2 cursor-pointer"
+                            >
+                              <FavIcon name="edit" className="mr-2" /> Edit
+                            </h1>
+                            <h2 className="border-b my-1"></h2>
+                            <h1
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(item._id);
+                              }}
+                              className="flex items-center px-2 cursor-pointer"
+                            >
+                              <FavIcon name="delete" className="mr-2" /> Delete
+                            </h1>
+                          </div>
+                        )}
+                      </div>
+
+                      <h1 className="text-center text-secondery-figma text-xl font-medium">
+                        {item?.podcast?.length} Music&apos;s
+                      </h1>
+                      {/* Progress bar */}
+                      <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
+                        <div className="bg-secondery-figma relative w-full h-px">
+                          <span className="bg-white h-px absolute inset-y-0 left-0"></span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <span className="font-medium flex items-center">
+                          <FavIcon name="like" className="mr-1 size-6" />
+                          <span className="mt-px">{item?.likes}</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            ) : (
+              <NoItemData title="No Owned Data Available" />
+            )}
           </div>
         ) : (
-          // ==========Users ===========
-          <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-            {Array.from({ length: 10 }).map((item, index) => {
-              return (
-                <div
-                  className="cursor-pointer h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
-                  key={index}
-                  onClick={() => setIsPreview(!isPreview)}
-                >
-                  <h1 className="flex justify-center">
-                    <FavIcon name="musicBers" />
-                  </h1>
-                  <h1 className="text-center text-secondery-figma text-lg font-medium">
-                    0:50
-                  </h1>
-                  <h1 className="bg-[#F7F7F7] w-full h-px"></h1>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium flex items-center">
-                      {" "}
-                      <FavIcon name="like" className="mr-1" /> 120
-                    </span>
-                    <span>
-                      <FavIcon name="play" />
-                    </span>
+          // ========= Users ==========
+          <div className="pt-4">
+            {podcastIsLoading ? (
+              <MusicSkeleton />
+            ) : podcasts?.data?.length > 0 ? (
+              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
+                {podcasts?.data?.map((item: any, index: any) => (
+                  <div key={index}>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateGlobal("isDetails", item);
+                        updateGlobal("isPreview", true);
+                      }}
+                      className="h-[190px] w-[200px] bg-card-figma rounded-md p-5 flex flex-col justify-between"
+                    >
+                      <div className="flex justify-center relative items-center menu-container">
+                        <FavIcon name="musicBers" />
+                      </div>
+
+                      <h1 className="text-center text-secondery-figma text-xl font-medium">
+                        {item?.podcast?.length} Music&apos;s
+                      </h1>
+                      {/* Progress bar */}
+                      <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
+                        <div className="bg-secondery-figma relative w-full h-px">
+                          <span className="bg-white h-px absolute inset-y-0 left-0"></span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <span className="font-medium flex items-center">
+                          <FavIcon name="like" className="mr-1 size-6" />
+                          <span className="mt-px">{item?.likes}</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            ) : (
+              <NoItemData title="No User Data Available" />
+            )}
           </div>
         )}
+
+        {/* Pagination */}
+        <ul className="flex flex-wrap justify-end mt-10 lg:mt-20">
+          <li className="font-medium">
+            <Pagination
+              onPageChange={(v: any) => updateGlobal("isPage", v)}
+              {...podcasts?.meta}
+            />
+          </li>
+        </ul>
       </WapperBox>
 
       {/* =================Upload new podcast  ================ */}
       <Modal
-        open={isStore}
-        setIsOpen={setIsStore}
+        open={global.isStore}
+        setIsOpen={(v) => updateGlobal("isStore", v)}
         title="Upload New podcast"
         titleStyle="text-center"
       >
+        {/* <CloseIcon className="mt-2 mr-2" onClose={() => handleUploadReset()} /> */}
         <Form from={from} onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div>
@@ -257,7 +311,9 @@ export default function Podcasts() {
                         ...isAudio,
                         audioPreview: URL.createObjectURL(file),
                       });
-                      from.setValue("audio", file as any, { shouldValidate: true });
+                      from.setValue("audio", file as any, {
+                        shouldValidate: true,
+                      });
                     }}
                   >
                     <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
@@ -274,7 +330,9 @@ export default function Podcasts() {
                       ...isAudio,
                       audioPreview: URL.createObjectURL(file),
                     });
-                    from.setValue("audio", file as any, { shouldValidate: true });
+                    from.setValue("audio", file as any, {
+                      shouldValidate: true,
+                    });
                   }}
                 >
                   <div>
@@ -340,10 +398,6 @@ export default function Podcasts() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  from.reset();
-                  setIsStore(!isStore);
-                }}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -362,8 +416,8 @@ export default function Podcasts() {
       </Modal>
       {/* =================Edit podcast ================ */}
       <Modal
-        open={isUpdate}
-        setIsOpen={setIsUpdate}
+        open={global.isUpdate}
+        setIsOpen={(v) => updateGlobal("isUpdate", v)}
         title="Edit podcast"
         titleStyle="text-center"
       >
@@ -377,7 +431,9 @@ export default function Podcasts() {
                     ...isAudio,
                     audioPreview: URL.createObjectURL(file),
                   });
-                  fromUpdate.setValue("audio", file as any, { shouldValidate: true });
+                  fromUpdate.setValue("audio", file as any, {
+                    shouldValidate: true,
+                  });
                 }}
               >
                 <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
@@ -428,10 +484,6 @@ export default function Podcasts() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Button
-                onClick={() => {
-                  fromUpdate.reset();
-                  setIsUpdate(!isUpdate);
-                }}
                 size="lg"
                 type="button"
                 className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
@@ -450,35 +502,49 @@ export default function Podcasts() {
       </Modal>
       {/* =============audio modal========== */}
       <ModalOne
-        open={isPreview}
-        setIsOpen={setIsPreview}
+        open={global.isPreview}
+        setIsOpen={(v) => updateGlobal("isPreview", v)}
         className="sm:max-w-xs"
         headerStyle="pt-4 px-4 pb-0"
         profile={
           <>
             <Avatars
-              src={PlaceholderImg()}
-              fallback={"E"}
+              src={helpers.imgSource(global?.isDetails?.user?.avatar)}
+              fallback={global?.isDetails?.user?.name}
               alt="profile"
               fallbackStyle="bg-[#cb4ec9]/70 text-white"
             />
             <div className="leading-5">
               <h1 className="flex font-medium items-center">
-                Elizabeth Olson{" "}
-                <FavIcon className="ml-2 size-4" name="internet" />
+                {global?.isDetails?.user?.name}
+                <span className="ml-2">
+                  {" "}
+                  {userVisibiliy[global?.isDetails?.privacy] || "public"}
+                </span>
               </h1>
-              <h1 className="text-secondery-figma">😥Mental</h1>
+              <div className="text-secondery-figma flex  items-center">
+                <picture>
+                  <img
+                    className="size-6 mt-[2px]"
+                    src={helpers.imgSource(global?.isDetails?.mood?.icon)}
+                    alt="img"
+                  />
+                </picture>
+                <span className="ml-[2px]">
+                  {helpers.capitalize(global?.isDetails?.mood?.name)}
+                </span>
+              </div>
             </div>
           </>
         }
       >
         <div className="space-y-4">
-          {/* <MusicPlayer /> */}
-          <p className="text-[#FFF]">
-            Lorem ipsum dolor sit amet consectetur. Semper vel phasellus commodo
-            neque. Duis turpis nascetur tincidunt egestas laoreet elementum
-            bibendum.
-          </p>
+          {global?.isDetails?.podcast?.map((item: any, idx: any) => (
+            <div key={idx} className="space-y-2">
+              <MusicPlayer idx={idx} audioSource={item?.url} />
+            </div>
+          ))}
+          <p className="text-[#FFF]">{global?.isDetails?.captions || "N/A"}</p>
           <div>
             <h1 className="text-lg">Host: Host name goes here</h1>
             <ul>
@@ -492,9 +558,9 @@ export default function Podcasts() {
             </ul>
           </div>
           <div className="mt-4 flex justify-between items-center">
-            <LikeToggle likes={10} />
+            <LikeToggle likes={global?.isDetails?.likes} />
             <div
-              onClick={() => handleDelete("123")}
+              onClick={() => handleDelete(global?.isDetails?._id)}
               className="border cursor-pointer size-10  grid place-items-center rounded-md"
             >
               <FavIcon name="delete" className="size-5" />

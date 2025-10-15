@@ -65,7 +65,10 @@ export default function MusicPlayer({
 
     window.addEventListener("pauseAllAudios", handlePauseAll as EventListener);
     return () => {
-      window.removeEventListener("pauseAllAudios", handlePauseAll as EventListener);
+      window.removeEventListener(
+        "pauseAllAudios",
+        handlePauseAll as EventListener
+      );
     };
   }, [idx]);
 
@@ -100,6 +103,7 @@ export default function MusicPlayer({
 
   /** 🧭 Seek in audio */
   const handleProgressBarClick = (e: React.MouseEvent) => {
+    if (!isPlaying) return;
     if (!audioRef.current || !progressBarRef.current) return;
     const rect = progressBarRef.current.getBoundingClientRect();
     const clickPosition = e.clientX - rect.left;
@@ -158,7 +162,11 @@ export default function MusicPlayer({
             type="button"
             className="h-8 w-8 p-0 hover:bg-transparent hover:text-[#b7b8b9] text-[#b7b8b9] rounded-full ml-4"
           >
-            {isMuted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+            {isMuted ? (
+              <VolumeX className="size-5" />
+            ) : (
+              <Volume2 className="size-5" />
+            )}
           </Button>
 
           {/* 🎧 Hidden audio */}

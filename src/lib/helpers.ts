@@ -62,14 +62,16 @@ export class helpers {
     Object.keys(values).forEach((key) => {
       const value = values[key];
       if (Array.isArray(value)) {
-        value.forEach((file: File) => {
-          if (file instanceof File) {
-            formData.append(key, file);
-          }
-        });
+        if (value.every((v) => v instanceof File)) {
+          value.forEach((file: File) => formData.append(key, file));
+        } else {
+          formData.append(key, JSON.stringify(value));
+        }
       } else if (value instanceof File) {
         formData.append(key, value);
       } else if (typeof value === "object" && value !== null) {
+        formData.append(key, JSON.stringify(value));
+      } else if (value === "array") {
         formData.append(key, JSON.stringify(value));
       } else {
         formData.append(key, value);

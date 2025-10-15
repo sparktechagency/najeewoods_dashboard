@@ -10,7 +10,7 @@ import { helpers, userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";
-import { Button, Skeleton } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { FieldValues, useForm } from "react-hook-form";
 import Form from "@/components/reuseble/from";
 import { FromTextArea } from "@/components/reuseble/from-textarea";
@@ -23,17 +23,18 @@ import { CloseIcon } from "@/components/reuseble/btn-modal";
 import {
   useDeletePostMutation,
   useGetPostQuery,
+  useStoreMediaMutation,
   useStorePostMutation,
   useUpdatePostMutation,
 } from "@/redux/api/commonApi";
 import { toast } from "sonner";
-import RepeatCount from "@/components/reuseble/repeat-count/count";
 import { NoItemData } from "@/components/reuseble/table-no-item";
 import { Pagination } from "@/components/reuseble/pagination";
 import { useGlobalState } from "@/components/hooks";
 import { InputSelectMood } from "@/components/reuseble/mood-select";
 import FromLocation from "@/components/reuseble/from-location";
 import AudioMulUpload from "@/components/reuseble/mutiple-audio";
+import { MusicSkeleton } from "@/components/common/skeleton-card";
 
 const intGlobal: any = {
   isPage: 1,
@@ -50,6 +51,7 @@ export default function Music() {
   const [global, updateGlobal] = useGlobalState(intGlobal);
   const [isActive, setIsActive] = useState("Owned");
   const [storePost, { isLoading }] = useStorePostMutation();
+  const [storeMedia] = useStoreMediaMutation();
   const [deletePost] = useDeletePostMutation();
   const query = {
     post_type: "audio",
@@ -77,6 +79,7 @@ export default function Music() {
     };
   }, [updateGlobal]);
 
+  // == store music ==
   const from = useForm({
     resolver: zodResolver(musicSchema),
     defaultValues: {
@@ -89,25 +92,56 @@ export default function Music() {
   });
 
   const handleSubmit = async (values: FieldValues) => {
-    const value = {
-      post_type: "audio",
-      mood: values.mood,
-      privacy: values?.visibility,
-      location: values?.location,
+    const music = {
       audio: values?.audio,
-      captions: values?.caption,
     };
-    const fromData = helpers.fromData(value);
-    const res = await storePost(fromData).unwrap();
-    if (res.success) {
-      handleUploadReset();
-      toast.success("Audio uploaded successfully", {
-        description: "Your audio has been uploaded successfully.",
-      });
+    const fromData = helpers.fromData(music);
+    const musicStore = await storeMedia(fromData).unwrap();
+    if (musicStore?.success) {
+      const audioIds = musicStore?.data?.map((item: any) => item._id);
+      const value = {
+        post_type: "audio",
+        mood: values.mood,
+        privacy: values?.visibility,
+        location: values?.location,
+        audio: audioIds,
+        captions: values?.caption,
+      };
+      console.log(value);
+
+      const fromData = helpers.fromData(value);
+      const res = await storePost(fromData).unwrap();
+      console.log(res);
+      if (res.success) {
+        handleUploadReset();
+        toast.success("Audio uploaded successfully", {
+          description: "Your audio has been uploaded successfully.",
+        });
+      }
     }
+    // console.log(musicStore);
+    // if (values) {
+    //   // const formData = new FormData();
+    //   // values.audio.forEach((file: any) => {
+    //   //   formData.append("audio", file);
+    //   // });
+    //   const fromData = helpers.fromData({ audio: values?.audio });
+    //   const musicStore = await storeMedia(fromData).unwrap();
+    //   console.log(musicStore);
+    // }
+
+    // console.log(value);
+    // const fromData = helpers.fromData(value);
+    // const res = await storePost(fromData).unwrap();
+    // if (res.success) {
+    //   handleUploadReset();
+    //   toast.success("Audio uploaded successfully", {
+    //     description: "Your audio has been uploaded successfully.",
+    //   });
+    // }
   };
 
-  // Update music
+  //  == update music ==
   const fromUpdate = useForm({
     defaultValues: {
       audio: [],
@@ -229,11 +263,7 @@ export default function Music() {
         {isActive == "Owned" ? (
           <div className="pt-4">
             {postIsLoading ? (
-              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-                <RepeatCount count={20}>
-                  <Skeleton className="w-[200px]  h-[180px]" />
-                </RepeatCount>
-              </div>
+              <MusicSkeleton />
             ) : music?.data?.length > 0 ? (
               <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
                 {music?.data?.map((item: any, index: any) => (
@@ -310,11 +340,7 @@ export default function Music() {
           // ========= Users ==========
           <div className="pt-4">
             {postIsLoading ? (
-              <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
-                <RepeatCount count={20}>
-                  <Skeleton className="w-[200px]  h-[180px]" />
-                </RepeatCount>
-              </div>
+              <MusicSkeleton />
             ) : music?.data?.length > 0 ? (
               <div className="flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
                 {music?.data?.map((item: any, index: any) => (

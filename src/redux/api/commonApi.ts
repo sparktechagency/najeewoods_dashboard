@@ -1,6 +1,7 @@
 import { tagTypes } from "@/redux/tag-types";
 import { baseApi } from "./baseApi";
 import { buildResponse } from "@/lib";
+
 export const commonApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPost: build.query({
@@ -51,6 +52,14 @@ export const commonApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.post],
     }),
+    storeMedia: build.mutation({
+      query: (data) => ({
+        url: "/media",
+        method: "POST",
+        ContentType: "multipart/form-data",
+        data,
+      }),
+    }),
   }),
 });
 
@@ -60,4 +69,5 @@ export const {
   useDeletePostMutation,
   useLikePostMutation,
   useUpdatePostMutation,
+  useStoreMediaMutation,
 } = commonApi;

@@ -53,7 +53,7 @@ export default function Vibes() {
                 }}
               >
                 <ImgBox
-                  src={helpers.imgSource(item?.image[0]) || ""}
+                  src={helpers.imgSource(item?.image?.[0]?.url) || ""}
                   alt="img"
                   className="h-[190px] w-[200px] rounded-xl"
                 >
@@ -119,7 +119,7 @@ export default function Vibes() {
             <>
               <Avatars
                 src={helpers.imgSource(isDetails?.user?.avatar)}
-                fallback={isDetails?.user?.name}
+                fallback={isDetails?.user?.name || "N/A"}
                 alt="profile"
                 fallbackStyle="bg-[#cb4ec9]/70 text-white"
               />

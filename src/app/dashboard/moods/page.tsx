@@ -190,7 +190,7 @@ export default function Moods() {
               </div>
             ))
           ) : (
-            <NoItemData title="No mood data available" />
+            <NoItemData className="w-full" title="No mood data available" />
           )}
         </div>
       </WapperBox>
