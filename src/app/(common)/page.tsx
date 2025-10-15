@@ -7,16 +7,27 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
 import { useLoginInMutation } from "@/redux/api/authApi";
 import { authKey, helpers, ResponseApiErrors } from "@/lib";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 import bgImg from "@/assets/bg.png";
 import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function RootPage() {
-  const [LoginIn, { isLoading }] = useLoginInMutation();
   const router = useRouter();
+  const [LoginIn, { isLoading }] = useLoginInMutation();
+  const token = helpers.getAuthCookie(authKey) || "";
+  const decoded: any = token ? jwtDecode(token) : null;
+  const isAdmin = decoded?.user?.role == "admin";
+
+  useEffect(() => {
+    if (isAdmin) {
+      return redirect("/dashboard");
+    }
+  }, [isAdmin]);
+
   const from = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {

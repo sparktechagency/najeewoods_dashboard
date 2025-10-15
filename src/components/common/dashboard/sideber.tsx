@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function Sideber({ sidebarOpen, setSidebarOpen }: any) {
   const router = useRouter();
+  
   const handlelogout = () => {
     helpers.removeAuthCookie(authKey);
     router.push("/");

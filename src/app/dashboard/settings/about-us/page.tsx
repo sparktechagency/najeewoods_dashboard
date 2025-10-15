@@ -15,9 +15,13 @@ export default function AboutUs() {
   const { data: about } = useGetAboutQuery({ type: "about" });
   const [storeAbout, { isLoading }] = useStoreAboutMutation();
 
+  console.log(content)
+
   useEffect(() => {
-    setContent(about?.data?.content);
-  }, [about]);
+    if (about?.data?.content || !isLoading) {
+      setContent(about?.data?.content)
+    }
+  }, [about,isLoading]);
 
   async function handleSubmit() {
     const values = {

@@ -1,6 +1,6 @@
+import { authKey } from "./constants";
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
-import { authKey } from "./constants";
 
 export class helpers {
   // ===== Cookies =====

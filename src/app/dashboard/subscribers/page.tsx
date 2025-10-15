@@ -191,6 +191,19 @@ export default function Subscribers() {
           </Button>
         </div>
       </Modal> */}
+      {/* function DetailsNav2({ icon, text, value }: any) {
+  return (
+    <div className="flex justify-between space-x-3 h-11">
+      <div className="w-full flex justify-between items-center border rounded-xl px-3">
+        <span className="flex gap-x-2 items-center">
+          {icon} {text}:
+        </span>
+        <span>{value}</span>
+      </div>
+    </div>
+  );
+} */}
+
       {/* =============users=========== */}
       <Modal
         open={isUser}
@@ -240,19 +253,19 @@ export default function Subscribers() {
           </div>
           <div className="space-y-3 pt-2">
             <DetailsNav
-              href="/dashboard/users/vibe-posted"
+              href={`/dashboard/users/vibe-posted/${isDetails?.user?._id}`}
               icon={<FavIcon name="vibePost" className="size-5" />}
               text="Vibe posted"
               value={isDetails?.user?.vibes}
             />
             <DetailsNav
-              href="/dashboard/users/music-posted"
+              href={`/dashboard/users/music-posted/${isDetails?.user?._id}`}
               icon={<FavIcon name="music" className="size-5" />}
               text="Music posted"
               value={isDetails?.user?.audio}
             />
             <DetailsNav
-              href="/dashboard/users/podcast-posted"
+              href={`/dashboard/users/podcast-posted/${isDetails?.user?._id}`}
               icon={<FavIcon name="padcostDetails" className="size-5" />}
               text="Podcast posted"
               value={isDetails?.user?.podcast}
@@ -283,20 +296,6 @@ function DetailsNav({ href, icon, text, value }: any) {
       >
         <ArrowUpRight />
       </Link>
-    </div>
-  );
-}
-
-// DetailsNav2
-function DetailsNav2({ icon, text, value }: any) {
-  return (
-    <div className="flex justify-between space-x-3 h-11">
-      <div className="w-full flex justify-between items-center border rounded-xl px-3">
-        <span className="flex gap-x-2 items-center">
-          {icon} {text}:
-        </span>
-        <span>{value}</span>
-      </div>
     </div>
   );
 }

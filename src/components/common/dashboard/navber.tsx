@@ -6,7 +6,6 @@ import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu } from "lucide-react";
 import { Button, Skeleton } from "@/components/ui";
-import useScroll from "@/components/context/scroll";
 import { authKey, helpers } from "@/lib";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,7 +15,7 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
   const contentRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { setIsScroll } = useScroll();
+  
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -32,15 +31,9 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [dropdownOpen]);
 
-  useEffect(() => {
-    const onScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScroll(scrollY);
-      navRef.current?.classList.toggle("nav-sticky", scrollY > 0);
-    };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+ 
+
+  
   const token = helpers.getAuthCookie(authKey);
   const { data: profile } = useGetProfileQuery(
     {},

@@ -57,7 +57,7 @@ export default function VidePost() {
             <BackBtn />
             <div>
               <h1 className="text-2xl font-semibold">
-                {vibes?.data[0]?.user?.name || "N"}&apos;s Vibes
+                {vibes?.data[0]?.user?.name || "N/A"}
               </h1>
               <h1 className="text-base">
                 {vibes?.meta?.total || 0} Vibes Posted

@@ -2,12 +2,11 @@
 import ShadowBox from "@/components/common/shadow-box";
 import { BackBtn } from "@/components/reuseble/back-btn";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { ArrowUp } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
-import { helpers, PlaceholderImg, userVisibiliy } from "@/lib";
+import { helpers, userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";
@@ -15,21 +14,21 @@ import { useDeletePostMutation } from "@/redux/api/commonApi";
 import { useGetPostIdQuery } from "@/redux/api/userApi";
 import { useParams } from "next/navigation";
 import { NoItemData } from "@/components/reuseble/table-no-item";
+import { Pagination } from "@/components/reuseble/pagination";
 import RepeatCount from "@/components/reuseble/repeat-count/count";
 import { Skeleton } from "@/components/ui";
-import { Pagination } from "@/components/reuseble/pagination";
 
-export default function MusicPosted() {
-  const { id } = useParams();
+export default function Podcast() {
   const { confirm } = useConfirmation();
+  const { id } = useParams();
   const [isPreview, setIsPreview] = useState(false);
   const [isPage, setIsPage] = useState(1);
   const [isDetails, setIsDetails] = useState<any>({});
   const [deletePost] = useDeletePostMutation();
-  const { data: music, isLoading } = useGetPostIdQuery({
+  const { data: podcast, isLoading } = useGetPostIdQuery({
     id,
     arg: {
-      post_type: "audio",
+      post_type: "podcast",
       page: isPage,
       limit: 16,
     },
@@ -37,10 +36,10 @@ export default function MusicPosted() {
 
   const handleDelete = async (id: string) => {
     const con = await confirm({
-      title: "You are going to delete this Music",
-      subTitle: "Delete Music",
+      title: "You are going to delete this podcast",
+      subTitle: "Delete Podcast",
       description:
-        "After deleting, users wont be able to find this music in your app",
+        "After deleting, users wont be able to find this podcast in your app",
     });
     if (con) {
       const res = await deletePost(id).unwrap();
@@ -58,11 +57,11 @@ export default function MusicPosted() {
             <BackBtn />
             <div>
               <h1 className="text-2xl font-semibold">
-                {music?.data[0]?.user?.name || "N/A"}
+                {podcast?.data[0]?.user?.name || "N/A"}
               </h1>
               <h1 className="text-base">
                 {" "}
-                {music?.meta?.total || 0} Music Posted
+                {podcast?.meta?.total || 0} Podcast Posted
               </h1>
             </div>
           </div>
@@ -74,8 +73,8 @@ export default function MusicPosted() {
             <RepeatCount count={20}>
               <Skeleton className="w-[200px]  h-[180px]" />
             </RepeatCount>
-          ) : music?.data?.length > 0 ? (
-            music?.data?.map((item: any, idx: any) => (
+          ) : podcast?.data?.length > 0 ? (
+            podcast?.data?.map((item: any, idx: any) => (
               <div key={idx}>
                 <div
                   onClick={(e) => {
@@ -90,7 +89,7 @@ export default function MusicPosted() {
                   </div>
 
                   <h1 className="text-center text-secondery-figma text-xl font-medium">
-                    {item?.audio?.length} Music&apos;s
+                    {item?.podcast?.length} Music&apos;s
                   </h1>
                   {/* Progress bar */}
                   <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
@@ -108,19 +107,19 @@ export default function MusicPosted() {
               </div>
             ))
           ) : (
-            <NoItemData className="w-full" title="No Music data available" />
+            <NoItemData className="w-full" title="No  Podcast data available" />
           )}
         </div>
         <ul className="flex flex-wrap justify-end mt-20">
           <li className="font-medium">
             <Pagination
               onPageChange={(v: any) => setIsPage(v)}
-              {...music?.meta}
+              {...podcast?.meta}
             ></Pagination>
           </li>
         </ul>
       </WapperBox>
-      {/* ================= Audio Modal ================= */}
+      {/* modal custom */}
       <ModalOne
         open={isPreview}
         setIsOpen={setIsPreview}
@@ -158,13 +157,27 @@ export default function MusicPosted() {
           </>
         }
       >
-        <div className="space-y-3">
-          {isDetails?.audio?.map((item: any, idx: any) => (
-            <div key={idx} className="space-y-2">
-              <MusicPlayer idx={idx} audioSource={item?.url} />
-            </div>
-          ))}
+        <div className="space-y-4">
+          <div className="space-y-3">
+            {isDetails?.podcast?.map((item: any, idx: any) => (
+              <div key={idx} className="space-y-2">
+                <MusicPlayer idx={idx} audioSource={item?.url} />
+              </div>
+            ))}
+          </div>
           <p className="text-[#FFF]">{isDetails?.captions || "N/A"}</p>
+          <div>
+            <h1 className="text-lg">Host: Host name goes here</h1>
+            <ul>
+              <li>Guests:</li>
+              <li>
+                <ul>
+                  <li>1.Guest 1</li>
+                  <li>2.Guest 2</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
           <div className="mt-4 flex justify-between items-center">
             <LikeToggle likes={isDetails?.likes} />
             <div
