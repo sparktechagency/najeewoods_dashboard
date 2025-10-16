@@ -53,7 +53,7 @@ function ProfileChild() {
       });
       setImg((pre: any) => ({
         ...pre,
-        preview: process.env.NEXT_PUBLIC_IMG_URL + avatar,
+        preview:helpers.imgSource(avatar?.url),
       }));
     }
   }, [data, ProLoading, avatar, profilefrom, email, name]);

@@ -15,11 +15,20 @@ const axiosBaseQuery =
       params?: AxiosRequestConfig["params"];
       headers?: AxiosRequestConfig["headers"];
       ContentType?: string;
+      onUploadProgress?: AxiosRequestConfig["onUploadProgress"];
     },
     unknown,
     unknown
   > =>
-  async ({ url, method, data, params, headers, ContentType }) => {
+  async ({
+    url,
+    method,
+    data,
+    params,
+    headers,
+    ContentType,
+    onUploadProgress,
+  }) => {
     const token = helpers.getAuthCookie(authKey);
     try {
       const result = await axios({
@@ -27,6 +36,7 @@ const axiosBaseQuery =
         method,
         data,
         params,
+        onUploadProgress,
         headers: {
           "Content-Type": ContentType || "application/json",
           Authorization: `Bearer ${token}`,

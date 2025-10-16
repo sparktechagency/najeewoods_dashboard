@@ -82,7 +82,10 @@ export class helpers {
 
   // ========= imgSource =============
   static imgSource(href: string): string {
-    if (href?.startsWith("http") || href?.startsWith("https")) return href;
+    // if (href === "object") {
+    //   return "";
+    // }
+    if (href?.startsWith("https://") || href?.startsWith("http://")) return href;
     return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
   }
   // ========= song ===============

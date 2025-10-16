@@ -20,7 +20,6 @@ export const commonApi = baseApi.injectEndpoints({
       query: (data) => ({
         url: "/posts",
         method: "POST",
-        ContentType: "multipart/form-data",
         data,
       }),
       invalidatesTags: [tagTypes.post],
@@ -53,9 +52,18 @@ export const commonApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.post],
     }),
     storeMedia: build.mutation({
-      query: (data) => ({
+      query: ({data,onUploadProgress}:any) => ({
         url: "/media",
         method: "POST",
+        ContentType: "multipart/form-data",
+        onUploadProgress,
+        data,
+      }),
+    }),
+    updateMedia: build.mutation({
+      query: ({ id, data }) => ({
+        url: `/media/${id}`,
+        method: "PATCH",
         ContentType: "multipart/form-data",
         data,
       }),
@@ -70,4 +78,5 @@ export const {
   useLikePostMutation,
   useUpdatePostMutation,
   useStoreMediaMutation,
+  useUpdateMediaMutation,
 } = commonApi;

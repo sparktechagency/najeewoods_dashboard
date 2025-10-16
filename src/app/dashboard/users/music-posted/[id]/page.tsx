@@ -2,12 +2,11 @@
 import ShadowBox from "@/components/common/shadow-box";
 import { BackBtn } from "@/components/reuseble/back-btn";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { ArrowUp } from "lucide-react";
 import FavIcon from "@/icon/favIcon";
 import { useState } from "react";
 import Avatars from "@/components/reuseble/avater";
 import ModalOne from "@/components/reuseble/modal-one";
-import { helpers, PlaceholderImg, userVisibiliy } from "@/lib";
+import { helpers,userVisibiliy } from "@/lib";
 import LikeToggle from "@/components/reuseble/like-toggle";
 import useConfirmation from "@/components/context/delete-modal";
 import MusicPlayer from "@/components/common/music-player";

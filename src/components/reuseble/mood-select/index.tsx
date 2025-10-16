@@ -56,7 +56,7 @@ export function InputSelectMood({
         icon: (
           <ImgBox
             className="size-7"
-            src={process.env.NEXT_PUBLIC_IMG_URL + item.icon}
+            src={helpers.imgSource(item.icon?.url)}
             alt="img"
           />
         ),
@@ -64,8 +64,6 @@ export function InputSelectMood({
       setSelectMoods(newMoods);
     }
   }, [moodsItem]);
-
-
 
   return (
     <Controller

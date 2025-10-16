@@ -35,6 +35,7 @@ import { InputSelectMood } from "@/components/reuseble/mood-select";
 import FromLocation from "@/components/reuseble/from-location";
 import AudioMulUpload from "@/components/reuseble/mutiple-audio";
 import { MusicSkeleton } from "@/components/common/skeleton-card";
+import ProgressBox from "@/components/common/progress";
 
 const intGlobal: any = {
   isPage: 1,
@@ -49,9 +50,10 @@ export default function Music() {
   const { confirm } = useConfirmation();
   const [audioPreview, setAudioPreview] = useState([]);
   const [global, updateGlobal] = useGlobalState(intGlobal);
+  const [progress, setisPreogress] = useState(0);
   const [isActive, setIsActive] = useState("Owned");
   const [storePost, { isLoading }] = useStorePostMutation();
-  const [storeMedia] = useStoreMediaMutation();
+  const [storeMedia, { isLoading: mediaIsLoading }] = useStoreMediaMutation();
   const [deletePost] = useDeletePostMutation();
   const query = {
     post_type: "audio",
@@ -92,53 +94,36 @@ export default function Music() {
   });
 
   const handleSubmit = async (values: FieldValues) => {
-    const music = {
-      audio: values?.audio,
-    };
-    const fromData = helpers.fromData(music);
-    const musicStore = await storeMedia(fromData).unwrap();
-    if (musicStore?.success) {
-      const audioIds = musicStore?.data?.map((item: any) => item._id);
+    const fromData = helpers.fromData({ audio: values?.audio });
+    const mediaRes = await storeMedia({
+      data: fromData,
+      onUploadProgress: (progressEvent: ProgressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setisPreogress(progress);
+        }
+      },
+    }).unwrap();
+    if (mediaRes?.success) {
+      const musicIds = mediaRes?.data?.map((item: any) => item?._id);
       const value = {
         post_type: "audio",
+        audio: musicIds,
         mood: values.mood,
-        privacy: values?.visibility,
         location: values?.location,
-        audio: audioIds,
         captions: values?.caption,
+        privacy: values?.visibility,
       };
-      console.log(value);
-
-      const fromData = helpers.fromData(value);
-      const res = await storePost(fromData).unwrap();
-      console.log(res);
+      const res = await storePost(value).unwrap();
       if (res.success) {
         handleUploadReset();
-        toast.success("Audio uploaded successfully", {
-          description: "Your audio has been uploaded successfully.",
+        toast.success("Music uploaded successfully", {
+          description: "Your Music has been uploaded successfully.",
         });
       }
     }
-    // console.log(musicStore);
-    // if (values) {
-    //   // const formData = new FormData();
-    //   // values.audio.forEach((file: any) => {
-    //   //   formData.append("audio", file);
-    //   // });
-    //   const fromData = helpers.fromData({ audio: values?.audio });
-    //   const musicStore = await storeMedia(fromData).unwrap();
-    //   console.log(musicStore);
-    // }
-
-    // console.log(value);
-    // const fromData = helpers.fromData(value);
-    // const res = await storePost(fromData).unwrap();
-    // if (res.success) {
-    //   handleUploadReset();
-    //   toast.success("Audio uploaded successfully", {
-    //     description: "Your audio has been uploaded successfully.",
-    //   });
-    // }
   };
 
   //  == update music ==
@@ -173,20 +158,21 @@ export default function Music() {
       ...(values?.audio && { audio: values?.audio }),
       captions: values?.caption,
     };
-    try {
-      const data = helpers.fromData(value);
-      const id = isEditItem._id;
-      const res = await updatePost({ id, data }).unwrap();
-      if (res.success) {
-        handleUpdateReset();
-        setIsEditItem({});
-        toast.success("Audio updated successfully", {
-          description: "Your audio has been updated successfully.",
-        });
-      }
-    } catch (err: any) {
-      console.log(err);
-    }
+    console.log(value);
+    // try {
+    //   const data = helpers.fromData(value);
+    //   const id = isEditItem._id;
+    //   const res = await updatePost({ id, data }).unwrap();
+    //   if (res.success) {
+    //     handleUpdateReset();
+    //     setIsEditItem({});
+    //     toast.success("Audio updated successfully", {
+    //       description: "Your audio has been updated successfully.",
+    //     });
+    //   }
+    // } catch (err: any) {
+    //   console.log(err);
+    // }
   };
 
   // Handle Delete Music
@@ -450,7 +436,6 @@ export default function Music() {
                 </AudioMulUpload>
               )}
             </div>
-
             <InputSelectMood
               label="Mood"
               name="mood"
@@ -481,26 +466,33 @@ export default function Music() {
               placeholder="Select hare"
               iconStyle="mr-2"
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => handleUploadReset()}
-                size="lg"
-                type="button"
-                className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
-              >
-                <X className="size-5" />
-                Cancel
-              </Button>
-              <Button
-                disabled={isLoading}
-                variant="primary"
-                size="lg"
-                className="w-full"
-              >
-                {" "}
-                <Plus className="size-5" />
-                Upload
-              </Button>
+
+            <div>
+              {mediaIsLoading && (
+                <ProgressBox className="mb-1" progress={progress} />
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => handleUploadReset()}
+                  disabled={isLoading || mediaIsLoading}
+                  size="lg"
+                  type="button"
+                  className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
+                >
+                  <X className="size-5" />
+                  Cancel
+                </Button>
+                <Button
+                  disabled={isLoading || mediaIsLoading}
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                >
+                  {" "}
+                  <Plus className="size-5" />
+                  Upload
+                </Button>
+              </div>
             </div>
           </div>
         </Form>
@@ -516,7 +508,17 @@ export default function Music() {
         <CloseIcon className="mt-2 mr-2" onClose={() => handleUpdateReset()} />
         <Form from={fromUpdate} onSubmit={handleUpdateMusic}>
           <div className="space-y-5">
-            <div className="mw-full h-fit rounded-md">
+            <div className="space-y-3">
+              {isEditItem?.audio?.map((item: any, idx: any) => (
+                <div key={idx} className="flex justify-between gap-3">
+                  <div className="space-y-2 w-full">
+                    <MusicPlayer idx={idx} audioSource={item?.url} />
+                  </div>
+                  <h1 className="size-10 grid bg-card-figma place-items-center"><FavIcon name="edit"/></h1>
+                </div>
+              ))}
+            </div>
+            {/* <div className="mw-full h-fit rounded-md">
               {global.audioPreview ? (
                 <MusicPlayer
                   audioSource={global?.audioPreview}
@@ -524,7 +526,13 @@ export default function Music() {
                   custom={false}
                 />
               ) : (
-                <MusicPlayer audioSource={isEditItem?.audio?.[0]} />
+                <div className="space-y-3">
+                  {isEditItem?.audio?.map((item: any, idx: any) => (
+                    <div key={idx} className="space-y-2">
+                      <MusicPlayer idx={idx} audioSource={item?.url} />
+                    </div>
+                  ))}
+                </div>
               )}
               <AudioUpload
                 onFileSelect={(file: File) => {
@@ -538,7 +546,7 @@ export default function Music() {
                   <span>Replace audio</span>
                 </span>
               </AudioUpload>
-            </div>
+            </div> */}
 
             <InputSelectMood
               label="Mood"
@@ -604,7 +612,7 @@ export default function Music() {
         profile={
           <>
             <Avatars
-              src={helpers.imgSource(global?.isDetails?.user?.avatar)}
+              src={helpers.imgSource(global?.isDetails?.user?.avatar?.url)}
               fallback={global?.isDetails?.user?.name}
               alt="profile"
               fallbackStyle="bg-[#cb4ec9]/70 text-white"

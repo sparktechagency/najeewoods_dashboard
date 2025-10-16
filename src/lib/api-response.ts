@@ -21,6 +21,7 @@ export function buildPagination(data: any) {
 export const ResponseApiErrors = (form: any, res: any) => {
   const errors = res?.data?.errors || res?.errors;
 
+
   if (Array.isArray(errors)) {
     errors.forEach((item: any) => {
       if (item?.field && item?.message) {

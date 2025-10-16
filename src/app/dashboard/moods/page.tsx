@@ -27,10 +27,15 @@ import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import {
+  useStoreMediaMutation,
+  useUpdateMediaMutation,
+} from "@/redux/api/commonApi";
 
 const intImg = {
   ImgPreview: "",
   UpPreview: "",
+  imgId: "",
 };
 
 const intState = {
@@ -47,7 +52,8 @@ export default function Moods() {
   const [updateMoods, { isLoading: updateLoading }] = useUpdateMoodsMutation();
   const { data: moodsItem, isLoading } = useGetMoodsQuery({});
   const [deleteMoods] = useDeleteMoodsMutation();
-
+  const [storeMedia] = useStoreMediaMutation();
+  const [updateMedia] = useUpdateMediaMutation();
   //  == Store Moods ==
   const from = useForm({
     resolver: zodResolver(moodSchema),
@@ -57,14 +63,20 @@ export default function Moods() {
     },
   });
 
-  const handleSubmit = async (value: FieldValues) => {
-    try {
-      const values = helpers.fromData(value);
-      const res = await storeMoods(values).unwrap();
-      if (res.success) {
+  const handleSubmit = async (values: FieldValues) => {
+    const fromData = helpers.fromData({ image: values?.icon });
+    const mediaRes = await storeMedia({ data: fromData }).unwrap();
+
+    if (mediaRes?.success) {
+      const moodRes = await storeMoods({
+        icon: mediaRes?.data?.[0]?._id,
+        name: values.name,
+      }).unwrap();
+
+      if (moodRes.success) {
         handleStoreReset();
       }
-    } catch (err: any) {}
+    }
   };
 
   //  == update Moods ==
@@ -81,15 +93,15 @@ export default function Moods() {
         name: isDetails.name,
       });
     }
-  }, [isDetails,Updatefrom]);
+  }, [isDetails, Updatefrom]);
 
   const updateSubmit = async (values: FieldValues) => {
-    const value = {
-      ...values,
-      ...(values.icon && { icon: values.icon }),
-    };
+    if (values?.icon) {
+      const data = helpers.fromData({ image: values.icon });
+      await updateMedia({ id: isImg?.imgId, data }).unwrap();
+    }
     const id = isDetails._id;
-    const data = helpers.fromData(value);
+    const data = { name: values.name };
     const res = await updateMoods({ id, data }).unwrap();
     if (res.success) {
       hanldeUpdateReset();
@@ -145,7 +157,7 @@ export default function Moods() {
       <WapperBox>
         <div className="pt-4 flex gap-6 lg:gap-4  2xl:gap-6 flex-wrap">
           {isLoading ? (
-            <RepeatCount count={20}>
+            <RepeatCount count={16}>
               <Skeleton className="w-[200px]  h-[180px]" />
             </RepeatCount>
           ) : moodsItem?.data?.length > 0 ? (
@@ -156,7 +168,7 @@ export default function Moods() {
               >
                 <div className="mx-auto">
                   <Image
-                    src={helpers.imgSource(item?.icon)}
+                    src={helpers.imgSource(item?.icon?.url) || "/blur.png"}
                     alt="img"
                     width={60}
                     height={20}
@@ -172,8 +184,7 @@ export default function Moods() {
                         setIsDetails(item);
                         setIsImg((prevState: any) => ({
                           ...prevState,
-                          UpPreview:
-                            process.env.NEXT_PUBLIC_IMG_URL + item.icon,
+                          UpPreview: helpers.imgSource(item?.icon?.url),
                         }));
                         updateState("isUpdate", true);
                       }}
@@ -293,6 +304,7 @@ export default function Moods() {
                 setIsImg({
                   ...isImg,
                   UpPreview: URL.createObjectURL(file),
+                  imgId: isDetails?.icon?._id,
                 });
                 Updatefrom.setValue("icon", file as any, {
                   shouldValidate: true,
@@ -331,7 +343,7 @@ export default function Moods() {
               >
                 {" "}
                 <FavIcon name="save" />
-                Save changes
+                Save Changes
               </Button>
             </div>
           </div>
