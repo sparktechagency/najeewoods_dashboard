@@ -25,6 +25,7 @@ import {
   useGetPostQuery,
   useStoreMediaMutation,
   useStorePostMutation,
+  useUpdateMediaMutation,
   useUpdatePostMutation,
 } from "@/redux/api/commonApi";
 import { toast } from "sonner";
@@ -52,8 +53,12 @@ export default function Music() {
   const [global, updateGlobal] = useGlobalState(intGlobal);
   const [progress, setisPreogress] = useState(0);
   const [isActive, setIsActive] = useState("Owned");
+  const [isEditItem, setIsEditItem] = useState<any>({});
+  const [updateMusicList, setUpdateMusicList] = useState<any[]>([]);
   const [storePost, { isLoading }] = useStorePostMutation();
   const [storeMedia, { isLoading: mediaIsLoading }] = useStoreMediaMutation();
+  const [updatePost, { isLoading: updateIsLoading }] = useUpdatePostMutation();
+  const [updateMedia, { isLoading: updateMloading }] = useUpdateMediaMutation();
   const [deletePost] = useDeletePostMutation();
   const query = {
     post_type: "audio",
@@ -64,8 +69,6 @@ export default function Music() {
   const { data: music, isLoading: postIsLoading } = useGetPostQuery({
     ...query,
   });
-  const [updatePost, { isLoading: updateIsLoading }] = useUpdatePostMutation();
-  const [isEditItem, setIsEditItem] = useState<any>({});
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -129,7 +132,6 @@ export default function Music() {
   //  == update music ==
   const fromUpdate = useForm({
     defaultValues: {
-      audio: [],
       location: null,
       caption: "",
       mood: "",
@@ -148,31 +150,39 @@ export default function Music() {
     }
   }, [isEditItem, fromUpdate]);
 
-  // Handle Update Music
   const handleUpdateMusic = async (values: FieldValues) => {
+    if (updateMusicList?.length > 0) {
+      updateMusicList.map(
+        async (item) =>
+          await updateMedia({
+            id: item?.id,
+            data: helpers.fromData({ audio: item?.file }),
+            onUploadProgress: (progressEvent: ProgressEvent) => {
+              if (progressEvent.total) {
+                const progress = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                );
+                setisPreogress(progress);
+              }
+            },
+          })
+      );
+    }
     const value = {
       post_type: "audio",
       mood: values.mood,
       privacy: values?.visibility,
       location: values?.location,
-      ...(values?.audio && { audio: values?.audio }),
       captions: values?.caption,
     };
-    console.log(value);
-    // try {
-    //   const data = helpers.fromData(value);
-    //   const id = isEditItem._id;
-    //   const res = await updatePost({ id, data }).unwrap();
-    //   if (res.success) {
-    //     handleUpdateReset();
-    //     setIsEditItem({});
-    //     toast.success("Audio updated successfully", {
-    //       description: "Your audio has been updated successfully.",
-    //     });
-    //   }
-    // } catch (err: any) {
-    //   console.log(err);
-    // }
+    const id = isEditItem._id;
+    const res = await updatePost({ id, data: value }).unwrap();
+    if (res.success) {
+      handleUpdateReset();
+      toast.success("Audio updated successfully", {
+        description: "Your audio has been updated successfully.",
+      });
+    }
   };
 
   // Handle Delete Music
@@ -199,6 +209,8 @@ export default function Music() {
 
   const handleUpdateReset = () => {
     fromUpdate.reset();
+    setIsEditItem({});
+    setUpdateMusicList([]);
     updateGlobal("isUpdate", false);
   };
 
@@ -300,7 +312,7 @@ export default function Music() {
                       </div>
 
                       <h1 className="text-center text-secondery-figma text-xl font-medium">
-                        {item?.audio?.length} music&apos;s
+                        {item?.audio?.length} Music&apos;s
                       </h1>
                       {/* Progress bar */}
                       <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
@@ -344,7 +356,7 @@ export default function Music() {
                       </div>
 
                       <h1 className="text-center text-secondery-figma text-xl font-medium">
-                        {item?.audio?.length} music&apos;s
+                        {item?.audio?.length} Music&apos;s
                       </h1>
                       {/* Progress bar */}
                       <div className="h-5 cursor-pointer flex flex-col items-center justify-center">
@@ -509,44 +521,53 @@ export default function Music() {
         <Form from={fromUpdate} onSubmit={handleUpdateMusic}>
           <div className="space-y-5">
             <div className="space-y-3">
-              {isEditItem?.audio?.map((item: any, idx: any) => (
-                <div key={idx} className="flex justify-between gap-3">
-                  <div className="space-y-2 w-full">
-                    <MusicPlayer idx={idx} audioSource={item?.url} />
+              {isEditItem?.audio?.map((item: any, idx: any) => {
+                const updatedItem = updateMusicList.find(
+                  (music) => music.id === item._id
+                );
+                return (
+                  <div
+                    key={idx}
+                    className="flex justify-between items-center gap-3"
+                  >
+                    {updatedItem?.id ? (
+                      <MusicPlayer
+                        idx={updatedItem.randomId}
+                        key={updatedItem.randomId}
+                        custom={false}
+                        audioSource={updatedItem?.preview}
+                      />
+                    ) : (
+                      <MusicPlayer
+                        key={item._id}
+                        idx={idx}
+                        audioSource={item.url}
+                      />
+                    )}
+                    <AudioUpload
+                      onFileSelect={(file) => {
+                        const item_object = {
+                          id: item._id,
+                          randomId: helpers.randomString(),
+                          preview: URL.createObjectURL(file),
+                          file: file,
+                        };
+                        setUpdateMusicList((prevList) => {
+                          const filteredList = prevList.filter(
+                            (i) => i.id !== item_object.id
+                          );
+                          return [...filteredList, item_object];
+                        });
+                      }}
+                    >
+                      <h1 className="size-10 grid rounded-full bg-card-figma/40 place-items-center">
+                        <FavIcon className="size-4" name="edit" />
+                      </h1>
+                    </AudioUpload>
                   </div>
-                  <h1 className="size-10 grid bg-card-figma place-items-center"><FavIcon name="edit"/></h1>
-                </div>
-              ))}
+                );
+              })}
             </div>
-            {/* <div className="mw-full h-fit rounded-md">
-              {global.audioPreview ? (
-                <MusicPlayer
-                  audioSource={global?.audioPreview}
-                  key={global?.audioPreview}
-                  custom={false}
-                />
-              ) : (
-                <div className="space-y-3">
-                  {isEditItem?.audio?.map((item: any, idx: any) => (
-                    <div key={idx} className="space-y-2">
-                      <MusicPlayer idx={idx} audioSource={item?.url} />
-                    </div>
-                  ))}
-                </div>
-              )}
-              <AudioUpload
-                onFileSelect={(file: File) => {
-                  updateGlobal("audioPreview", URL.createObjectURL(file));
-                  fromUpdate.setValue("audio", file as any);
-                }}
-              >
-                <span className="flex items-center space-x-2 py-1 px-2 rounded-md mt-2 border p-1 w-fit h-fit">
-                  {" "}
-                  <FavIcon name="chnage" />
-                  <span>Replace audio</span>
-                </span>
-              </AudioUpload>
-            </div> */}
 
             <InputSelectMood
               label="Mood"
@@ -578,26 +599,31 @@ export default function Music() {
               placeholder="Select hare"
               iconStyle="mr-2"
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={() => handleUpdateReset()}
-                size="lg"
-                type="button"
-                className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
-              >
-                <X className="size-5" />
-                Cancel
-              </Button>
-              <Button
-                disabled={updateIsLoading}
-                variant="primary"
-                size="lg"
-                className="w-full"
-              >
-                {" "}
-                <Plus className="size-5" />
-                Upload
-              </Button>
+            <div>
+              {updateMloading && (
+                <ProgressBox className="mb-1" progress={progress} />
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => handleUpdateReset()}
+                  size="lg"
+                  type="button"
+                  className="bg-modal-figma hover:bg-modal-figma cursor-pointer  rounded-xl w-full"
+                >
+                  <X className="size-5" />
+                  Cancel
+                </Button>
+                <Button
+                  disabled={updateIsLoading}
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                >
+                  {" "}
+                  <Plus className="size-5" />
+                  Upload
+                </Button>
+              </div>
             </div>
           </div>
         </Form>

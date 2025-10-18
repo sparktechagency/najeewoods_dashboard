@@ -28,7 +28,6 @@ export const commonApi = baseApi.injectEndpoints({
       query: ({ id, data }) => ({
         url: `/posts/${id}`,
         method: "PATCH",
-        ContentType: "multipart/form-data",
         data,
       }),
       invalidatesTags: [tagTypes.post],
@@ -52,21 +51,24 @@ export const commonApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.post],
     }),
     storeMedia: build.mutation({
-      query: ({data,onUploadProgress}:any) => ({
+      query: ({ data, onUploadProgress }: any) => ({
         url: "/media",
         method: "POST",
         ContentType: "multipart/form-data",
         onUploadProgress,
         data,
       }),
+      invalidatesTags: [tagTypes.post],
     }),
     updateMedia: build.mutation({
-      query: ({ id, data }) => ({
+      query: ({ id, data, onUploadProgress }) => ({
         url: `/media/${id}`,
         method: "PATCH",
         ContentType: "multipart/form-data",
+        onUploadProgress,
         data,
       }),
+      invalidatesTags: [tagTypes.post],
     }),
   }),
 });

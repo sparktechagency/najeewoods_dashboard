@@ -56,7 +56,7 @@ export function InputSelectMood({
         icon: (
           <ImgBox
             className="size-7"
-            src={helpers.imgSource(item.icon?.url)}
+            src={helpers.imgSource(item.icon)}
             alt="img"
           />
         ),

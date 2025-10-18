@@ -56,6 +56,9 @@ export class helpers {
   static upperCase(text: string): string {
     return text ? text.toUpperCase() : "";
   }
+  static randomString(): string {
+    return crypto.randomUUID();
+  }
   // ========= from data =============
   static fromData(values: Record<string, any>): FormData {
     const formData = new FormData();
@@ -82,10 +85,8 @@ export class helpers {
 
   // ========= imgSource =============
   static imgSource(href: string): string {
-    // if (href === "object") {
-    //   return "";
-    // }
-    if (href?.startsWith("https://") || href?.startsWith("http://")) return href;
+    if (href?.startsWith("https://") || href?.startsWith("http://"))
+      return href;
     return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
   }
   // ========= song ===============
@@ -95,5 +96,3 @@ export class helpers {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   }
 }
-
-// static fromData(values: Record<string, any>): FormData { const formData = new FormData(); Object.keys(values).forEach((key) => { const value = values[key]; if (value instanceof File) { formData.append(key, value); } else if (typeof value === "object" && value !== null) { formData.append(key, JSON.stringify(value)); } else { formData.append(key, value); } }); return formData; }
