@@ -17,6 +17,7 @@ export const moodsApi = baseApi.injectEndpoints({
         url: "/moods",
         method: "POST",
         data,
+        ContentType: "multipart/form-data",
       }),
       invalidatesTags: [tagTypes.moods],
     }),
@@ -24,6 +25,7 @@ export const moodsApi = baseApi.injectEndpoints({
       query: ({ id, data }) => ({
         url: `/moods/${id}`,
         method: "PATCH",
+        ContentType: "multipart/form-data",
         data,
       }),
       invalidatesTags: [tagTypes.moods],
@@ -50,5 +52,5 @@ export const {
   useStoreMoodsMutation,
   useUpdateMoodsMutation,
   useDeleteMoodsMutation,
-  useSingleMoodsQuery
+  useSingleMoodsQuery,
 } = moodsApi;

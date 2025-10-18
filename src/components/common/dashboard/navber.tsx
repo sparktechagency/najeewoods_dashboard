@@ -72,13 +72,7 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
                     <ImgBox
                       alt="profile"
                       className="size-12 rounded-full cursor-pointer"
-                      //  src={
-                      //   (profile?.data?.avatar?.url.
-                      //     process.env.NEXT_PUBLIC_IMG_URL +
-                      //       profile?.data?.avatar?.url) ||
-                      //   "/blur.png"
-                      // }
-                      src="/blur.png"
+                      src={helpers.imgSource(profile?.data?.avatar) || "/blur.png"}
                     />
                     <div className="text-start space-y-1 leading-5">
                       <h1 className="font-medium">

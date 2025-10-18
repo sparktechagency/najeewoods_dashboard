@@ -27,15 +27,10 @@ import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  useStoreMediaMutation,
-  useUpdateMediaMutation,
-} from "@/redux/api/commonApi";
 
 const intImg = {
   ImgPreview: "",
   UpPreview: "",
-  imgId: "",
 };
 
 const intState = {
@@ -48,12 +43,10 @@ export default function Moods() {
   const [state, updateState] = useModalState(intState);
   const [isImg, setIsImg] = useState<any>(intImg);
   const [isDetails, setIsDetails] = useState<any>({});
-  const [storeMoods, { isLoading: storeLoading }] = useStoreMoodsMutation();
   const [updateMoods, { isLoading: updateLoading }] = useUpdateMoodsMutation();
+  const [storeMoods, { isLoading: storeLoading }] = useStoreMoodsMutation();
   const { data: moodsItem, isLoading } = useGetMoodsQuery({});
   const [deleteMoods] = useDeleteMoodsMutation();
-  const [storeMedia] = useStoreMediaMutation();
-  const [updateMedia] = useUpdateMediaMutation();
   //  == Store Moods ==
   const from = useForm({
     resolver: zodResolver(moodSchema),
@@ -63,20 +56,14 @@ export default function Moods() {
     },
   });
 
-  const handleSubmit = async (values: FieldValues) => {
-    const fromData = helpers.fromData({ image: values?.icon });
-    const mediaRes = await storeMedia({ data: fromData }).unwrap();
-
-    if (mediaRes?.success) {
-      const moodRes = await storeMoods({
-        icon: mediaRes?.data?.[0]?._id,
-        name: values.name,
-      }).unwrap();
-
-      if (moodRes.success) {
+  const handleSubmit = async (value: FieldValues) => {
+    try {
+      const values = helpers.fromData(value);
+      const res = await storeMoods(values).unwrap();
+      if (res.success) {
         handleStoreReset();
       }
-    }
+    } catch (err: any) {}
   };
 
   //  == update Moods ==
@@ -96,12 +83,12 @@ export default function Moods() {
   }, [isDetails, Updatefrom]);
 
   const updateSubmit = async (values: FieldValues) => {
-    if (values?.icon) {
-      const data = helpers.fromData({ image: values.icon });
-      await updateMedia({ id: isImg?.imgId, data }).unwrap();
-    }
+    const value = {
+      ...values,
+      ...(values.icon && { icon: values.icon }),
+    };
     const id = isDetails._id;
-    const data = { name: values.name };
+    const data = helpers.fromData(value);
     const res = await updateMoods({ id, data }).unwrap();
     if (res.success) {
       hanldeUpdateReset();
@@ -168,7 +155,7 @@ export default function Moods() {
               >
                 <div className="mx-auto">
                   <Image
-                    src={helpers.imgSource(item?.icon?.url) || "/blur.png"}
+                    src={helpers.imgSource(item?.icon) || "/blur.png"}
                     alt="img"
                     width={60}
                     height={20}
@@ -184,7 +171,7 @@ export default function Moods() {
                         setIsDetails(item);
                         setIsImg((prevState: any) => ({
                           ...prevState,
-                          UpPreview: helpers.imgSource(item?.icon?.url),
+                          UpPreview: helpers.imgSource(item?.icon),
                         }));
                         updateState("isUpdate", true);
                       }}
@@ -304,7 +291,6 @@ export default function Moods() {
                 setIsImg({
                   ...isImg,
                   UpPreview: URL.createObjectURL(file),
-                  imgId: isDetails?.icon?._id,
                 });
                 Updatefrom.setValue("icon", file as any, {
                   shouldValidate: true,

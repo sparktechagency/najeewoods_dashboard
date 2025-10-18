@@ -52,7 +52,7 @@ export default function Users() {
                 <TableCell className="relative">
                   <div className="flex items-center gap-3">
                     <Avatars
-                      src={helpers.imgSource(item.avatar?.url) || ""}
+                      src={helpers.imgSource(item.avatar) || ""}
                       fallback={item.name}
                       alt="profile"
                       fallbackStyle="bg-[#cb4ec9]/70 text-white"
@@ -133,7 +133,7 @@ export default function Users() {
           <div className="border flex justify-between rounded-lg p-2">
             <div className="flex items-center space-x-2">
               <Avatars
-                src={helpers.imgSource(isDetails.avatar?.url) || ""}
+                src={helpers.imgSource(isDetails.avatar) || ""}
                 fallback={isDetails.name}
                 alt="profile"
                 fallbackStyle="bg-[#cb4ec9]/70 text-white"
