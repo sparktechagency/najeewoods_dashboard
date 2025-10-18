@@ -1,21 +1,25 @@
 "use client";
-import { useState } from "react";
-import { CircleAlert, Plus, X } from "lucide-react";
+
+import { useState, useEffect } from "react";
+import { CircleAlert, X } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui";
+import { ScrollArea } from "@/components/ui";
+import { useGetUserQuery } from "@/redux/api/userApi";
+import { helpers } from "@/lib";
+import Avatars from "../avater";
 
 interface FormSelectProps {
   name: string;
   label?: string;
   placeholder?: string;
-  defaultValue?: string;
   className?: string;
   stylelabel?: string;
   matching?: boolean;
-  items?: any;
+  selectedUsers?: any;
+  setSelectedUsers?: any;
 }
 
 export function InputWordSelectField({
@@ -25,101 +29,131 @@ export function InputWordSelectField({
   stylelabel,
   className,
   matching = false,
-  items = [],
+  selectedUsers,
+  setSelectedUsers,
 }: FormSelectProps) {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
   const [inputValue, setInputValue] = useState("");
+
+  // Fetch users dynamically when searching
+  const { data: users, isLoading } = useGetUserQuery(
+    { search: inputValue },
+    { skip: !inputValue }
+  );
+
+  // 🧠 Sync selected user IDs into form field
+  useEffect(() => {
+    const ids = selectedUsers.map((user:any) => user._id);
+    setValue(name, ids);
+  }, [selectedUsers, setValue, name]);
+
+  // ✅ Add user if not already selected
+  const handleAddUser = (user: any) => {
+    setSelectedUsers((prev:any) => {
+      const exists = prev.some((u:any) => u._id === user._id);
+      return exists ? prev : [...prev, user];
+    });
+    setInputValue("");
+  };
+
+  // ✅ Remove selected user
+  const handleRemoveUser = (userId: string) => {
+    setSelectedUsers((prev:any) => prev.filter((u:any) => u._id !== userId));
+  };
 
   return (
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, value = items }, fieldState: { error } }) => {
-        const selectedNames = value || [];
+      render={({ fieldState: { error } }) => (
+        <div className="relative">
+          {/* Input Field */}
+          <div className="mb-2 relative">
+            <Input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={placeholder || "Search user..."}
+              className={cn(
+                "w-full py-[22px] rounded-[20px] shadow-none pr-10",
+                className
+              )}
+            />
+          </div>
 
-        const handleAddTag = (e: React.KeyboardEvent) => {
-          if (e.key === "Enter" && inputValue.trim()) {
-            const newTags = [...selectedNames, inputValue];
-            onChange(newTags);
-            setInputValue("");
-            e.preventDefault();
-          }
-        };
-
-        const handleSubmitTag = () => {
-          if (inputValue.trim()) {
-            const newTags = [...selectedNames, inputValue];
-            onChange(newTags);
-            setInputValue("");
-          }
-        };
-
-        // ✅ Fixed: remove by index number instead of tag value
-        const handleRemoveTag = (index: number) => {
-          const newTags = selectedNames.filter((_: any, i: number) => i !== index);
-          onChange(newTags);
-        };
-
-        return (
-          <div className="relative">
-            <div className="mb-2">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleAddTag}
-                placeholder={placeholder}
-                className={cn(
-                  "w-full py-[22px] rounded-[20px] shadow-none",
-                  className
-                )}
-              />
-              <Button
-                type="button"
-                onClick={handleSubmitTag}
-                className="bgOne absolute right-2 cursor-pointer top-[10px] h-7"
-              >
-                <Plus className="size-5" />
-              </Button>
+          {/* Dropdown Search Results */}
+          {inputValue && !isLoading && users?.data?.length > 0 && (
+            <div className="absolute z-20 bg-[#222] border w-full rounded-xl mt-1 p-2">
+              <ScrollArea className="h-40 w-full">
+                <div className="space-y-3 mr-3">
+                  {users?.data?.map((user: any) => (
+                    <div
+                      key={user._id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddUser(user);
+                      }}
+                      className="flex items-center gap-3 p-1 cursor-pointer hover:bg-[#333] rounded-lg transition"
+                    >
+                      <Avatars
+                        src={helpers.imgSource(user?.avatar?.url)}
+                        fallback={user?.name}
+                        alt="profile"
+                        className="size-2"
+                        fallbackStyle="bg-[#cb4ec9]/70 text-white"
+                      />
+                      <div>
+                        <h1 className="font-medium">{user.name}</h1>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
+          )}
 
+          {/* Selected Users */}
+          {selectedUsers.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {selectedNames?.map((tag: any, index: number) => (
+              {selectedUsers.map((user:any) => (
                 <div
-                  key={index}
-                  className="flex items-center bg-[#3D3D3D] text-white py-1 px-3 rounded-full"
+                  key={user._id}
+                  className="flex items-center gap-2 bg-[#3D3D3D] text-white px-3 py-1 rounded-full"
                 >
-                  {tag}
+                  <span className="text-sm">{user.name}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveTag(index)} // ✅ remove by index
-                    className="ml-2 cursor-pointer text-white"
+                    onClick={() => handleRemoveUser(user._id)}
+                    className="ml-1 text-white"
                   >
                     <X className="size-4" />
                   </button>
                 </div>
               ))}
             </div>
+          )}
 
-            {!matching && (
-              <Label
-                className={cn(
-                  "text-secondery-figma text-base font-medium absolute -top-3 left-7 bg-blacks px-3",
-                  stylelabel
-                )}
-              >
-                {label}
-              </Label>
-            )}
+          {/* Label */}
+          {!matching && (
+            <Label
+              className={cn(
+                "text-secondery-figma text-base font-medium absolute -top-3 left-7 bg-blacks px-3",
+                stylelabel
+              )}
+            >
+              {label}
+            </Label>
+          )}
 
-            {error?.message && (
-              <h3 className="text-sm pt-[1px] text-end text-[#f73f4e] flex gap-1 items-center justify-end">
-                {error.message}
-                <CircleAlert size={14} />
-              </h3>
-            )}
-          </div>
-        );
-      }}
+          {/* Error Message */}
+          {error?.message && (
+            <h3 className="text-sm pt-[1px] text-end text-[#f73f4e] flex gap-1 items-center justify-end">
+              {error.message}
+              <CircleAlert size={14} />
+            </h3>
+          )}
+        </div>
+      )}
     />
   );
 }

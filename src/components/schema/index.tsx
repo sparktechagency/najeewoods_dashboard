@@ -24,7 +24,7 @@ export const musicSchema = z.object({
 });
 
 export const podcastSchema = musicSchema.extend({
-  guests: z.array(z.string()).nonempty("Guest is required"),
+  podcast:z.array(z.string()).nonempty("Podcast is required"),
 });
 
 export const passwordChangeSchema = z

@@ -4,41 +4,36 @@ import PostingCart from "@/components/common/chart/posting-chart";
 import ShadowBox from "@/components/common/shadow-box";
 import WapperBox from "@/components/reuseble/wapper-box";
 import FavIcon from "@/icon/favIcon";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { useGetDashboardQuery } from "@/redux/api/dashboardApi";
 import React from "react";
 
-const data = [
-  {
-    title: "Total earnings",
-    value: "$1600",
-    percentage: "+20%",
-    icon: "earningsIcon", // This can be replaced with the actual icon class or image path
-    trend: "up",
-  },
-  {
-    title: "Total vibes",
-    value: "500",
-    percentage: "-20%",
-    icon: "videIcon",
-    trend: "down",
-  },
-  {
-    title: "Total music's",
-    value: "720",
-    percentage: "+20%",
-    icon: "musicIcon",
-    trend: "up",
-  },
-  {
-    title: "Total podcasts",
-    value: "50",
-    percentage: "+20%",
-    icon: "podcastsIcon",
-    trend: "up",
-  },
-];
+
 
 export default function RootHome() {
+  const {data:statistics}=useGetDashboardQuery({})
+
+  const dataStatistics = [
+  {
+    title: "Total Earnings",
+    value: statistics?.data?.total_earning,
+    icon: "earningsIcon",
+  },
+  {
+    title: "Total Vibes",
+    value: statistics?.data?.total_vibes,
+    icon: "videIcon",
+  },
+  {
+    title: "Total Music's",
+    value: statistics?.data?.total_audio,
+    icon: "musicIcon",
+  },
+  {
+    title: "Total Podcasts",
+    value:statistics?.data?.total_podcast,
+    icon: "podcastsIcon",
+  },
+];
   return (
     <div>
       <ShadowBox className="md:-top-26">
@@ -47,7 +42,7 @@ export default function RootHome() {
             Dashboard Overview
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-5">
-            {data.map((item, index) => (
+            {dataStatistics.map((item, index) => (
               <div
                 key={index}
                 className="rounded-2xl p-6 space-y-2 border text-white relative overflow-hidden"
@@ -58,20 +53,7 @@ export default function RootHome() {
                 </div>
                 <p className="font-medium text-xl">{item.title}</p>
                 <div className="flex items-end justify-between">
-                  <span className="text-3xl font-semibold">{item.value}</span>
-                  <div>
-                    {item.trend === "up" ? (
-                      <span className="*:text-green-figma flex items-center space-x-1">
-                        <ArrowUp className="size-[17px]" />
-                        <span className="font-medium">{item.percentage}</span>
-                      </span>
-                    ) : (
-                      <span className="*:text-reds-figma  flex items-center space-x-1">
-                        <ArrowDown className="size-[17px]" />
-                        <span className="font-medium">{item.percentage}</span>
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-3xl font-semibold">{item.value || 0}</span>
                 </div>
               </div>
             ))}
@@ -82,12 +64,12 @@ export default function RootHome() {
         <div className="pt-3">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-7">
             <div className="col-span-2">
-              <h1 className="text-2xl font-semibold mb-4">Posting preference</h1>
-              <PostingCart />
+              <h1 className="text-2xl font-semibold mb-4">Posting Preference</h1>
+              <PostingCart data={statistics?.data?.posting_preference} />
             </div>
             <div className="col-span-3">
               <h1 className="text-2xl font-semibold mb-4">Earning Statistics</h1>
-              <AnalyticsCharts />
+              <AnalyticsCharts data={statistics?.data?.earning_per_day} />
             </div>
           </div>
         </div>
