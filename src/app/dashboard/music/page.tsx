@@ -92,7 +92,7 @@ export default function Music() {
       location: null,
       caption: "",
       mood: "",
-      visibility: "",
+      privacy: "",
     },
   });
 
@@ -117,7 +117,7 @@ export default function Music() {
         mood: values.mood,
         location: values?.location,
         captions: values?.caption,
-        privacy: values?.visibility,
+        privacy: values?.privacy,
       };
       const res = await storePost(value).unwrap();
       if (res.success) {
@@ -135,7 +135,7 @@ export default function Music() {
       location: null,
       caption: "",
       mood: "",
-      visibility: "",
+      privacy: "",
     },
   });
 
@@ -144,7 +144,7 @@ export default function Music() {
       fromUpdate.reset({
         caption: isEditItem?.captions,
         mood: isEditItem?.mood?._id,
-        visibility: isEditItem?.privacy,
+        privacy: isEditItem?.privacy,
         location: isEditItem?.location,
       });
     }
@@ -171,7 +171,7 @@ export default function Music() {
     const value = {
       post_type: "audio",
       mood: values.mood,
-      privacy: values?.visibility,
+      privacy: values?.privacy,
       location: values?.location,
       captions: values?.caption,
     };
@@ -474,7 +474,7 @@ export default function Music() {
                 },
               ]}
               label="Visibility"
-              name="visibility"
+              name="privacy"
               placeholder="Select hare"
               iconStyle="mr-2"
             />
@@ -595,7 +595,7 @@ export default function Music() {
                 },
               ]}
               label="Visibility"
-              name="visibility"
+              name="privacy"
               placeholder="Select hare"
               iconStyle="mr-2"
             />

@@ -148,7 +148,7 @@ export default function Vibes() {
           }
         >
           <ImgBox
-            src={helpers.imgSource(isDetails?.image?.[0])}
+            src={helpers.imgSource(isDetails?.image?.[0]?.url)}
             className="w-full h-[300px]"
             alt="img"
           ></ImgBox>

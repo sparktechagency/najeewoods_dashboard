@@ -1,4 +1,4 @@
-import { email, z } from "zod";
+import {z } from "zod";
 
 export const moodSchema = z.object({
   name: z.string().nonempty("Mood name is required"),
@@ -7,13 +7,14 @@ export const moodSchema = z.object({
     .refine((file) => file instanceof File, { message: "Photo is required" }),
 });
 
+// /musicSchema
 export const musicSchema = z.object({
   mood: z.string().nonempty("Vide is required"),
   location: z.any().refine((obj) => obj && Object.keys(obj).length > 0, {
     message: "Location is required",
   }),
   caption: z.string().nonempty("Caption is required"),
-  visibility: z.string().nonempty("Visibility is required"),
+  privacy: z.string().nonempty("Visibility is required"),
   audio: z
     .array(z.any())
     .refine(
@@ -22,10 +23,25 @@ export const musicSchema = z.object({
       { message: "Music is required" }
     ),
 });
-
-export const podcastSchema = musicSchema.extend({
-  podcast:z.array(z.string()).nonempty("Podcast is required"),
+// podcastSchema
+export const podcastSchema = z.object({
+  mood: z.string().nonempty("Vide is required"),
+  location: z.any().refine((obj) => obj && Object.keys(obj).length > 0, {
+    message: "Location is required",
+  }),
+  private_circle: z.array(z.any()).refine((v) => v.length >= 1, { message: "Guest is required" }),
+  caption: z.string().nonempty("Caption is required"),
+  privacy: z.string().nonempty("Visibility is required"),
+  podcast: z
+    .array(z.any())
+    .refine(
+      (files) =>
+        files.length >= 1 && files.every((file) => file instanceof File),
+      { message: "Music is required" }
+    ),
 });
+
+
 
 export const passwordChangeSchema = z
   .object({
