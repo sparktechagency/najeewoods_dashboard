@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const cookiesStore = await cookies();
   const token = cookiesStore.get(authKey)?.value;
-  const decoded: any = jwtDecode(token as string);
+  const decoded: any = token && jwtDecode(token as string);
   const roleKey = decoded?.user?.role as string;
 
   if (!roleKey) {

@@ -41,7 +41,7 @@ export default function RootPage() {
       const res = await LoginIn(values).unwrap();
       if (res.success) {
         helpers.setAuthCookie(authKey, res?.data?.token);
-        const decode = helpers.decodeToken(res?.data?.token);
+        const decode = helpers.decodeToken(res?.data?.token || "");
         if (decode?.user?.role === "admin") {
           router.push("/dashboard");
           from.reset();

@@ -34,7 +34,7 @@ function VarifyOTpChild() {
     setCode(updated);
 
     // Auto-focus next input
-    if (value && i < 5) {
+    if (value && i < 4) {
       inputRefs.current[i + 1]?.focus();
     }
   };
@@ -48,8 +48,8 @@ function VarifyOTpChild() {
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text/plain").slice(0, 6);
-    if (!/^\d{6}$/.test(pastedData)) {
+    const pastedData = e.clipboardData.getData("text/plain").slice(0, 4);
+    if (!/^\d{4}$/.test(pastedData)) {
       setError("Please paste a 6-digit number.");
       return;
     }
@@ -61,8 +61,8 @@ function VarifyOTpChild() {
     setIsError("");
     try {
       const joinedCode = code.join("");
-      if (joinedCode.length < 6) {
-        setError("Please enter all 6 digits.");
+      if (joinedCode.length < 4) {
+        setError("Please enter all 4 digits.");
       } else {
         const value = { email, code: code.join("") };
         const res = await otpVarify(value).unwrap();
