@@ -1,6 +1,9 @@
+import relativeTime from "dayjs/plugin/relativeTime";
 import { authKey } from "./constants";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
+dayjs.extend(relativeTime);
 
 export class helpers {
   // ===== Cookies =====
@@ -20,6 +23,10 @@ export class helpers {
     return Cookies.get(authKey);
   }
 
+  static decodeToken(token: string): any {
+    return jwtDecode(token);
+  }
+
   // ===== Dates =====
   static formatDate(date: string | Date, type = "DD MMM YYYY"): string {
     return dayjs(date).format(type);
@@ -31,6 +38,9 @@ export class helpers {
 
   static formatDateTime(date: string | Date): string {
     return dayjs(date).format("h:s A - DD MMM YYYY");
+  }
+  static timeAgoDiff(date: string | Date): string {
+    return dayjs(date).fromNow();
   }
   //  ===== localStorage  =====
   static getStorageItem = (key: string) => {
@@ -88,11 +98,5 @@ export class helpers {
     if (href?.startsWith("https://") || href?.startsWith("http://"))
       return href;
     return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
-  }
-  // ========= song ===============
-  static songMinutes(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   }
 }

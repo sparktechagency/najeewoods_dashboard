@@ -41,11 +41,18 @@ export default function RootPage() {
       const res = await LoginIn(values).unwrap();
       if (res.success) {
         helpers.setAuthCookie(authKey, res?.data?.token);
-        router.push("/dashboard");
-        from.reset();
-        toast.success("Login Successful", {
-          description: "Welcome back! You have been logged in successfully.",
-        });
+        const decode = helpers.decodeToken(res?.data?.token);
+        if (decode?.user?.role === "admin") {
+          router.push("/dashboard");
+          from.reset();
+          toast.success("Login Successful", {
+            description: "Welcome back! You have been logged in successfully.",
+          });
+        } else {
+          toast.error("Access Restricted — Super Admins Only", {
+            description: "Use valid credentials to continue",
+          });
+        }
       }
     } catch (err: any) {
       ResponseApiErrors(from, err);

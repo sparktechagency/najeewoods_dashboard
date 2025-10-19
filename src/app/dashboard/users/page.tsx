@@ -193,11 +193,12 @@ export default function Users() {
 
 // ======= DetailsNav ========
 function DetailsNav({ href, icon, text, value }: any) {
+  const url = value > 0 ? href : "#";
   return (
     <div className="flex justify-between space-x-3 h-11">
       <Link
-        href={href}
-        className="w-full flex justify-between items-center border rounded-xl px-3"
+        href={url}
+        className="w-full  flex justify-between items-center border rounded-xl px-3"
       >
         <span className="flex gap-x-2 items-center">
           {icon} {text}:
@@ -205,7 +206,7 @@ function DetailsNav({ href, icon, text, value }: any) {
         <span>{value}</span>
       </Link>
       <Link
-        href={href}
+        href={url}
         className="h-11 w-12 bgOne rounded-xl grid place-items-center cursor-pointer"
       >
         <ArrowUpRight />

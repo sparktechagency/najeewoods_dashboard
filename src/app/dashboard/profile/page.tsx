@@ -43,7 +43,7 @@ function ProfileChild() {
   });
 
   // set data from
-  const { name, email, avatar } = data?.data || {};
+  const { name, email, avatar,updatedAt } = data?.data || {};
 
   useEffect(() => {
     if (!ProLoading) {
@@ -82,7 +82,7 @@ function ProfileChild() {
             <h1 className="text-2xl font-semibold">
               {isTab === "tab-1" ? "Admin profile" : "Change password"}
             </h1>
-            <h1 className="text-base">Last updated 6 days ago</h1>
+            <h1 className="text-base">Last Updated: {helpers.timeAgoDiff(updatedAt)}</h1>
           </div>
         </div>
       </ShadowBox>

@@ -43,7 +43,7 @@ export default function Privacy() {
       <ShadowBox>
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center">
           <div>
-            <h1 className="text-2xl font-semibold">Privacy policy</h1>
+            <h1 className="text-2xl font-semibold">Privacy Policy</h1>
           </div>
           <Button
             disabled={isLoading}
