@@ -120,9 +120,10 @@ export default function Podcasts() {
         mood: values.mood,
         location: values?.location,
         captions: values?.caption,
-        private_circle: values?.private_circle,
-        // privacy: values?.privacy,
-        privacy: "private_circle",
+        ...(values?.private_circle && {
+          private_circle: values?.private_circle,
+        }),
+        privacy: values?.privacy,
       };
       const res = await storePost(value).unwrap();
       if (res.success) {
@@ -154,7 +155,9 @@ export default function Podcasts() {
         location: isEditItem?.location,
       });
       // add user
-      setSelectedUsers(isEditItem?.private_circle || []);
+      if (isEditItem?.privacy == "private_circle") {
+        setSelectedUsers(isEditItem?.private_circle || []);
+      }
     }
   }, [isEditItem, fromUpdate]);
 
@@ -181,9 +184,10 @@ export default function Podcasts() {
       mood: values.mood,
       location: values?.location,
       captions: values?.caption,
-      private_circle: values?.private_circle,
-      privacy: "private_circle",
-      // privacy: values?.privacy,
+      ...(values?.privacy == "private_circle" && {
+        private_circle: values?.private_circle,
+      }),
+      privacy: values?.privacy,
     };
     const id = isEditItem._id;
     const res = await updatePost({ id, data: value }).unwrap();
@@ -468,15 +472,17 @@ export default function Podcasts() {
               iconStyle="mt-1"
             />
             <FromLocation label="Location" name="location" />
-            <InputWordSelectField
-              name="private_circle"
-              label="Guest Name"
-              placeholder="Add Guest names (Press Enter)"
-              matching={false}
-              className="w-full"
-              selectedUsers={selectedUsers}
-              setSelectedUsers={setSelectedUsers}
-            />
+            {from?.watch("privacy") == "private_circle" && (
+              <InputWordSelectField
+                name="private_circle"
+                label="Guest Name"
+                placeholder="Add Guest names (Press Enter)"
+                matching={false}
+                className="w-full"
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+              />
+            )}
             <FromTextArea
               label="Caption"
               name="caption"
@@ -488,6 +494,11 @@ export default function Podcasts() {
                   label: "Public",
                   value: "public",
                   icon: <FavIcon className="size-[18px]" name="internet" />,
+                },
+                {
+                  label: "Private Circle",
+                  value: "private_circle",
+                  icon: <FavIcon className="size-[18px]" name="pri_circle" />,
                 },
                 {
                   label: "Solo",
@@ -598,15 +609,18 @@ export default function Podcasts() {
               iconStyle="mt-1"
             />
             <FromLocation label="Location" name="location" />
-            <InputWordSelectField
-              name="private_circle"
-              label="Guest Name"
-              placeholder="Add guest names (press Enter)"
-              matching={false}
-              className="w-full"
-              selectedUsers={selectedUsers}
-              setSelectedUsers={setSelectedUsers}
-            />
+            {fromUpdate?.watch("privacy") == "private_circle" && (
+              <InputWordSelectField
+                name="private_circle"
+                label="Guest Name"
+                placeholder="Add guest names (press Enter)"
+                matching={false}
+                className="w-full"
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+              />
+            )}
+
             <FromTextArea
               label="Caption"
               name="caption"
@@ -618,6 +632,11 @@ export default function Podcasts() {
                   label: "Public",
                   value: "public",
                   icon: <FavIcon className="size-[18px]" name="internet" />,
+                },
+                {
+                  label: "Private Circle",
+                  value: "private_circle",
+                  icon: <FavIcon className="size-[18px]" name="pri_circle" />,
                 },
                 {
                   label: "Solo",
@@ -705,20 +724,23 @@ export default function Podcasts() {
             </div>
           ))}
           <p className="text-[#FFF]">{global?.isDetails?.captions || "N/A"}</p>
-          <ul>
-            <li className="font-semibold">Guests:</li>
-            <li className="mt-1">
-              <ul className="flex items-center flex-wrap gap-2">
-                {global?.isDetails?.private_circle?.map(
-                  (item: any, idx: any) => (
-                    <li key={idx} className="border w-fit px-3 rounded-full">
-                      {item.name}
-                    </li>
-                  )
-                )}
-              </ul>
-            </li>
-          </ul>
+          {global?.isDetails?.private_circle?.length > 0 && (
+            <ul>
+              <li className="font-semibold">Guests:</li>
+              <li className="mt-1">
+                <ul className="flex items-center flex-wrap gap-2">
+                  {global?.isDetails?.private_circle?.map(
+                    (item: any, idx: any) => (
+                      <li key={idx} className="border w-fit px-3 rounded-full">
+                        {item.name}
+                      </li>
+                    )
+                  )}
+                </ul>
+              </li>
+            </ul>
+          )}
+
           <div className="mt-4 flex justify-between items-center">
             <LikeToggle likes={global?.isDetails?.likes} />
             <div

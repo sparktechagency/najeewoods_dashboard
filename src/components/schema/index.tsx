@@ -1,4 +1,4 @@
-import {z } from "zod";
+import { z } from "zod";
 
 export const moodSchema = z.object({
   name: z.string().nonempty("Mood name is required"),
@@ -24,24 +24,52 @@ export const musicSchema = z.object({
     ),
 });
 // podcastSchema
-export const podcastSchema = z.object({
-  mood: z.string().nonempty("Vide is required"),
-  location: z.any().refine((obj) => obj && Object.keys(obj).length > 0, {
-    message: "Location is required",
-  }),
-  private_circle: z.array(z.any()).refine((v) => v.length >= 1, { message: "Guest is required" }),
-  caption: z.string().nonempty("Caption is required"),
-  privacy: z.string().nonempty("Visibility is required"),
-  podcast: z
-    .array(z.any())
-    .refine(
-      (files) =>
-        files.length >= 1 && files.every((file) => file instanceof File),
-      { message: "Music is required" }
-    ),
-});
+// export const podcastSchema = z.object({
+//   mood: z.string().nonempty("Vide is required"),
+//   location: z.any().refine((obj) => obj && Object.keys(obj).length > 0, {
+//     message: "Location is required",
+//   }),
+//   private_circle: z.array(z.any()).refine((v) => v.length >= 1, { message: "Guest is required" }),
+//   caption: z.string().nonempty("Caption is required"),
+//   privacy: z.string().nonempty("Visibility is required"),
+//   podcast: z
+//     .array(z.any())
+//     .refine(
+//       (files) =>
+//         files.length >= 1 && files.every((file) => file instanceof File),
+//       { message: "Music is required" }
+//     ),
+// });
 
-
+export const podcastSchema = z
+  .object({
+    mood: z.string().nonempty("Vibe is required"),
+    location: z.any().refine((obj) => obj && Object.keys(obj).length > 0, {
+      message: "Location is required",
+    }),
+    caption: z.string().nonempty("Caption is required"),
+    privacy: z.string().nonempty("Visibility is required"),
+    podcast: z
+      .array(z.any())
+      .refine(
+        (files) =>
+          files.length >= 1 && files.every((file) => file instanceof File),
+        { message: "Music file is required" }
+      ),
+    private_circle: z.array(z.any()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    // If privacy = private_circle, then guests must be selected
+    if (data.privacy === "private_circle") {
+      if (!data.private_circle || data.private_circle.length === 0) {
+        ctx.addIssue({
+          path: ["private_circle"],
+          message: "Private Circle is required",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    }
+  });
 
 export const passwordChangeSchema = z
   .object({
