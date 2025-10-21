@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import { Provider as ReduxProvider } from "react-redux";
 import { makeStore } from "@/redux/store";
 
+
+
 export default function Provider({ children }: childrenProps) {
   const store = makeStore();
   return (
