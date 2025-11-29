@@ -34,6 +34,8 @@ export default function VidePost() {
     },
   });
 
+  console.log(vibes);
+
   const handleDelete = async (id: string) => {
     const con = await confirm({
       title: "You are going to delete this vibe",
@@ -83,7 +85,7 @@ export default function VidePost() {
                 }}
               >
                 <ImgBox
-                  src={helpers.imgSource(item?.image[0])}
+                  src={helpers.imgSource(item?.image[0]?.url) || "/blur.png"}
                   alt="ff"
                   className="h-[200px] w-[200px]"
                 >
@@ -145,7 +147,7 @@ export default function VidePost() {
         }
       >
         <ImgBox
-          src={helpers.imgSource(isDetails?.image?.[0])}
+          src={helpers.imgSource(isDetails?.image?.[0]?.url) || "/blur.png"}
           className="w-full h-[300px]"
           alt="img"
         ></ImgBox>

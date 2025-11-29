@@ -43,7 +43,7 @@ export function InputWordSelectField({
 
   // 🧠 Sync selected user IDs into form field
   useEffect(() => {
-    const ids = selectedUsers.map((user:any) => user._id);
+    const ids = selectedUsers?.map((user:any) => user._id);
     setValue(name, ids);
   }, [selectedUsers, setValue, name]);
 
@@ -113,9 +113,9 @@ export function InputWordSelectField({
           )}
 
           {/* Selected Users */}
-          {selectedUsers.length > 0 && (
+          {selectedUsers?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {selectedUsers.map((user:any) => (
+              {selectedUsers?.map((user:any) => (
                 <div
                   key={user._id}
                   className="flex items-center gap-2 bg-[#3D3D3D] text-white px-3 py-1 rounded-full"

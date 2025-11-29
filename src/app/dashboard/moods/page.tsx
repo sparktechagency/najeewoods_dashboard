@@ -27,6 +27,7 @@ import FavIcon from "@/icon/favIcon";
 import { helpers } from "@/lib";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import FromColorPicker from "@/components/reuseble/from-color";
 
 const intImg = {
   ImgPreview: "",
@@ -53,6 +54,7 @@ export default function Moods() {
     defaultValues: {
       icon: null,
       name: "",
+      color: "#FF8787",
     },
   });
 
@@ -71,6 +73,7 @@ export default function Moods() {
     defaultValues: {
       icon: null,
       name: "",
+      color:""
     },
   });
 
@@ -78,6 +81,7 @@ export default function Moods() {
     if (isDetails) {
       Updatefrom.reset({
         name: isDetails.name,
+        color:isDetails.color
       });
     }
   }, [isDetails, Updatefrom]);
@@ -252,6 +256,7 @@ export default function Moods() {
               label="Mood name"
               placeholder="Enter Your Mood Name"
             />
+            <FromColorPicker label="Color" name="color" />
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => handleStoreReset()}
@@ -311,6 +316,7 @@ export default function Moods() {
             </ImgUpload>
 
             <FromInput name="name" label="Mood Name" />
+            <FromColorPicker label="Color" name="color" />
             <div className="grid grid-cols-2 gap-3">
               <Button
                 onClick={() => hanldeUpdateReset()}

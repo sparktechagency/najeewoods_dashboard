@@ -5,6 +5,7 @@ export const moodSchema = z.object({
   icon: z
     .any()
     .refine((file) => file instanceof File, { message: "Photo is required" }),
+  color: z.string().optional(),
 });
 
 // /musicSchema

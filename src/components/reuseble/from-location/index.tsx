@@ -66,8 +66,11 @@ export default function FromLocation({
   const handleSelectSuggestion = (suggestion: any) => {
     const locationData = {
       address: suggestion.formatted_address,
-      lat: suggestion.geometry.location.lat,
-      long: suggestion.geometry.location.lng,
+      coordinates: [
+        suggestion.geometry.location.lng,
+        suggestion.geometry.location.lat
+      ],
+      type: "Point",
     };
 
     // Set the location object directly in the form data

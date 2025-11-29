@@ -9,7 +9,7 @@ import { CustomTable } from "@/components/reuseble/table";
 import { TableNoItem } from "@/components/reuseble/table-no-item";
 import { TableSkeleton } from "@/components/reuseble/table-skeleton";
 import WapperBox from "@/components/reuseble/wapper-box";
-import { TableCell, TableRow } from "@/components/ui";
+import { Button, TableCell, TableRow } from "@/components/ui";
 import { ArrowUpRight } from "lucide-react";
 import React, { useState } from "react";
 import FavIcon from "@/icon/favIcon";
@@ -194,22 +194,23 @@ export default function Users() {
 // ======= DetailsNav ========
 function DetailsNav({ href, icon, text, value }: any) {
   const url = value > 0 ? href : "#";
+
   return (
     <div className="flex justify-between space-x-3 h-11">
-      <Link
-        href={url}
-        className="w-full  flex justify-between items-center border rounded-xl px-3"
-      >
+      <div className="w-full  flex justify-between items-center border rounded-xl px-3">
         <span className="flex gap-x-2 items-center">
           {icon} {text}:
         </span>
         <span>{value}</span>
-      </Link>
-      <Link
-        href={url}
-        className="h-11 w-12 bgOne rounded-xl grid place-items-center cursor-pointer"
-      >
-        <ArrowUpRight />
+      </div>
+
+      <Link href={url}>
+        <Button
+          disabled={value > 0 ? false : true}
+          className="h-11 w-12 disabled:opacity-70 disabled:cursor-default bgOne rounded-xl grid place-items-center cursor-pointer"
+        >
+          <ArrowUpRight className="size-[24px]" />
+        </Button>
       </Link>
     </div>
   );

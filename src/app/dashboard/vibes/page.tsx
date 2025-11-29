@@ -21,7 +21,7 @@ export default function Vibes() {
   const { data: vibes, isLoading } = useGetPostQuery({
     post_type: "vibes",
     page: isPage,
-    limit:16,
+    limit: 16,
   });
 
   return (
@@ -53,7 +53,7 @@ export default function Vibes() {
                 }}
               >
                 <ImgBox
-                  src={helpers.imgSource(item?.image?.[0]?.url) || ""}
+                  src={helpers.imgSource(item?.image?.[0]?.url) || "/blur.png"}
                   alt="img"
                   className="h-[190px] w-[200px] rounded-xl"
                 >
@@ -76,7 +76,7 @@ export default function Vibes() {
                         <h1 className="flex font-medium items-center">
                           {item?.user?.name || "N/A"}
                           <span className="ml-1">
-                            {userVisibiliy[item.privacy] || " public"}
+                            {userVisibiliy[item.privacy] || "public"}
                           </span>
                         </h1>
                         <h1 className="text-secondery-figma flex  items-center">
@@ -135,7 +135,9 @@ export default function Vibes() {
                   <picture>
                     <img
                       className="size-6 mt-[2px]"
-                      src={helpers.imgSource(isDetails?.mood?.icon)}
+                      src={
+                        helpers.imgSource(isDetails?.mood?.icon)
+                      }
                       alt="img"
                     />
                   </picture>
@@ -148,7 +150,7 @@ export default function Vibes() {
           }
         >
           <ImgBox
-            src={helpers.imgSource(isDetails?.image?.[0]?.url)}
+            src={helpers.imgSource(isDetails?.image?.[0]?.url) || "/blur.png"}
             className="w-full h-[300px]"
             alt="img"
           ></ImgBox>
