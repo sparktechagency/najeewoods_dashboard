@@ -3,6 +3,7 @@ import "@/app/style/globals.css";
 import { Metadata } from "next";
 import Provider from "@/components/provider";
 
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
