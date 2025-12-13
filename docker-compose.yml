@@ -1,0 +1,17 @@
+services:
+  najeewoods_dashboard:
+    build: .
+    image: arifbiswas/najeewoods_dashboard:latest
+    container_name: najeewoods_dashboard
+    ports:
+      - 5050:5050
+    env_file:
+      - .env
+
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    name: app-network
