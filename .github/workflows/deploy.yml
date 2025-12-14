@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: production
-  
+    env:
+     IMAGE_NAME: arifbiswas/najeewoods_dashboard
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -29,8 +30,10 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }} # Should be a classic access token
 
-      - name: Push Docker Image to Registry
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/$najeewoods_dashboard:latest
+      - name: Push Docker image
+        run: |
+             docker push $IMAGE_NAME:latest
+
 
       # --- REVISED DEPLOYMENT STEP ---
 
