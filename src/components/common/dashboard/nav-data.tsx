@@ -6,7 +6,7 @@ export const navItems = [
     href: "/dashboard",
   },
   { icon: "users", active_i: "users_i", text: "Users", href: "/dashboard/users" },
-  { icon: "moods", active_i: "moods_i", text: "Modds", href: "/dashboard/moods" },
+  { icon: "moods", active_i: "moods_i", text: "Moods", href: "/dashboard/moods" },
   { icon: "vides", active_i: "vides_i", text: "Vibes", href: "/dashboard/vibes" },
   { icon: "music", active_i: "music_i", text: "Music", href: "/dashboard/music" },
   {
@@ -24,7 +24,7 @@ export const navItems = [
   {
     icon: "settings",
     active_i: "settings_i",
-    text: "setting",
+    text: "Setting",
     submenu: [
       {
         icon: "about",
