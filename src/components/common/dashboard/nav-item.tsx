@@ -53,11 +53,11 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-md md:rounded-xl transition-colors duration-200`}
             >
               {isActive(href) ? (
-                <FavIcon name={active_i} />
+                <FavIcon  name={active_i} />
               ) : (
-                <FavIcon name={icon} />
+                <FavIcon  name={icon} />
               )}
-              <span className="block md:hidden">{text}</span>
+              <span className="block  md:hidden">{text}</span>
             </Link>
           ) : (
             <div
@@ -99,13 +99,13 @@ export default function NavItem({ items }: { items: NavItem[] }) {
               className="overflow-hidden transition-all space-y-1 pt-1 duration-300 ease-out max-h-0"
             >
               {submenu.map(({ href, icon, text, active_i }, subIndex) => (
-                <li key={subIndex}>
+                <li key={subIndex} className="ml-2 md:ml-0">
                   {href && (
                     <Link
                       href={href}
                       className={`${
                         isActive(href) ? "bgOne" : ""
-                      } w-full  md:w-12 h-12 flex items-center justify-start md:justify-center rounded-xl transition-colors duration-200`}
+                      } w-full   md:w-12 h-12 flex items-center justify-start md:justify-center rounded-xl transition-colors duration-200`}
                     >
                       {isActive(href) ? (
                         <FavIcon name={active_i} />
