@@ -34,7 +34,7 @@ jobs:
          IMAGE_NAME: arifbiswas/najeewoods_dashboard
         run: |
           docker buildx build \
-           --platform linux/amd64,linux/arm64 \
+           --platform linux/amd64 \
           -t $IMAGE_NAME:latest \
           --push .
 
