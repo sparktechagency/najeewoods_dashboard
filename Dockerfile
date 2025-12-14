@@ -18,9 +18,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set environment variable for build
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV PORT $PORT_Fronted 
+
 # The build command generates the standalone output in .next/standalone
 RUN npm run build
 
@@ -33,9 +31,7 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Set environment variable for production runtime
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+
 
 # Copy the standalone output and public files from the builder stage
 # The 'standalone' folder contains *all* necessary dependencies and server files
