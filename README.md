@@ -1,7 +1,4 @@
-# 🎨 najeewoods32  — Figma Template
-[View the design on Figma →](https://www.figma.com/design/vBbvFHMuIAgxYJKeg3stSt/Najewoods?node-id=127-3804&m=dev)
 
-## 🛠️ Technologies Used
 ## 🛠️ Technologies Used
 - **Next.js 15.3.8**: For server-side rendering, routing, and building SEO-friendly apps.
 - **Tailwind CSS**: Utility-first CSS framework for rapid UI styling.
@@ -35,4 +32,5 @@
 ├─ tsconfig.json
 └─ package.json
 ```
+
 
