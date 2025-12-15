@@ -50,8 +50,15 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /var/www/ 
-            ls
-            docker compose up -d
+            
+            # 1. শুধু নির্দিষ্ট সার্ভিসটির ইমেজ পুল করুন
+            # এখানে 'frontend' এর জায়গায় আপনার ডকার-কম্পোজ ফাইলের সঠিক সার্ভিস নামটি দিন।
+            docker compose pull najeewoods_dashboard 
+            
+            # 2. শুধু সেই সার্ভিসটি পুনরায় তৈরি করে শুরু করুন
+            docker compose up -d --force-recreate najeewoods_dashboard 
+            
+            docker image prune -f
         env:
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
