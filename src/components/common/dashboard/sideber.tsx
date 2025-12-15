@@ -7,12 +7,16 @@ import Navitem from "./nav-item";
 import { Button } from "@/components/ui";
 import { authKey, helpers } from "@/lib";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/redux/hooks";
+import { clearUser } from "@/redux/feature/authSlice";
 
 export default function Sideber({ sidebarOpen, setSidebarOpen }: any) {
   const router = useRouter();
+  const dispatch=useAppDispatch()
   
   const handlelogout = () => {
     helpers.removeAuthCookie(authKey);
+    dispatch(clearUser())
     router.push("/");
   };
 
