@@ -17,6 +17,9 @@ export async function middleware(request: NextRequest) {
   const decoded: any = token && jwtDecode(token as string);
   const roleKey = decoded?.user?.role as string;
 
+  
+
+
   if (!roleKey) {
     if (authRoutes.includes(pathname)) {
       return NextResponse.next();

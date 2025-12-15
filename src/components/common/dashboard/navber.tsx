@@ -1,15 +1,15 @@
 "use client";
-import { useGetProfileQuery } from "@/redux/api/authApi";
 import React, { useState, useRef, useEffect } from "react";
 import navbg from "@/assets/navber-bg.png";
 import { ImgBox } from "@/components/reuseble/img-box";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu } from "lucide-react";
-import { Button, Skeleton } from "@/components/ui";
-import { authKey, helpers } from "@/lib";
+import { Button} from "@/components/ui";
+import {helpers } from "@/lib";
 import Link from "next/link";
 import Image from "next/image";
 import FavIcon from "@/icon/favIcon";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -30,11 +30,9 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [dropdownOpen]);
 
-  const token = helpers.getAuthCookie(authKey);
-  const { data: profile } = useGetProfileQuery(
-    {},
-    { refetchOnFocus: true, skip: !token }
-  );
+ 
+  const {user}=useAppSelector(state=>state.auth)
+  
 
   return (
     <div>
@@ -72,18 +70,14 @@ export default function Navber({ sidebarOpen, setSidebarOpen }: any) {
                     <ImgBox
                       alt="profile"
                       className="size-12 rounded-full cursor-pointer"
-                      src={helpers.imgSource(profile?.data?.avatar) || "/blur.png"}
+                      src={helpers.imgSource(user?.avatar as any) || "/blur.png"}
                     />
                     <div className="text-start space-y-1 leading-5">
                       <h1 className="font-medium">
-                        {profile?.data?.name || (
-                          <Skeleton className="h-4 w-30" />
-                        )}
+                        {user?.name}
                       </h1>
                       <h1>
-                        {profile?.data?.email || (
-                          <Skeleton className="h-4 w-40" />
-                        )}
+                        {user?.email}
                       </h1>
                     </div>
                   </button>

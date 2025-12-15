@@ -3,14 +3,14 @@ import { childrenProps } from "@/types";
 import { ConfirmDialogProvider } from "../context/delete-modal";
 import { Toaster } from "sonner";
 import { Provider as ReduxProvider } from "react-redux";
-import { makeStore } from "@/redux/store";
-
-
+import { useEffect } from "react";
+import { initAuth } from "@/redux/feature/authSlice";
+import { store } from "@/redux/store";
 
 export default function Provider({ children }: childrenProps) {
-  const store = makeStore();
   return (
     <ReduxProvider store={store}>
+      <AuthInit />
       <ConfirmDialogProvider>
         {children}
         <Toaster
@@ -31,4 +31,15 @@ export default function Provider({ children }: childrenProps) {
       </ConfirmDialogProvider>
     </ReduxProvider>
   );
+}
+
+//  =========== profiel referch kora =========
+function AuthInit() {
+  const dispatch = store.dispatch;
+
+  useEffect(() => {
+    initAuth(dispatch, store.getState);
+  }, [dispatch]);
+
+  return null;
 }
