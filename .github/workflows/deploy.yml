@@ -33,10 +33,14 @@ jobs:
         env:
          IMAGE_NAME: arifbiswas/najeewoods_dashboard
         run: |
-          docker buildx build \
-           --platform linux/amd64 \
-          -t $IMAGE_NAME:latest \
-          --push .
+             docker buildx build \
+              --platform linux/amd64 \
+                --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
+             --build-arg NEXT_PUBLIC_IMG_URL=${{ secrets.NEXT_PUBLIC_IMG_URL }} \
+             --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{                     secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
+             --build-arg PORT=${{ secrets.PORT }} \
+             -t $IMAGE_NAME:latest \
+             --push .
 
 
 
