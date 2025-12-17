@@ -51,7 +51,6 @@ jobs:
           script: |
             cd /var/www/ 
             
-            # 1. শুধু নির্দিষ্ট সার্ভিসটির ইমেজ পুল করুন
             # এখানে 'frontend' এর জায়গায় আপনার ডকার-কম্পোজ ফাইলের সঠিক সার্ভিস নামটি দিন।
             docker compose pull najeewoods_dashboard 
             
