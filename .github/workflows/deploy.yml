@@ -14,12 +14,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # (Steps for Node setup, install, test, and build app remain the same)
-
-      - name: Build Docker Image
-        # Tag the image with the repository name and version/commit SHA
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/najeewoods_dashboard:latest .
       
       # --- NEW STEPS FOR DOCKER REGISTRY DEPLOYMENT ---
       
@@ -33,12 +27,12 @@ jobs:
         env:
          IMAGE_NAME: arifbiswas/najeewoods_dashboard
         run: |
-             docker buildx build \
-              --platform linux/amd64 \
-                --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
-             --build-arg NEXT_PUBLIC_IMG_URL=${{ secrets.NEXT_PUBLIC_IMG_URL }} \
-             --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{                     secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
-             --build-arg PORT=${{ secrets.PORT }} \
+         docker buildx build \
+           --platform linux/amd64 \
+          --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
+           --build-arg NEXT_PUBLIC_IMG_URL=${{ secrets.NEXT_PUBLIC_IMG_URL }} \
+            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
+            --build-arg PORT=${{ secrets.PORT }} \
              -t $IMAGE_NAME:latest \
              --push .
 
