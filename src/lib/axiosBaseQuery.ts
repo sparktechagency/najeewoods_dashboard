@@ -1,8 +1,9 @@
+import type { AxiosError, AxiosRequestConfig } from "axios";
+
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
-import type { AxiosRequestConfig, AxiosError } from "axios";
+import axios from "axios";
 import { authKey } from "./constants";
 import { helpers } from "./helpers";
-import axios from "axios";
 
 const axiosBaseQuery =
   (
@@ -30,6 +31,8 @@ const axiosBaseQuery =
     onUploadProgress,
   }) => {
     const token = helpers.getAuthCookie(authKey);
+
+    console.log(baseUrl + url);
     try {
       const result = await axios({
         url: baseUrl + url,
