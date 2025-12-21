@@ -5,7 +5,7 @@ import { loginSchema } from "@/components/schema";
 import { Button, Checkbox, Label } from "@/components/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldValues, useForm } from "react-hook-form";
-import { useLoginInMutation } from "@/redux/api/authApi";
+import { authApi, useLoginInMutation } from "@/redux/api/authApi";
 import { authKey, helpers, ResponseApiErrors } from "@/lib";
 import { redirect, useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
@@ -14,6 +14,8 @@ import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
 import React, { useEffect } from "react";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/feature/authSlice";
 
 export default function RootPage() {
   const router = useRouter();
@@ -21,7 +23,7 @@ export default function RootPage() {
   const token = helpers.getAuthCookie(authKey) || "";
   const decoded: any = token ? jwtDecode(token) : null;
   const isAdmin = decoded?.user?.role == "admin";
-
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (isAdmin) {
       return redirect("/dashboard");
@@ -41,6 +43,14 @@ export default function RootPage() {
       const res = await LoginIn(values).unwrap();
       if (res.success) {
         helpers.setAuthCookie(authKey, res?.data?.token);
+        dispatch(setUser({ token: res?.data?.token }));
+        if(helpers.getAuthCookie(authKey)){
+          dispatch(
+          authApi.endpoints.getProfile.initiate(undefined, {
+            forceRefetch: true,
+          })
+        );
+        }
         const decode = helpers.decodeToken(res?.data?.token || "");
         if (decode?.user?.role === "admin") {
           router.push("/dashboard");
