@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /var/www/ 
+            cd /var/www/najeewoods_dashboard
             
             # এখানে 'frontend' এর জায়গায় আপনার ডকার-কম্পোজ ফাইলের সঠিক সার্ভিস নামটি দিন।
             docker compose pull najeewoods_dashboard 

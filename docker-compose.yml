@@ -1,12 +1,12 @@
 services:
   najeewoods_dashboard:
-    build: ./vide-connect-dashboard
+    build: .
     image: arifbiswas/najeewoods_dashboard:latest
     container_name: najeewoods_dashboard
     ports:
       - 5050:5050
     env_file:
-      - ./vide-connect-dashboard/.env
+      - .env
       # - ./najeewoods_dashboard/.env
     environment:
       PORT: 5050
