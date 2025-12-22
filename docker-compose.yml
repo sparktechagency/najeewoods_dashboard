@@ -12,8 +12,7 @@ services:
       PORT: 5050
     networks:
       - app-network
-
-networks:
-  app-network:
-    driver: bridge
-    name: app-network
+# networks:
+#   app-network:
+#     driver: bridge
+#     name: app-network
