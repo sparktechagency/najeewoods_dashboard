@@ -1,8 +1,9 @@
+import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { authKey } from "./constants";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import dayjs from "dayjs";
+import { authKey } from "./constants";
+
 dayjs.extend(relativeTime);
 
 export class helpers {
@@ -95,8 +96,15 @@ export class helpers {
 
   // ========= imgSource =============
   static imgSource(href: string): string {
-    if (href?.startsWith("https://") || href?.startsWith("http://"))
+    if (!href) return "";
+
+    if (href.startsWith("http://") || href.startsWith("https://")) {
       return href;
-    return href ? `${process.env.NEXT_PUBLIC_IMG_URL}${href}` : "";
+    }
+
+    const base = process.env.NEXT_PUBLIC_IMG_URL!.replace(/\/+$/, "");
+    const path = href.replace(/^\/+/, "");
+
+    return `${base}/${path}`;
   }
 }
