@@ -30,7 +30,7 @@ export default function ForgotPassword() {
         toast.success("Successful", {
           description: "Password reset code sent to your email",
         });
-        router.push(`/auth/verify-otp?email=${values.email}`);
+        router.push(`/verify-otp?email=${values.email}`);
         from.reset();
       }
     } catch (err: any) {

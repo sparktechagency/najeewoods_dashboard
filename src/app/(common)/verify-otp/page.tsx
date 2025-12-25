@@ -71,7 +71,7 @@ function VarifyOTpChild() {
             description: "You can now set a new password",
             });
           setCode([]);
-          router.push(`/auth/new-password?email=${email}`);
+          router.push(`/new-password?email=${email}`);
         }
         // router.push("/new-password");
         setError("");

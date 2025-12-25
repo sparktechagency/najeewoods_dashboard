@@ -36,7 +36,7 @@ function NewPasswordChild() {
       toast.success("Password updated successfully", {
         description: "Please login with your new password.",
       });
-      router.push("/auth");
+      router.push("/");
       from.reset();
     }
   };
