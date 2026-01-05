@@ -9,6 +9,8 @@ const authRoutes = [
   "/reset-password",
   "/new-password",
   "/verify-otp",
+  "/privacy-policy",
+  "/support",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -47,5 +49,7 @@ export const config = {
     "/reset-password",
     "/new-password",
     "/verify-otp",
+    "/privacy-policy",
+    "/support",
   ],
 };
