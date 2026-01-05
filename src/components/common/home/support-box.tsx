@@ -37,8 +37,8 @@ export default function SupportBox() {
     } catch (err: any) {}
   };
   return (
-    <div className="w-11/12 lg:max-w-6xl rounded-md border p-2 lg:p-10 mx-auto">
-      <Form from={from} onSubmit={handleSubmit}>
+    <div className="w-11/12 lg:max-w-6xl rounded-md border p-5 lg:p-10 mx-auto">
+      <Form from={from} onSubmit={handleSubmit} className="pt-5 lg:pt-1">
         <div className="space-y-6">
           <FromInput
             name="name"
