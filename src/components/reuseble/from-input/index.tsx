@@ -32,7 +32,7 @@ export function FromInput({
   className,
   ...rest
 }: formInputProps) {
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(true);
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const { control } = useFormContext();
 
   const inputType = eye ? (isPasswordVisible ? "text" : "password") : type;

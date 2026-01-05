@@ -101,6 +101,7 @@ export default function RootPage() {
                   label="Password"
                   placeholder="Enter your password"
                   stylelabel="bg-input-bg"
+                  type="password"
                 />
                 <div className="flex items-center mt-3 justify-between text-sm">
                   <div className="flex items-center space-x-2">

@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { authKey } from "./lib";
 
 const authRoutes = [
-   "/",
+  "/",
   "/forgot-password",
   "/reset-password",
   "/new-password",
@@ -18,11 +18,15 @@ export async function middleware(request: NextRequest) {
   const decoded: any = token && jwtDecode(token as string);
   const roleKey = decoded?.user?.role as string;
 
-  if (!token) return NextResponse.next();
-  
-  const isAuthRoute = authRoutes.some(route =>
-    pathname === route
-  );
+  if (!token) {
+    if (pathname.startsWith("/dashboard")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    return NextResponse.next();
+  }
+
+  const isAuthRoute = authRoutes.some((route) => pathname === route);
 
   if (roleKey == "admin") {
     if (isAuthRoute) {
@@ -31,9 +35,8 @@ export async function middleware(request: NextRequest) {
     if (/^\/dashboard\/*/.test(pathname)) {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
-
 }
 
 export const config = {
