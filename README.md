@@ -8,29 +8,3 @@
 - **Security**: Updated to the latest versions, ensuring full stability and enhanced security.
 
 
-## 📂 Project Structure 
-```
-├─ app
-│  ├─ (common)
-│  ├─ dashboard
-│  ├─ style
-│  └─ layout.tsx
-├─ assets
-├─ components
-│  ├─ common
-│  ├─ context
-│  ├─ hooks
-│  ├─ provider
-│  ├─ reuseble
-│  ├─ schema
-│  └─ ui
-├─ icon
-├─ lib
-├─ types
-├─ .env
-├─ tailwind.config.js
-├─ tsconfig.json
-└─ package.json
-```
-
-
