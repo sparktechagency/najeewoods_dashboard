@@ -14,6 +14,7 @@ import {
   Type,
   UserCheck,
   UserX,
+  Users,
 } from "lucide-react";
 
 import ShadowBox from "@/components/common/shadow-box";
@@ -55,7 +56,7 @@ export default function ReportManagement() {
         data: { action: actionType },
       }).unwrap();
       setIsModalOpen(false);
-      // Add success toast/notification logic here if available
+
       if (res.success) {
         toast.success(res.message, {
           description: "Action successfully performed.",
@@ -63,10 +64,10 @@ export default function ReportManagement() {
       }
     } catch (error: any) {
       console.error("Action failed", error);
-      // Add error toast/notification logic here
       toast.error(error?.data?.message || "Action failed. Please try again.");
     }
   };
+
   return (
     <div>
       <ShadowBox>
@@ -127,7 +128,6 @@ export default function ReportManagement() {
                   <span className="text-red-500 font-bold">{item.count}</span>
                 </TableCell>
                 <TableCell>
-                  {/* "delete_post", "hide_post", "active_post" , "ban_user" , "active_user" ,pending */}
                   <span
                     className={`text-xs uppercase px-2 py-1 rounded-full border ${
                       item.status === "pending"
@@ -182,18 +182,18 @@ export default function ReportManagement() {
       >
         <div className="p-4 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* User Info Card */}
+            {/* User Info Card (Reported User) */}
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <UserCheck size={18} /> User Details
+                <UserCheck size={18} /> Reported User
               </h3>
               <div className="flex items-center gap-4">
                 <Image
                   src={helpers.imgSource(isDetails?.user_id?.avatar)}
                   alt={isDetails?.user_id?.name}
-                  width={100}
-                  height={100}
-                  className="w-30 h-30 rounded-sm"
+                  width={80}
+                  height={80}
+                  className="w-20 h-20 rounded-md object-cover"
                 />
                 <div className="space-y-1 text-sm">
                   <p>
@@ -205,12 +205,8 @@ export default function ReportManagement() {
                     {isDetails?.user_id?.email}
                   </p>
                   <p>
-                    <span className="text-gray-400">Gender:</span>{" "}
-                    {isDetails?.user_id?.gender}
-                  </p>
-                  <p>
                     <span className="text-gray-400">Role:</span>{" "}
-                    <span className="text-yellow-500 uppercase">
+                    <span className="text-yellow-500 uppercase font-bold">
                       {isDetails?.user_id?.role}
                     </span>
                   </p>
@@ -218,22 +214,24 @@ export default function ReportManagement() {
               </div>
             </div>
 
-            {/* Post Info Card */}
+            {/* Post Content Summary */}
             <div className="bg-white/5 p-4 rounded-xl border border-white/10">
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
                 <Type size={18} /> Post Content
               </h3>
-              <p className="text-sm italic mb-2">
-                {isDetails?.post_id?.captions}
+              <p className="text-sm italic mb-2 line-clamp-3">
+                {isDetails?.post_id?.captions || "No captions available."}
               </p>
               <div className="flex items-start gap-2 text-xs text-gray-400">
                 <MapPin size={14} className="mt-0.5" />
-                <span>{isDetails?.post_id?.location?.address}</span>
+                <span>
+                  {isDetails?.post_id?.location?.address || "Location N/A"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Appeal Message */}
+          {/* Appeal Message Section */}
           {isDetails?.appeal_message && (
             <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl">
               <h4 className="text-yellow-500 text-sm font-bold flex items-center gap-2 mb-1">
@@ -245,24 +243,66 @@ export default function ReportManagement() {
             </div>
           )}
 
-          {/* Report Descriptions */}
-          <div className="space-y-2">
-            <h4 className="font-semibold text-white">
-              Report Log ({isDetails?.count})
-            </h4>
-            <div className="max-h-60 overflow-y-auto bg-black/40 rounded-lg p-3 text-base space-y-2">
-              {isDetails?.description?.map((desc: string, i: number) => (
-                <p
-                  key={i}
-                  className="border-b  border-white/5 pb-1 last:border-0"
-                >
-                  • {desc}
-                </p>
-              ))}
+          {/* Logs & Reporters Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Report Descriptions Log */}
+            <div className="space-y-2">
+              <h4 className="font-semibold text-white flex items-center gap-2">
+                <AlertTriangle size={16} className="text-red-400" />
+                Report Log ({isDetails?.count})
+              </h4>
+              <div className="max-h-52 overflow-y-auto bg-black/40 rounded-lg p-3 text-sm space-y-2 border border-white/5">
+                {isDetails?.description?.map((desc: string, i: number) => (
+                  <p
+                    key={i}
+                    className="border-b border-white/5 pb-1 last:border-0 text-gray-300"
+                  >
+                    • {desc}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Reporter Users List */}
+            <div className="space-y-2">
+              <h4 className="font-semibold text-white flex items-center gap-2">
+                <Users size={16} className="text-blue-400" />
+                Reported By ({isDetails?.report_users?.length || 0})
+              </h4>
+              <div className="max-h-52 overflow-y-auto bg-black/40 rounded-lg p-3 space-y-3 border border-white/5">
+                {isDetails?.report_users?.length > 0 ? (
+                  isDetails?.report_users?.map((reporter: any) => (
+                    <div
+                      key={reporter._id}
+                      className="flex items-center gap-3 border-b border-white/5 pb-2 last:border-0"
+                    >
+                      <Image
+                        src={helpers.imgSource(reporter.avatar)}
+                        alt={reporter.name}
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 rounded-full border border-white/20"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-gray-200">
+                          {reporter.name}
+                        </span>
+                        <span className="text-[10px] text-gray-500">
+                          {reporter.email}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-500 italic">
+                    No reporter data found.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Action Grid */}
+          {/* Administrative Controls */}
           <div className="pt-4 border-t border-white/10">
             <h4 className="text-lg font-medium mb-4 text-center">
               Administrative Controls
